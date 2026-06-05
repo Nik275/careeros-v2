@@ -1,0 +1,1240 @@
+
+> careeros-v2@0.1.0 test
+> vitest run recommendation-orchestrator.test.ts --run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/reliability/recommendation-orchestrator.test.ts [2m([22m[2m117 tests[22m[2m | [22m[31m115 failed[39m[2m)[22m[32m 46[2mms[22m[39m
+[31m     [31m×[31m should classify STRONG_RECOMMEND for high consistency and confidence[39m[32m 6[2mms[22m[39m
+[31m     [31m×[31m should classify HIGH_CONFIDENCE_MATCH for good confidence without full longitudinal support[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should classify PARENTAL_PRESSURE_WARNING when external pressure detected[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should classify PRESTIGE_TRAP_WARNING for prestige-motivated inconsistent interest[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify MONEY_MOTIVATED_MISMATCH for money-primary motivation with contradictions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify BURNOUT_RISK when burnout indicators present[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify IDENTITY_CRISIS for low identity clarity and emotional instability[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify HIGH_REGRET_RISK for high regret probability[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify EMERGING_MATCH for positive momentum[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify NEEDS_MORE_DATA for insufficient sessions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify HOLD_AND_OBSERVE for high volatility[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify PSYCHOLOGICAL_BLOCKER for low readiness despite good match[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify SKILL_GAP when interest exists but low confidence[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify IDENTITY_EXPLORATION for active identity development[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify EMOTIONAL_INSTABILITY for volatile emotional states[39m[32m 0[2mms[22m[39m
+     [32m✓[39m should include reasoning in classification result[32m 0[2mms[22m[39m
+[31m     [31m×[31m should create initial tracker for new career[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should update tracker with session data[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should detect RISING state for improving confidence trend[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should detect LOCKED state for high confidence stable careers[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect VOLATILE state for fluctuating scores[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should prevent switching from LOCKED recommendations without exceptional evidence[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should allow switching when evidence thresholds are met[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should track recommendation persistence[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should calculate contradiction resistance[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate stability report[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate whyThisCareer explanation[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate whyNotThisCareer explanation[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate current risks assessment[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should identify burnout risk in current risks[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate long-term outlook[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate confidence explanation[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate next actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate evidence summary[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate nuanced reasoning[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate alternative perspectives[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should adapt guidance for STRONG_RECOMMEND state[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should adapt guidance for BURNOUT_RISK state[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include tradeoff analysis in guidance[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate identity evolution narrative[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should generate stable traits narrative[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate emotional trends analysis[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should identify contradiction patterns[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should analyze motivation shifts[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should track confidence trajectory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should identify long-term themes[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate comprehensive summary[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate key insights[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should identify growth areas[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle empty profile gracefully[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect intrinsic motivation patterns[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect extrinsic motivation patterns[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate 30-day plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate 90-day plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate 1-year plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include exploration actions in 30-day plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include networking actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include reflection actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include skill building actions in 90-day plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include experience actions in 90-day plan[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include decision checkpoints[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should adapt plan for STRONG_RECOMMEND state[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should adapt plan for BURNOUT_RISK state[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include adaptation factors[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should assign priorities to actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include estimated hours for actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include checkpoints for actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include resources for actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate conservative plan for low emotional stability[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should not trigger intervention for safe recommendation[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect parental pressure[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect prestige trap[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect money-motivated mismatch[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect burnout risk[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect emotional instability[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect identity confusion[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect impulsive switching[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should assign CRITICAL severity for multiple serious issues[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate intervention message[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate alternative guidance[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate required actions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate override conditions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include evidence in detected issues[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate complete recommendation profile[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should include recommendation states in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include confidence scores in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include mentor guidance in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include risk assessments in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include student narrative in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include action plans in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include evolution states in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include tradeoff reasoning in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include future outlook in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include decision confidence in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include explainability in profile[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should rank recommendations by score[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include rank change information[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include tier information[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include momentum information[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include explanation for each recommendation[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should track intervention flags[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate timestamp[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should track session count[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should maintain recommendation stability over multiple calls[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect and intervene on dangerous patterns[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should generate consistent narratives across calls[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle empty career list gracefully[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle single career[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should generate different roadmaps for different states[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle missing profile gracefully[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle careers with no history[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle very high session counts[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle profiles with many contradictions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle profiles with no stable traits[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle extreme emotional states[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should complete orchestration within reasonable time[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle many careers efficiently[39m[32m 1[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 115 [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify STRONG_RECOMMEND for high consistency and confidence
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'STRONG_RECOMMEND')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m235:51[22m[39m
+    [90m233|[39m     )[33m;[39m
+    [90m234|[39m
+    [90m235|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mSTRONG_RECOMMEND[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m236|[39m     [34mexpect[39m(result[33m.[39mconfidence)[33m.[39m[34mtoBeGreaterThan[39m([34m0.8[39m)[33m;[39m
+    [90m237|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify HIGH_CONFIDENCE_MATCH for good confidence without full longitudinal support
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'HIGH_CONFIDENCE_MATCH')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m250:51[22m[39m
+    [90m248|[39m     )[33m;[39m
+    [90m249|[39m
+    [90m250|[39m     expect(result.state).toBe(RecommendationState.HIGH_CONFIDENCE_MATC…
+    [90m   |[39m                                                   [31m^[39m
+    [90m251|[39m   })[33m;[39m
+    [90m252|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify PARENTAL_PRESSURE_WARNING when external pressure detected
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'PARENTAL_PRESSURE_WARNING')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m270:51[22m[39m
+    [90m268|[39m     )[33m;[39m
+    [90m269|[39m
+    [90m270|[39m     expect(result.state).toBe(RecommendationState.PARENTAL_PRESSURE_WA…
+    [90m   |[39m                                                   [31m^[39m
+    [90m271|[39m   })[33m;[39m
+    [90m272|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify PRESTIGE_TRAP_WARNING for prestige-motivated inconsistent interest
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'PRESTIGE_TRAP_WARNING')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m290:51[22m[39m
+    [90m288|[39m     )[33m;[39m
+    [90m289|[39m
+    [90m290|[39m     expect(result.state).toBe(RecommendationState.PRESTIGE_TRAP_WARNIN…
+    [90m   |[39m                                                   [31m^[39m
+    [90m291|[39m   })[33m;[39m
+    [90m292|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify MONEY_MOTIVATED_MISMATCH for money-primary motivation with contradictions
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MONEY_MOTIVATED_MISMATCH')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m313:51[22m[39m
+    [90m311|[39m     )[33m;[39m
+    [90m312|[39m
+    [90m313|[39m     expect(result.state).toBe(RecommendationState.MONEY_MOTIVATED_MISM…
+    [90m   |[39m                                                   [31m^[39m
+    [90m314|[39m   })[33m;[39m
+    [90m315|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify BURNOUT_RISK when burnout indicators present
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'BURNOUT_RISK')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m333:51[22m[39m
+    [90m331|[39m     )[33m;[39m
+    [90m332|[39m
+    [90m333|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mBURNOUT_RISK[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m334|[39m   })[33m;[39m
+    [90m335|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify IDENTITY_CRISIS for low identity clarity and emotional instability
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'IDENTITY_CRISIS')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m356:51[22m[39m
+    [90m354|[39m     )[33m;[39m
+    [90m355|[39m
+    [90m356|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mIDENTITY_CRISIS[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m357|[39m   })[33m;[39m
+    [90m358|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify HIGH_REGRET_RISK for high regret probability
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'HIGH_REGRET_RISK')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m370:51[22m[39m
+    [90m368|[39m     )[33m;[39m
+    [90m369|[39m
+    [90m370|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mHIGH_REGRET_RISK[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m371|[39m   })[33m;[39m
+    [90m372|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify EMERGING_MATCH for positive momentum
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'EMERGING_MATCH')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m391:51[22m[39m
+    [90m389|[39m     )[33m;[39m
+    [90m390|[39m
+    [90m391|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mEMERGING_MATCH[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m392|[39m   })[33m;[39m
+    [90m393|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify NEEDS_MORE_DATA for insufficient sessions
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'NEEDS_MORE_DATA')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m407:51[22m[39m
+    [90m405|[39m     )[33m;[39m
+    [90m406|[39m
+    [90m407|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mNEEDS_MORE_DATA[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m408|[39m   })[33m;[39m
+    [90m409|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify HOLD_AND_OBSERVE for high volatility
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'HOLD_AND_OBSERVE')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m428:51[22m[39m
+    [90m426|[39m     )[33m;[39m
+    [90m427|[39m
+    [90m428|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mHOLD_AND_OBSERVE[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m429|[39m   })[33m;[39m
+    [90m430|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify PSYCHOLOGICAL_BLOCKER for low readiness despite good match
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'PSYCHOLOGICAL_BLOCKER')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m450:51[22m[39m
+    [90m448|[39m     )[33m;[39m
+    [90m449|[39m
+    [90m450|[39m     expect(result.state).toBe(RecommendationState.PSYCHOLOGICAL_BLOCKE…
+    [90m   |[39m                                                   [31m^[39m
+    [90m451|[39m   })[33m;[39m
+    [90m452|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify SKILL_GAP when interest exists but low confidence
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'SKILL_GAP')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m473:51[22m[39m
+    [90m471|[39m     )[33m;[39m
+    [90m472|[39m
+    [90m473|[39m     [34mexpect[39m(result[33m.[39mstate)[33m.[39m[34mtoBe[39m([33mRecommendationState[39m[33m.[39m[33mSKILL_GAP[39m)[33m;[39m
+    [90m   |[39m                                                   [31m^[39m
+    [90m474|[39m   })[33m;[39m
+    [90m475|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify IDENTITY_EXPLORATION for active identity development
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'IDENTITY_EXPLORATION')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m492:51[22m[39m
+    [90m490|[39m     )[33m;[39m
+    [90m491|[39m
+    [90m492|[39m     expect(result.state).toBe(RecommendationState.IDENTITY_EXPLORATION…
+    [90m   |[39m                                                   [31m^[39m
+    [90m493|[39m   })[33m;[39m
+    [90m494|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation State Classification[2m > [22mshould classify EMOTIONAL_INSTABILITY for volatile emotional states
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'EMOTIONAL_INSTABILITY')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m512:51[22m[39m
+    [90m510|[39m     )[33m;[39m
+    [90m511|[39m
+    [90m512|[39m     expect(result.state).toBe(RecommendationState.EMOTIONAL_INSTABILIT…
+    [90m   |[39m                                                   [31m^[39m
+    [90m513|[39m   })[33m;[39m
+    [90m514|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould create initial tracker for new career
+[31m[1mAssertionError[22m: expected undefined to be +0 // Object.is equality[39m
+
+[32m- Expected:[39m
+0
+
+[31m+ Received:[39m
+undefined
+
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m552:39[22m[39m
+    [90m550|[39m     [34mexpect[39m(tracker[33m.[39mcareerId)[33m.[39m[34mtoBe[39m([32m'software-engineering'[39m)[33m;[39m
+    [90m551|[39m     expect(tracker.currentState).toBe(RecommendationEvolutionState.EME…
+    [90m552|[39m     [34mexpect[39m(tracker[33m.[39mrecommendationAge)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                       [31m^[39m
+    [90m553|[39m   })[33m;[39m
+    [90m554|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould update tracker with session data
+[31m[1mAssertionError[22m: expected undefined to be 1 // Object.is equality[39m
+
+[32m- Expected:[39m
+1
+
+[31m+ Received:[39m
+undefined
+
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m568:39[22m[39m
+    [90m566|[39m     )[33m;[39m
+    [90m567|[39m
+    [90m568|[39m     [34mexpect[39m(tracker[33m.[39mrecommendationAge)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   |[39m                                       [31m^[39m
+    [90m569|[39m     [34mexpect[39m(tracker[33m.[39mmomentumHistory[33m.[39mlength)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m570|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould detect RISING state for improving confidence trend
+[31m[1mTypeError[22m: actual value must be number or bigint, received "undefined"[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m592:37[22m[39m
+    [90m590|[39m     }
+    [90m591|[39m
+    [90m592|[39m     [34mexpect[39m(tracker[33m.[39mconfidenceTrend)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m593|[39m   })[33m;[39m
+    [90m594|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould detect VOLATILE state for fluctuating scores
+[31m[1mAssertionError[22m: expected undefined to be 'volatile' // Object.is equality[39m
+
+[32m- Expected:[39m
+"volatile"
+
+[31m+ Received:[39m
+undefined
+
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m637:34[22m[39m
+    [90m635|[39m     )[33m;[39m
+    [90m636|[39m
+    [90m637|[39m     expect(tracker.currentState).toBe(RecommendationEvolutionState.VOL…
+    [90m   |[39m                                  [31m^[39m
+    [90m638|[39m   })[33m;[39m
+    [90m639|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould prevent switching from LOCKED recommendations without exceptional evidence
+[31m[1mTypeError[22m: engine.canSwitchRecommendation is not a function[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m647:30[22m[39m
+    [90m645|[39m     tracker[33m.[39mevidenceAccumulation [33m=[39m [34m0.9[39m[33m;[39m
+    [90m646|[39m
+    [90m647|[39m     [35mconst[39m canSwitch [33m=[39m engine[33m.[39m[34mcanSwitchRecommendation[39m(
+    [90m   |[39m                              [31m^[39m
+    [90m648|[39m       [32m'software-engineering'[39m[33m,[39m
+    [90m649|[39m       [32m'data-science'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould allow switching when evidence thresholds are met
+[31m[1mTypeError[22m: engine.canSwitchRecommendation is not a function[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m673:30[22m[39m
+    [90m671|[39m     tracker[33m.[39mcurrentState [33m=[39m [33mRecommendationEvolutionState[39m[33m.[39m[33mRISING[39m[33m;[39m
+    [90m672|[39m
+    [90m673|[39m     [35mconst[39m canSwitch [33m=[39m engine[33m.[39m[34mcanSwitchRecommendation[39m(
+    [90m   |[39m                              [31m^[39m
+    [90m674|[39m       [32m'software-engineering'[39m[33m,[39m
+    [90m675|[39m       [32m'data-science'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould track recommendation persistence
+[31m[1mTypeError[22m: actual value must be number or bigint, received "undefined"[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m699:47[22m[39m
+    [90m697|[39m     )[33m;[39m
+    [90m698|[39m
+    [90m699|[39m     expect(tracker.recommendationPersistence).toBeGreaterThanOrEqual(0…
+    [90m   |[39m                                               [31m^[39m
+    [90m700|[39m   })[33m;[39m
+    [90m701|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould calculate contradiction resistance
+[31m[1mTypeError[22m: actual value must be number or bigint, received "undefined"[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m716:45[22m[39m
+    [90m714|[39m     )[33m;[39m
+    [90m715|[39m
+    [90m716|[39m     [34mexpect[39m(tracker[33m.[39mcontradictionResistance)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                             [31m^[39m
+    [90m717|[39m   })[33m;[39m
+    [90m718|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mRecommendation Momentum Engine[2m > [22mshould generate stability report
+[31m[1mTypeError[22m: engine.getStabilityReport is not a function[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m723:27[22m[39m
+    [90m721|[39m     engine.updateTracker('data-science', profile, decisionResult, crea…
+    [90m722|[39m
+    [90m723|[39m     [35mconst[39m report [33m=[39m engine[33m.[39m[34mgetStabilityReport[39m()[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m724|[39m
+    [90m725|[39m     [34mexpect[39m(report[33m.[39msize)[33m.[39m[34mtoBe[39m([34m2[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate whyThisCareer explanation
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate whyNotThisCareer explanation
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate current risks assessment
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould identify burnout risk in current risks
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate long-term outlook
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate confidence explanation
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate next actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate evidence summary
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate nuanced reasoning
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould generate alternative perspectives
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould adapt guidance for STRONG_RECOMMEND state
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould adapt guidance for BURNOUT_RISK state
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMentor Guidance Generation[2m > [22mshould include tradeoff analysis in guidance
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'HIGH_CONFIDENCE_MATCH')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m748:34[22m[39m
+    [90m746|[39m     [90m// Create a valid state classification[39m
+    [90m747|[39m     state [33m=[39m {
+    [90m748|[39m       state[33m:[39m [33mRecommendationState[39m[33m.[39m[33mHIGH_CONFIDENCE_MATCH[39m[33m,[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m749|[39m       confidence[33m:[39m [34m0.75[39m[33m,[39m
+    [90m750|[39m       reasoning: ['Good longitudinal consistency', 'Strong confidence'…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould generate identity evolution narrative
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1024:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould generate stable traits narrative
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1032:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould generate emotional trends analysis
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1046:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould identify contradiction patterns
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1062:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould analyze motivation shifts
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1076:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould track confidence trajectory
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1084:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould identify long-term themes
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1099:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould generate comprehensive summary
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1107:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould generate key insights
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1114:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould identify growth areas
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1124:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould handle empty profile gracefully
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1143:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould detect intrinsic motivation patterns
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1157:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mStudent Narrative Generation[2m > [22mshould detect extrinsic motivation patterns
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'slice')[39m
+[36m [2m❯[22m generateLongTermThemes lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2500:47[22m[39m
+    [90m2498|[39m
+    [90m2499|[39m   // Add insights
+    [90m2500|[39m   themes.push(...profile.insights.keyInsights.slice(0, 3));
+    [90m   |[39m                                               [31m^[39m
+    [90m2501|[39m
+    [90m2502|[39m   // Add emerging patterns
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2317:21[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1169:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould generate 30-day plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould generate 90-day plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould generate 1-year plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include exploration actions in 30-day plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include networking actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include reflection actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include skill building actions in 90-day plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include experience actions in 90-day plan
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include decision checkpoints
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould adapt plan for STRONG_RECOMMEND state
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould adapt plan for BURNOUT_RISK state
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include adaptation factors
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould assign priorities to actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include estimated hours for actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include checkpoints for actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould include resources for actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mAction Roadmap Generation[2m > [22mshould generate conservative plan for low emotional stability
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'RECOMMEND_WITH_EXPLORATION')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1188:34[22m[39m
+    [90m1186|[39m     decisionResult [33m=[39m [34mcreateMockDecisionResult[39m()[33m;[39m
+    [90m1187|[39m     state [33m=[39m {
+    [90m1188|[39m       state[33m:[39m [33mRecommendationState[39m[33m.[39m[33mRECOMMEND_WITH_EXPLORATION[39m[33m,[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m1189|[39m       confidence[33m:[39m [34m0.7[39m[33m,[39m
+    [90m1190|[39m       reasoning[33m:[39m [[32m'Emerging match'[39m][33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould not trigger intervention for safe recommendation
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect parental pressure
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect prestige trap
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect money-motivated mismatch
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect burnout risk
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect emotional instability
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect identity confusion
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould detect impulsive switching
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould assign CRITICAL severity for multiple serious issues
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould generate intervention message
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould generate alternative guidance
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould generate required actions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould generate override conditions
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mDangerous Decision Intervention[2m > [22mshould include evidence in detected issues
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'HIGH_CONFIDENCE_MATCH')[39m
+[36m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1380:34[22m[39m
+    [90m1378|[39m     decisionResult [33m=[39m [34mcreateMockDecisionResult[39m()[33m;[39m
+    [90m1379|[39m     state [33m=[39m {
+    [90m1380|[39m       state[33m:[39m [33mRecommendationState[39m[33m.[39m[33mHIGH_CONFIDENCE_MATCH[39m[33m,[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m1381|[39m       confidence[33m:[39m [34m0.75[39m[33m,[39m
+    [90m1382|[39m       reasoning[33m:[39m [[32m'Good match'[39m][33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould generate complete recommendation profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1681:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include recommendation states in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1694:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include confidence scores in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1705:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[43/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include mentor guidance in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1716:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[44/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include risk assessments in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1727:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[45/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include student narrative in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1738:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[46/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include action plans in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1749:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[47/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include evolution states in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1760:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[48/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include tradeoff reasoning in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1771:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[49/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include future outlook in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1782:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[50/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include decision confidence in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1794:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[51/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include explainability in profile
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1806:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[52/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould rank recommendations by score
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1821:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[53/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include rank change information
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1832:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[54/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include tier information
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1844:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[55/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include momentum information
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1856:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[56/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould include explanation for each recommendation
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1868:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[57/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould track intervention flags
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1880:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[58/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould generate timestamp
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1894:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[59/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mMain Orchestration[2m > [22mshould track session count
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1905:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[60/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould maintain recommendation stability over multiple calls
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1927:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[61/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould detect and intervene on dangerous patterns
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'isTemporaryCrisis')[39m
+[36m [2m❯[22m assessCareerReadiness lib/intelligence/reliability/decision-intelligence.ts:[2m1359:41[22m[39m
+    [90m1357|[39m
+    [90m1358|[39m   [90m// Check for crisis[39m
+    [90m1359|[39m   [35mif[39m (insights[33m.[39midentityChangeAssessment[33m.[39misTemporaryCrisis) {
+    [90m   |[39m                                         [31m^[39m
+    [90m1360|[39m     [35mreturn[39m {
+    [90m1361|[39m       readiness[33m:[39m [32m'temporary_crisis'[39m[33m,[39m
+[90m [2m❯[22m makeCareerDecision lib/intelligence/reliability/decision-intelligence.ts:[2m2150:21[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1750:20[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1967:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[62/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould generate consistent narratives across calls
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1978:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[63/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould handle empty career list gracefully
+[31m[1mTypeError[22m: traits.map is not a function[39m
+[36m [2m❯[22m generateStableTraitsNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2350:36[22m[39m
+    [90m2348|[39m   }
+    [90m2349|[39m
+    [90m2350|[39m   const traitDescriptions = traits.map(trait => {
+    [90m   |[39m                                    [31m^[39m
+    [90m2351|[39m     const capitalized = trait.charAt(0).toUpperCase() + trait.slice(1);
+    [90m2352|[39m     return capitalized;
+[90m [2m❯[22m generateStudentNarrative lib/intelligence/reliability/recommendation-orchestrator.ts:[2m2312:28[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1836:28[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m1996:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[64/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould handle single career
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2007:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[65/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mIntegration Tests[2m > [22mshould generate different roadmaps for different states
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2018:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[66/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle missing profile gracefully
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2041:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[67/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle careers with no history
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2052:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[68/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle very high session counts
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'isTemporaryCrisis')[39m
+[36m [2m❯[22m assessCareerReadiness lib/intelligence/reliability/decision-intelligence.ts:[2m1359:41[22m[39m
+    [90m1357|[39m
+    [90m1358|[39m   [90m// Check for crisis[39m
+    [90m1359|[39m   [35mif[39m (insights[33m.[39midentityChangeAssessment[33m.[39misTemporaryCrisis) {
+    [90m   |[39m                                         [31m^[39m
+    [90m1360|[39m     [35mreturn[39m {
+    [90m1361|[39m       readiness[33m:[39m [32m'temporary_crisis'[39m[33m,[39m
+[90m [2m❯[22m makeCareerDecision lib/intelligence/reliability/decision-intelligence.ts:[2m2150:21[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1750:20[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2068:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[69/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle profiles with many contradictions
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'isTemporaryCrisis')[39m
+[36m [2m❯[22m assessCareerReadiness lib/intelligence/reliability/decision-intelligence.ts:[2m1359:41[22m[39m
+    [90m1357|[39m
+    [90m1358|[39m   [90m// Check for crisis[39m
+    [90m1359|[39m   [35mif[39m (insights[33m.[39midentityChangeAssessment[33m.[39misTemporaryCrisis) {
+    [90m   |[39m                                         [31m^[39m
+    [90m1360|[39m     [35mreturn[39m {
+    [90m1361|[39m       readiness[33m:[39m [32m'temporary_crisis'[39m[33m,[39m
+[90m [2m❯[22m makeCareerDecision lib/intelligence/reliability/decision-intelligence.ts:[2m2150:21[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1750:20[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2096:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[70/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle profiles with no stable traits
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'isTemporaryCrisis')[39m
+[36m [2m❯[22m assessCareerReadiness lib/intelligence/reliability/decision-intelligence.ts:[2m1359:41[22m[39m
+    [90m1357|[39m
+    [90m1358|[39m   [90m// Check for crisis[39m
+    [90m1359|[39m   [35mif[39m (insights[33m.[39midentityChangeAssessment[33m.[39misTemporaryCrisis) {
+    [90m   |[39m                                         [31m^[39m
+    [90m1360|[39m     [35mreturn[39m {
+    [90m1361|[39m       readiness[33m:[39m [32m'temporary_crisis'[39m[33m,[39m
+[90m [2m❯[22m makeCareerDecision lib/intelligence/reliability/decision-intelligence.ts:[2m2150:21[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1750:20[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2112:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[71/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mEdge Cases[2m > [22mshould handle extreme emotional states
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'isTemporaryCrisis')[39m
+[36m [2m❯[22m assessCareerReadiness lib/intelligence/reliability/decision-intelligence.ts:[2m1359:41[22m[39m
+    [90m1357|[39m
+    [90m1358|[39m   [90m// Check for crisis[39m
+    [90m1359|[39m   [35mif[39m (insights[33m.[39midentityChangeAssessment[33m.[39misTemporaryCrisis) {
+    [90m   |[39m                                         [31m^[39m
+    [90m1360|[39m     [35mreturn[39m {
+    [90m1361|[39m       readiness[33m:[39m [32m'temporary_crisis'[39m[33m,[39m
+[90m [2m❯[22m makeCareerDecision lib/intelligence/reliability/decision-intelligence.ts:[2m2150:21[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1750:20[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2138:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[72/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mPerformance[2m > [22mshould complete orchestration within reasonable time
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2157:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[73/115]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/reliability/recommendation-orchestrator.test.ts[2m > [22mPerformance[2m > [22mshould handle many careers efficiently
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'get')[39m
+[36m [2m❯[22m calculatePsychologicalReadiness lib/intelligence/reliability/recommendation-orchestrator.ts:[2m596:46[22m[39m
+    [90m594|[39m   const identityClarity = profile.stableTraits.length > 0 ? 0.7 : 0.4;
+    [90m595|[39m   const memory = profile.recommendationMemory;
+    [90m596|[39m   const careerMemory = memory.careerSpecific.get(careerId);
+    [90m   |[39m                                              [31m^[39m
+    [90m597|[39m   const decisionConfidence = careerMemory?.decisionConfidence || 0.5;
+    [90m598|[39m   const contradictions = profile.contradictionSignals;
+[90m [2m❯[22m calculateClassificationFactors lib/intelligence/reliability/recommendation-orchestrator.ts:[2m222:29[22m[39m
+[90m [2m❯[22m classifyRecommendationState lib/intelligence/reliability/recommendation-orchestrator.ts:[2m196:19[22m[39m
+[90m [2m❯[22m orchestrateRecommendations lib/intelligence/reliability/recommendation-orchestrator.ts:[2m1761:19[22m[39m
+[90m [2m❯[22m lib/intelligence/reliability/recommendation-orchestrator.test.ts:[2m2175:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[74/115]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m115 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (117)[39m
+[2m   Start at [22m 09:40:21
+[2m   Duration [22m 1.55s[2m (transform 187ms, setup 0ms, import 231ms, tests 46ms, environment 827ms)[22m
+

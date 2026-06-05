@@ -1,0 +1,487 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
+
+enum EducationLevel {
+  HIGH_SCHOOL
+  UNDERGRADUATE
+  POSTGRADUATE
+  OTHER
+}
+
+enum AssessmentStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum QuestionType {
+  SINGLE_SELECT
+  MULTI_SELECT
+  SCALE
+  TEXT
+  SLIDER
+}
+
+enum CareerCategory {
+  TECHNOLOGY
+  BUSINESS
+  DESIGN
+  HEALTHCARE
+  SCIENCE
+  EDUCATION
+  LAW
+  FINANCE
+  CREATIVE
+  ENTREPRENEURSHIP
+  OTHER
+}
+
+enum MemoryImportance {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+//////////////////////////////////////////////////////
+// USER
+//////////////////////////////////////////////////////
+
+model User {
+  id                    String   @id @default(cuid())
+  clerkUserId           String?  @unique
+  email                 String   @unique
+  name                  String?
+  avatarUrl             String?
+
+  dateOfBirth           DateTime?
+  country               String?
+  grade                 String?
+
+  educationLevel        EducationLevel?
+  onboardingCompleted   Boolean  @default(false)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  assessmentSessions    AssessmentSession[]
+  psychologicalProfiles PsychologicalProfile[]
+  careerMatches         CareerMatch[]
+  
+  // Mentor Memory System V1
+  mentorMemory          MentorMemoryCore?
+  decisionHistory       DecisionHistory[]
+  growthSnapshots       GrowthSnapshot[]
+  emotionalPattern      EmotionalPatternProfile?
+  sessionMemories       SessionMemory[]
+  
+  // Legacy
+  mentorMemories        MentorMemory[]
+
+  @@index([email])
+}
+
+//////////////////////////////////////////////////////
+// ASSESSMENTS
+//////////////////////////////////////////////////////
+
+model Assessment {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions   AssessmentQuestion[]
+  sessions    AssessmentSession[]
+
+  @@index([slug])
+}
+
+model AssessmentQuestion {
+  id             String @id @default(cuid())
+
+  assessmentId   String
+  assessment     Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  question       String
+  type           QuestionType
+
+  options        Json?
+  metadata       Json?
+
+  weight         Float @default(1)
+  order          Int
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  responses      AssessmentResponse[]
+
+  @@index([assessmentId])
+  @@index([order])
+}
+
+model AssessmentSession {
+  id             String @id @default(cuid())
+
+  userId         String
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assessmentId   String
+  assessment     Assessment @relation(fields: [assessmentId], references: [id])
+
+  status         AssessmentStatus @default(IN_PROGRESS)
+
+  startedAt      DateTime @default(now())
+  completedAt    DateTime?
+
+  responses      AssessmentResponse[]
+
+  @@index([userId])
+  @@index([assessmentId])
+  @@index([status])
+}
+
+model AssessmentResponse {
+  id               String @id @default(cuid())
+
+  sessionId        String
+  session          AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  questionId       String
+  question         AssessmentQuestion @relation(fields: [questionId], references: [id])
+
+  answer           Json
+  responseTimeMs   Int?
+
+  createdAt        DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([questionId])
+}
+
+//////////////////////////////////////////////////////
+// PSYCHOLOGICAL PROFILE
+//////////////////////////////////////////////////////
+
+model PsychologicalProfile {
+  id                  String @id @default(cuid())
+
+  userId              String
+  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  version             Int
+
+  personalityType     String?
+  learningStyle       String?
+  workStyle           String?
+  socialStyle         String?
+  energyPattern       String?
+
+  motivationProfile   Json?
+  riskProfile         Json?
+  strengths           Json?
+  growthAreas         Json?
+  identitySignals     Json?
+
+  confidenceScore     Float?
+
+  createdAt           DateTime @default(now())
+
+  @@index([userId])
+  @@index([version])
+}
+
+//////////////////////////////////////////////////////
+// CAREERS
+//////////////////////////////////////////////////////
+
+model Career {
+  id                      String @id @default(cuid())
+
+  slug                    String @unique
+  title                   String
+  category                CareerCategory
+
+  description             String?
+
+  salaryRange             Json?
+
+  futureDemandScore       Float?
+  aiResistanceScore       Float?
+  stressLevel             Float?
+  workLifeBalance         Float?
+
+  educationRequirements   Json?
+  metadata                Json?
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  careerMatches           CareerMatch[]
+
+  @@index([slug])
+  @@index([category])
+}
+
+model CareerMatch {
+  id                  String @id @default(cuid())
+
+  userId              String
+  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  careerId            String
+  career              Career @relation(fields: [careerId], references: [id], onDelete: Cascade)
+
+  overallScore        Float
+
+  psychologicalFit    Float?
+  financialFit        Float?
+  futureFit           Float?
+  lifestyleFit        Float?
+  fulfillmentFit      Float?
+  regretScore         Float?
+
+  reasoning           Json?
+  confidenceScore     Float?
+
+  createdAt           DateTime @default(now())
+
+  @@index([userId])
+  @@index([careerId])
+  @@index([overallScore])
+}
+
+//////////////////////////////////////////////////////
+// MENTOR MEMORY SYSTEM V1
+// Psychological mentor memory - not generic chat memory
+//////////////////////////////////////////////////////
+
+// Core mentor memory table - stores psychological profile
+model MentorMemoryCore {
+  id                    String   @id @default(cuid())
+  
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Core psychology (stable over time)
+  coreMotivations       String[] @default([])
+  dominantTraits        Json     @default("[]")
+  coreVulnerabilities   String[] @default([])
+  keyStrengths          String[] @default([])
+  decisionStyle         String   @default("balanced")
+  stressResponse        String   @default("problem_solve")
+  
+  // Recurring patterns (frequency tracked)
+  recurringPatterns     Json     @default("[]")
+  
+  // Active blind spots with frequency
+  blindSpotMemory       Json     @default("[]")
+  
+  // Unresolved tensions
+  unresolvedContradictions Json  @default("[]")
+  
+  // Longitudinal summary
+  mentorSummary         String   @default("New student. Building psychological profile.")
+  
+  // Confidence in our understanding (0-1)
+  memoryConfidence      Float    @default(0.1)
+  
+  // Metadata
+  sessionCount          Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId])
+  @@index([updatedAt])
+  @@map("mentor_memories")
+}
+
+// Decision history - track significant decisions
+model DecisionHistory {
+  id                    String   @id @default(cuid())
+  
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // The decision
+  decisionTopic         String
+  context               String?
+  
+  // What we recommended
+  mentorRecommendation  String
+  recommendationRationale String?
+  
+  // What they chose
+  chosenDirection       String
+  decisionConfidence    Float    @default(0.5)
+  
+  // Outcome tracking
+  status                String   @default("pending")
+  outcome               String?
+  outcomeConfidence     Float?
+  
+  // If unresolved
+  unresolvedTension     Boolean  @default(false)
+  followUpNeeded        Boolean  @default(false)
+  
+  createdAt             DateTime @default(now())
+  resolvedAt            DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("decision_history")
+}
+
+// Growth snapshots - periodic psychological growth tracking
+model GrowthSnapshot {
+  id                    String   @id @default(cuid())
+  
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Confidence changes
+  selfConfidence        Json     // { previousValue, currentValue, change, direction }
+  decisionConfidence    Json
+  
+  // Clarity
+  careerClarity         Json
+  identityClarity       Json
+  
+  // Psychological shifts
+  motivationShift       Json     @default("[]")
+  
+  // Blind spot evolution
+  blindSpotFrequency    Json     @default("[]")
+  
+  // Contradiction evolution
+  contradictionChanges  Json     @default("[]")
+  
+  // Emotional patterns
+  emotionalStability    Json
+  anxietyBaseline       Json
+  
+  // Mentor summary of period
+  periodSummary         String
+  
+  createdAt             DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("growth_snapshots")
+}
+
+// Emotional patterns - tracked over time
+model EmotionalPatternProfile {
+  id                    String   @id @default(cuid())
+  
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Decision-related anxiety
+  anxietyBeforeDecisions Json
+  
+  // Validation seeking
+  validationSeeking     Json
+  
+  // Overthinking
+  overthinkingTendency  Json
+  
+  // Confidence volatility
+  confidenceVolatility  Json
+  
+  // Recurring fears
+  recurringFears        Json     @default("[]")
+  
+  // Emotional triggers
+  knownTriggers         String[] @default([])
+  
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId])
+  @@map("emotional_patterns")
+}
+
+// Session memory - extracted insights from individual sessions
+model SessionMemory {
+  id                    String   @id @default(cuid())
+  
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  sessionId             String   @unique
+  
+  // Key psychological insights from this session
+  insights              Json     @default("[]")
+  
+  // New patterns detected
+  newPatterns           Json     @default("[]")
+  
+  // Patterns reinforced
+  reinforcedPatterns    String[] @default([])
+  
+  // Blind spots surfaced
+  surfacedBlindSpots    String[] @default([])
+  
+  // Decisions discussed
+  decisionsDiscussed    String[] @default([])
+  
+  // Emotional state
+  dominantEmotion       String   @default("neutral")
+  emotionalIntensity    Float    @default(0.5)
+  
+  // Breakthrough moments
+  breakthroughs         Json     @default("[]")
+  
+  // Resistance points
+  resistancePoints      Json     @default("[]")
+  
+  // Follow-up commitments
+  commitments           String[] @default([])
+  
+  createdAt             DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("session_memories")
+}
+
+// Legacy memory model (kept for compatibility)
+model MentorMemory {
+  id            String @id @default(cuid())
+
+  userId        String
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key           String
+  value         Json
+
+  importance    MemoryImportance @default(MEDIUM)
+
+  source        String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([importance])
+  @@index([key])
+}

@@ -1,0 +1,82 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/score-aggregator.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/score-aggregator.test.ts [2m([22m[2m26 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+       [32m✓[39m should calculate weighted average of dimension scores[32m 1[2mms[22m[39m
+       [32m✓[39m should handle risk dimensions with negative weights[32m 0[2mms[22m[39m
+       [32m✓[39m should cap score at maximum[32m 0[2mms[22m[39m
+       [32m✓[39m should floor score at minimum[32m 0[2mms[22m[39m
+       [32m✓[39m should return positive adjustment for high confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should return negative adjustment for low confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should return zero for matching confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should scale adjustment appropriately[32m 0[2mms[22m[39m
+       [32m✓[39m should return 0 for no contradictions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate penalty based on severity[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m should accumulate penalties for multiple contradictions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should cap penalty at maximum[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize high burnout risk[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize high regret risk[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize poor constraint compatibility[32m 0[2mms[22m[39m
+       [32m✓[39m should bonus for excellent dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize for poor dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should cap adjustment at maximum[32m 0[2mms[22m[39m
+       [32m✓[39m should floor adjustment at minimum[32m 0[2mms[22m[39m
+       [32m✓[39m should return all modifier components[32m 1[2mms[22m[39m
+       [32m✓[39m should apply all modifiers[32m 1[2mms[22m[39m
+       [32m✓[39m should cap at maximum[32m 0[2mms[22m[39m
+       [32m✓[39m should floor at minimum[32m 0[2mms[22m[39m
+       [32m✓[39m should return confidence between 0 and 1[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete career intelligence score[32m 2[2mms[22m[39m
+       [32m✓[39m should calculate base and final scores[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/score-aggregator.test.ts[2m > [22mScore Aggregator[2m > [22mcalculateContradictionPenaltyFromSeverities[2m > [22mshould calculate penalty based on severity
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'medium')[39m
+[36m [2m❯[22m calculateContradictionPenaltyFromSeverities lib/intelligence/scoring/score-aggregator.ts:[2m97:21[22m[39m
+    [90m 95|[39m
+    [90m 96|[39m   [35mfor[39m ([35mconst[39m contradiction [35mof[39m contradictions) {
+    [90m 97|[39m     totalPenalty += CONTRADICTION_SEVERITY_WEIGHTS[contradiction.sever…
+    [90m   |[39m                     [31m^[39m
+    [90m 98|[39m   }
+    [90m 99|[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/score-aggregator.test.ts:[2m133:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/score-aggregator.test.ts[2m > [22mScore Aggregator[2m > [22mcalculateContradictionPenaltyFromSeverities[2m > [22mshould accumulate penalties for multiple contradictions
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'medium')[39m
+[36m [2m❯[22m calculateContradictionPenaltyFromSeverities lib/intelligence/scoring/score-aggregator.ts:[2m97:21[22m[39m
+    [90m 95|[39m
+    [90m 96|[39m   [35mfor[39m ([35mconst[39m contradiction [35mof[39m contradictions) {
+    [90m 97|[39m     totalPenalty += CONTRADICTION_SEVERITY_WEIGHTS[contradiction.sever…
+    [90m   |[39m                     [31m^[39m
+    [90m 98|[39m   }
+    [90m 99|[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/score-aggregator.test.ts:[2m141:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/score-aggregator.test.ts[2m > [22mScore Aggregator[2m > [22mcalculateContradictionPenaltyFromSeverities[2m > [22mshould cap penalty at maximum
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'critical')[39m
+[36m [2m❯[22m calculateContradictionPenaltyFromSeverities lib/intelligence/scoring/score-aggregator.ts:[2m97:21[22m[39m
+    [90m 95|[39m
+    [90m 96|[39m   [35mfor[39m ([35mconst[39m contradiction [35mof[39m contradictions) {
+    [90m 97|[39m     totalPenalty += CONTRADICTION_SEVERITY_WEIGHTS[contradiction.sever…
+    [90m   |[39m                     [31m^[39m
+    [90m 98|[39m   }
+    [90m 99|[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/score-aggregator.test.ts:[2m150:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (26)[39m
+[2m   Start at [22m 19:01:46
+[2m   Duration [22m 1.02s[2m (transform 92ms, setup 0ms, import 119ms, tests 14ms, environment 723ms)[22m
+

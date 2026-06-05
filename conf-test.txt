@@ -1,0 +1,183 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/confidence.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/confidence.test.ts [2m([22m[2m34 tests[22m[2m | [22m[31m11 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+       [32m✓[39m should score highly for complete profiles[32m 1[2mms[22m[39m
+       [32m✓[39m should score lower for incomplete profiles[32m 0[2mms[22m[39m
+[31m       [31m×[31m should consider personality trait count[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m should consider value count[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should return moderate score for empty longitudinal data[32m 0[2mms[22m[39m
+       [32m✓[39m should increase score for strengthening patterns[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score for weakening patterns[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score more for shifting patterns[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score for contradictions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score for stuck loops[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for extreme personality traits[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for extreme values[32m 0[2mms[22m[39m
+       [32m✓[39m should consider motivation clarity[32m 0[2mms[22m[39m
+       [32m✓[39m should consider motivation stability[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return moderate score for insufficient data[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for consistent states[32m 0[2mms[22m[39m
+       [32m✓[39m should score lower for volatile states[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score for recent motivation shifts[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return perfect score for no contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score for low severity contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score more for high severity contradictions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score significantly for critical contradictions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should accumulate penalties for multiple contradictions[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete confidence calibration[32m 0[2mms[22m[39m
+       [32m✓[39m should include all confidence factors[32m 0[2mms[22m[39m
+       [32m✓[39m should generate recommendations based on factors[32m 0[2mms[22m[39m
+       [32m✓[39m should blend base and dimension confidence[32m 0[2mms[22m[39m
+[31m       [31m×[31m should penalize for contradictions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should enforce minimum confidence[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should enforce maximum confidence[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 11 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessDataQuality[2m > [22mshould consider personality trait count
+[31m[1mAssertionError[22m: expected 1 to be greater than 1[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m94:27[22m[39m
+    [90m 92|[39m       const sparseQuality = assessDataQuality(sparsePsychological, mot…
+    [90m 93|[39m
+    [90m 94|[39m       [34mexpect[39m(fullQuality)[33m.[39m[34mtoBeGreaterThan[39m(sparseQuality)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m 95|[39m     })[33m;[39m
+    [90m 96|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessDataQuality[2m > [22mshould consider value count
+[31m[1mAssertionError[22m: expected 1 to be greater than 1[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m120:27[22m[39m
+    [90m118|[39m       const sparseQuality = assessDataQuality(sparsePsychological, mot…
+    [90m119|[39m
+    [90m120|[39m       [34mexpect[39m(fullQuality)[33m.[39m[34mtoBeGreaterThan[39m(sparseQuality)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m121|[39m     })[33m;[39m
+    [90m122|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessPatternStability[2m > [22mshould decrease score for weakening patterns
+[31m[1mAssertionError[22m: expected 0.84 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m153:25[22m[39m
+    [90m151|[39m
+    [90m152|[39m       [35mconst[39m stability [33m=[39m [34massessPatternStability[39m(longitudinal)[33m;[39m
+    [90m153|[39m       [34mexpect[39m(stability)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m154|[39m     })[33m;[39m
+    [90m155|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessPatternStability[2m > [22mshould decrease score more for shifting patterns
+[31m[1mAssertionError[22m: expected 0.9 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m164:25[22m[39m
+    [90m162|[39m
+    [90m163|[39m       [35mconst[39m stability [33m=[39m [34massessPatternStability[39m(longitudinal)[33m;[39m
+    [90m164|[39m       [34mexpect[39m(stability)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m165|[39m     })[33m;[39m
+    [90m166|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessPatternStability[2m > [22mshould decrease score for contradictions
+[31m[1mAssertionError[22m: expected 0.6 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m176:25[22m[39m
+    [90m174|[39m
+    [90m175|[39m       [35mconst[39m stability [33m=[39m [34massessPatternStability[39m(longitudinal)[33m;[39m
+    [90m176|[39m       [34mexpect[39m(stability)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m177|[39m     })[33m;[39m
+    [90m178|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessPatternStability[2m > [22mshould decrease score for stuck loops
+[31m[1mAssertionError[22m: expected 0.6 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m188:25[22m[39m
+    [90m186|[39m
+    [90m187|[39m       [35mconst[39m stability [33m=[39m [34massessPatternStability[39m(longitudinal)[33m;[39m
+    [90m188|[39m       [34mexpect[39m(stability)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m189|[39m     })[33m;[39m
+    [90m190|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessTemporalConsistency[2m > [22mshould decrease score for recent motivation shifts
+[31m[1mAssertionError[22m: expected 0.949 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m354:27[22m[39m
+    [90m352|[39m
+    [90m353|[39m       [35mconst[39m consistency [33m=[39m [34massessTemporalConsistency[39m(longitudinal)[33m;[39m
+    [90m354|[39m       [34mexpect[39m(consistency)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m355|[39m     })[33m;[39m
+    [90m356|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessContradictionLevel[2m > [22mshould decrease score significantly for critical contradictions
+[31m[1mAssertionError[22m: expected 0.5 to be less than 0.5[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m413:21[22m[39m
+    [90m411|[39m
+    [90m412|[39m       [35mconst[39m level [33m=[39m [34massessContradictionLevel[39m(longitudinal)[33m;[39m
+    [90m413|[39m       [34mexpect[39m(level)[33m.[39m[34mtoBeLessThan[39m([34m0.5[39m)[33m;[39m
+    [90m   |[39m                     [31m^[39m
+    [90m414|[39m     })[33m;[39m
+    [90m415|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessContradictionLevel[2m > [22mshould accumulate penalties for multiple contradictions
+[31m[1mAssertionError[22m: expected 0.5 to be less than 0.5[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m426:21[22m[39m
+    [90m424|[39m
+    [90m425|[39m       [35mconst[39m level [33m=[39m [34massessContradictionLevel[39m(longitudinal)[33m;[39m
+    [90m426|[39m       [34mexpect[39m(level)[33m.[39m[34mtoBeLessThan[39m([34m0.5[39m)[33m;[39m
+    [90m   |[39m                     [31m^[39m
+    [90m427|[39m     })[33m;[39m
+    [90m428|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22mcalibrateConfidence[2m > [22mshould penalize for contradictions
+[31m[1mAssertionError[22m: expected NaN to be less than NaN[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m517:34[22m[39m
+    [90m515|[39m       const withContradictions = calibrateConfidence(baseConfidence, d…
+    [90m516|[39m
+    [90m517|[39m       [34mexpect[39m(withContradictions)[33m.[39m[34mtoBeLessThan[39m(noContradictions)[33m;[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m518|[39m     })[33m;[39m
+    [90m519|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22mcalibrateConfidence[2m > [22mshould enforce minimum confidence
+[31m[1mAssertionError[22m: expected NaN to be greater than or equal to 0.3[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m526:26[22m[39m
+    [90m524|[39m       const calibrated = calibrateConfidence(baseConfidence, dimension…
+    [90m525|[39m
+    [90m526|[39m       [34mexpect[39m(calibrated)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m   |[39m                          [31m^[39m
+    [90m527|[39m     })[33m;[39m
+    [90m528|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m11 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:11:07
+[2m   Duration [22m 987ms[2m (transform 50ms, setup 0ms, import 68ms, tests 13ms, environment 720ms)[22m
+

@@ -1,0 +1,121 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts [2m([22m[2m28 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 16[2mms[22m[39m
+       [32m✓[39m should return stable trajectory for insufficient data[32m 2[2mms[22m[39m
+       [32m✓[39m should detect improving trajectory[32m 0[2mms[22m[39m
+       [32m✓[39m should detect declining trajectory[32m 0[2mms[22m[39m
+[31m       [31m×[31m should detect volatile trajectory[39m[32m 6[2mms[22m[39m
+       [32m✓[39m should calculate velocity based on state changes[32m 0[2mms[22m[39m
+       [32m✓[39m should calculate acceleration from growth deltas[32m 0[2mms[22m[39m
+       [32m✓[39m should increase confidence with more data points[32m 0[2mms[22m[39m
+       [32m✓[39m should generate projections[32m 0[2mms[22m[39m
+       [32m✓[39m should return modifier of 1.0 for stable trajectory[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return modifier greater than 1.0 for improving trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return modifier less than 1.0 for declining trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return reduced modifier for volatile trajectory[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should apply acceleration bonus for positive acceleration[32m 0[2mms[22m[39m
+       [32m✓[39m should apply deceleration penalty for negative acceleration[32m 0[2mms[22m[39m
+       [32m✓[39m should cap modifier at maximum[32m 0[2mms[22m[39m
+       [32m✓[39m should floor modifier at minimum[32m 0[2mms[22m[39m
+       [32m✓[39m should return modifiers for all dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should apply direction-specific impacts[32m 0[2mms[22m[39m
+[31m       [31m×[31m should adjust based on velocity[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should return zero modifier for clean longitudinal data[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize stuck loops[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize shifting patterns[32m 0[2mms[22m[39m
+       [32m✓[39m should accumulate multiple penalties[32m 0[2mms[22m[39m
+       [32m✓[39m should cap penalty at -0.2[32m 0[2mms[22m[39m
+       [32m✓[39m should cap positive modifier at 0.1[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete modifier set[32m 0[2mms[22m[39m
+       [32m✓[39m should calculate all components[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts[2m > [22mTrajectory Modifier[2m > [22manalyzeTrajectory[2m > [22mshould detect volatile trajectory
+[31m[1mAssertionError[22m: expected 'improving' to be 'volatile' // Object.is equality[39m
+
+Expected: [32m"volatile"[39m
+Received: [31m"improving"[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts:[2m79:34[22m[39m
+    [90m 77|[39m       [35mconst[39m analysis [33m=[39m [34manalyzeTrajectory[39m(longitudinal[33m,[39m psychological)[33m;[39m
+    [90m 78|[39m
+    [90m 79|[39m       [34mexpect[39m(analysis[33m.[39mdirection)[33m.[39m[34mtoBe[39m([32m'volatile'[39m)[33m;[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m 80|[39m     })[33m;[39m
+    [90m 81|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts[2m > [22mTrajectory Modifier[2m > [22mcalculateTrajectoryModifier[2m > [22mshould return modifier greater than 1.0 for improving trajectory
+[31m[1mAssertionError[22m: expected 'Improving trajectory (30.0 velocity) …' to contain 'improving'[39m
+
+Expected: [32m"[7mi[27mmproving"[39m
+Received: [31m"[7mI[27mmproving[7m trajectory (30.0 velocity) suggests increasing readiness for challenging careers[27m"[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts:[2m189:34[22m[39m
+    [90m187|[39m
+    [90m188|[39m       [34mexpect[39m(modifier[33m.[39mmodifier)[33m.[39m[34mtoBeGreaterThan[39m([34m1.0[39m)[33m;[39m
+    [90m189|[39m       [34mexpect[39m(modifier[33m.[39mreasoning)[33m.[39m[34mtoContain[39m([32m'improving'[39m)[33m;[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m190|[39m     })[33m;[39m
+    [90m191|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts[2m > [22mTrajectory Modifier[2m > [22mcalculateTrajectoryModifier[2m > [22mshould return modifier less than 1.0 for declining trajectory
+[31m[1mAssertionError[22m: expected 'Declining trajectory (30.0 velocity) …' to contain 'declining'[39m
+
+Expected: [32m"[7md[27meclining"[39m
+Received: [31m"[7mD[27meclining[7m trajectory (30.0 velocity) suggests caution with demanding careers[27m"[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts:[2m205:34[22m[39m
+    [90m203|[39m
+    [90m204|[39m       [34mexpect[39m(modifier[33m.[39mmodifier)[33m.[39m[34mtoBeLessThan[39m([34m1.0[39m)[33m;[39m
+    [90m205|[39m       [34mexpect[39m(modifier[33m.[39mreasoning)[33m.[39m[34mtoContain[39m([32m'declining'[39m)[33m;[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m206|[39m     })[33m;[39m
+    [90m207|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts[2m > [22mTrajectory Modifier[2m > [22mcalculateTrajectoryModifier[2m > [22mshould return reduced modifier for volatile trajectory
+[31m[1mAssertionError[22m: expected 'Volatile trajectory suggests waiting …' to contain 'volatile'[39m
+
+Expected: [32m"[7mv[27molatile"[39m
+Received: [31m"[7mV[27molatile[7m trajectory suggests waiting for stability before major career decisions[27m"[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts:[2m221:34[22m[39m
+    [90m219|[39m
+    [90m220|[39m       [34mexpect[39m(modifier[33m.[39mmodifier)[33m.[39m[34mtoBe[39m([34m0.9[39m)[33m;[39m
+    [90m221|[39m       [34mexpect[39m(modifier[33m.[39mreasoning)[33m.[39m[34mtoContain[39m([32m'volatile'[39m)[33m;[39m
+    [90m   |[39m                                  [31m^[39m
+    [90m222|[39m     })[33m;[39m
+    [90m223|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts[2m > [22mTrajectory Modifier[2m > [22mcalculateDimensionModifiers[2m > [22mshould adjust based on velocity
+[31m[1mTypeError[22m: actual value must be number or bigint, received "undefined"[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts:[2m348:60[22m[39m
+    [90m346|[39m
+    [90m347|[39m       [90m// Fast improvement should have stronger modifiers[39m
+    [90m348|[39m       expect(fastModifiers[Object.keys(fastModifiers)[0]]).toBeGreater…
+    [90m   |[39m                                                            [31m^[39m
+    [90m349|[39m         slowModifiers[[33mObject[39m[33m.[39m[34mkeys[39m(slowModifiers)[[34m0[39m]]
+    [90m350|[39m       )[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 19:21:00
+[2m   Duration [22m 979ms[2m (transform 56ms, setup 0ms, import 76ms, tests 16ms, environment 718ms)[22m
+

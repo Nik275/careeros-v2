@@ -1,0 +1,167 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/identity-alignment.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/identity-alignment.test.ts [2m([22m[2m16 tests[22m[2m | [22m[31m10 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+       [32m✓[39m should score highly for matching prestige preferences[32m 2[2mms[22m[39m
+       [32m✓[39m should penalize prestige mismatch[32m 0[2mms[22m[39m
+       [32m✓[39m should handle low prestige preference with low prestige career[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for matching recognition preferences[32m 0[2mms[22m[39m
+       [32m✓[39m should consider extraversion for recognition fit[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score highly for matching purpose values[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should penalize purpose mismatch[32m 0[2mms[22m[39m
+[31m       [31m×[31m should handle low purpose preference with low impact career[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score highly for matching values[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should penalize value mismatch[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return composite score[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include all sub-scores[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should provide explanation[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate confidence[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score high for strong identity alignment[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score low for identity misalignment[39m[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 10 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculatePurposeAlignment[2m > [22mshould score highly for matching purpose values
+[31m[1mAssertionError[22m: expected 18 to be greater than 70[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m117:28[22m[39m
+    [90m115|[39m
+    [90m116|[39m       const result = calculatePurposeAlignment(profile, career.identit…
+    [90m117|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeGreaterThan[39m([34m70[39m)[33m;[39m
+    [90m   |[39m                            [31m^[39m
+    [90m118|[39m     })[33m;[39m
+    [90m119|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculatePurposeAlignment[2m > [22mshould handle low purpose preference with low impact career
+[31m[1mAssertionError[22m: expected 30 to be greater than 60[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m147:28[22m[39m
+    [90m145|[39m
+    [90m146|[39m       const result = calculatePurposeAlignment(profile, career.identit…
+    [90m147|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeGreaterThan[39m([34m60[39m)[33m;[39m
+    [90m   |[39m                            [31m^[39m
+    [90m148|[39m     })[33m;[39m
+    [90m149|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateValueExpression[2m > [22mshould score highly for matching values
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'valueExpression')[39m
+[36m [2m❯[22m calculateValueExpression lib/intelligence/scoring/identity-alignment.ts:[2m223:49[22m[39m
+    [90m221|[39m   [35mconst[39m factors[33m:[39m [33mScoreFactor[39m[] [33m=[39m [][33m;[39m
+    [90m222|[39m
+    [90m223|[39m   [35mconst[39m careerValueExpression [33m=[39m identityMarkers[33m.[39mvalueExpression[33m;[39m
+    [90m   |[39m                                                 [31m^[39m
+    [90m224|[39m   [35mconst[39m studentValues [33m=[39m psychologicalProfile[33m.[39mvalues[33m;[39m
+    [90m225|[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m164:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateValueExpression[2m > [22mshould penalize value mismatch
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'valueExpression')[39m
+[36m [2m❯[22m calculateValueExpression lib/intelligence/scoring/identity-alignment.ts:[2m223:49[22m[39m
+    [90m221|[39m   [35mconst[39m factors[33m:[39m [33mScoreFactor[39m[] [33m=[39m [][33m;[39m
+    [90m222|[39m
+    [90m223|[39m   [35mconst[39m careerValueExpression [33m=[39m identityMarkers[33m.[39mvalueExpression[33m;[39m
+    [90m   |[39m                                                 [31m^[39m
+    [90m224|[39m   [35mconst[39m studentValues [33m=[39m psychologicalProfile[33m.[39mvalues[33m;[39m
+    [90m225|[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m180:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould return composite score
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m190:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould include all sub-scores
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m201:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould provide explanation
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m217:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould calculate confidence
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m225:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould score high for strong identity alignment
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m255:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/identity-alignment.test.ts[2m > [22mIdentity Alignment Scoring[2m > [22mcalculateIdentityAlignment[2m > [22mshould score low for identity misalignment
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'filter')[39m
+[36m [2m❯[22m calculatePurposeAlignment lib/intelligence/scoring/identity-alignment.ts:[2m157:38[22m[39m
+    [90m155|[39m
+    [90m156|[39m   // Calculate overlap between student values and career purpose marke…
+    [90m157|[39m   [35mconst[39m valueMatches [33m=[39m careerPurpose[33m.[39m[34mfilter[39m(p [33m=>[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m158|[39m     psychologicalProfile.values[p.toLowerCase().replace(/\s+/g, '')] >…
+    [90m159|[39m   )[33m.[39mlength[33m;[39m
+[90m [2m❯[22m calculateIdentityAlignment lib/intelligence/scoring/identity-alignment.ts:[2m314:5[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/identity-alignment.test.ts:[2m281:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m10 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (16)[39m
+[2m   Start at [22m 19:41:48
+[2m   Duration [22m 1.16s[2m (transform 67ms, setup 0ms, import 91ms, tests 12ms, environment 851ms)[22m
+

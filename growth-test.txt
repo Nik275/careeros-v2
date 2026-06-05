@@ -1,0 +1,94 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/growth-potential.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/growth-potential.test.ts [2m([22m[2m22 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+[31m       [31m×[31m should score highly for optimal learning curve match[39m[32m 4[2mms[22m[39m
+       [32m✓[39m should penalize too steep learning curve[32m 0[2mms[22m[39m
+       [32m✓[39m should warn about boredom risk for gentle curve with high ability[32m 0[2mms[22m[39m
+       [32m✓[39m should consider openness for learning curve preference[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score highly for high ceiling with ambitious student[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should penalize low ceiling with ambitious student[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should handle moderate ceiling appropriately[32m 0[2mms[22m[39m
+       [32m✓[39m should consider low ambition with high ceiling[32m 0[2mms[22m[39m
+       [32m✓[39m should use base skill diversification from career[32m 0[2mms[22m[39m
+       [32m✓[39m should consider openness for diversification preference[32m 0[2mms[22m[39m
+       [32m✓[39m should warn about excessive diversification[32m 0[2mms[22m[39m
+       [32m✓[39m should warn about insufficient diversification[32m 0[2mms[22m[39m
+[31m       [31m×[31m should score highly for achievable mastery timeline[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should penalize long mastery timeline[32m 0[2mms[22m[39m
+       [32m✓[39m should consider conscientiousness for long timelines[32m 0[2mms[22m[39m
+       [32m✓[39m should consider mastery value for timeline preference[32m 0[2mms[22m[39m
+       [32m✓[39m should return composite score[32m 0[2mms[22m[39m
+       [32m✓[39m should include all sub-scores[32m 0[2mms[22m[39m
+       [32m✓[39m should provide explanation[32m 0[2mms[22m[39m
+       [32m✓[39m should calculate confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should score high for strong growth potential[32m 0[2mms[22m[39m
+       [32m✓[39m should score low for limited growth potential[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/growth-potential.test.ts[2m > [22mGrowth Potential Scoring[2m > [22mcalculateLearningCurve[2m > [22mshould score highly for optimal learning curve match
+[31m[1mAssertionError[22m: expected 75 to be greater than 75[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/growth-potential.test.ts:[2m34:28[22m[39m
+    [90m 32|[39m
+    [90m 33|[39m       [35mconst[39m result [33m=[39m [34mcalculateLearningCurve[39m(profile[33m,[39m career)[33m;[39m
+    [90m 34|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeGreaterThan[39m([34m75[39m)[33m;[39m
+    [90m   |[39m                            [31m^[39m
+    [90m 35|[39m     })[33m;[39m
+    [90m 36|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/growth-potential.test.ts[2m > [22mGrowth Potential Scoring[2m > [22mcalculateCeilingHeight[2m > [22mshould score highly for high ceiling with ambitious student
+[31m[1mAssertionError[22m: expected 75 to be greater than 75[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/growth-potential.test.ts:[2m125:28[22m[39m
+    [90m123|[39m
+    [90m124|[39m       [35mconst[39m result [33m=[39m [34mcalculateCeilingHeight[39m(profile[33m,[39m career)[33m;[39m
+    [90m125|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeGreaterThan[39m([34m75[39m)[33m;[39m
+    [90m   |[39m                            [31m^[39m
+    [90m126|[39m     })[33m;[39m
+    [90m127|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/growth-potential.test.ts[2m > [22mGrowth Potential Scoring[2m > [22mcalculateCeilingHeight[2m > [22mshould penalize low ceiling with ambitious student
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/growth-potential.test.ts:[2m146:81[22m[39m
+    [90m144|[39m       [35mconst[39m result [33m=[39m [34mcalculateCeilingHeight[39m(profile[33m,[39m career)[33m;[39m
+    [90m145|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeLessThan[39m([34m40[39m)[33m;[39m
+    [90m146|[39m       expect(result.factors.some(f => f.name === 'lowCeilingAmbitionMi…
+    [90m   |[39m                                                                                 [31m^[39m
+    [90m147|[39m     })[33m;[39m
+    [90m148|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/growth-potential.test.ts[2m > [22mGrowth Potential Scoring[2m > [22mcalculateMasteryTimeline[2m > [22mshould score highly for achievable mastery timeline
+[31m[1mAssertionError[22m: expected 60 to be greater than 70[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/growth-potential.test.ts:[2m297:28[22m[39m
+    [90m295|[39m
+    [90m296|[39m       [35mconst[39m result [33m=[39m [34mcalculateMasteryTimeline[39m(profile[33m,[39m career)[33m;[39m
+    [90m297|[39m       [34mexpect[39m(result[33m.[39mscore)[33m.[39m[34mtoBeGreaterThan[39m([34m70[39m)[33m;[39m
+    [90m   |[39m                            [31m^[39m
+    [90m298|[39m     })[33m;[39m
+    [90m299|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m18 passed[39m[22m[90m (22)[39m
+[2m   Start at [22m 19:36:46
+[2m   Duration [22m 1.03s[2m (transform 58ms, setup 0ms, import 77ms, tests 14ms, environment 760ms)[22m
+

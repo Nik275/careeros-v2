@@ -1,0 +1,181 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/explanation-engine.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/explanation-engine.test.ts [2m([22m[2m47 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[32m 18[2mms[22m[39m
+       [32m✓[39m should generate excellent fit summary[32m 1[2mms[22m[39m
+       [32m✓[39m should generate good fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should generate moderate fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should generate poor fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence qualifier for low confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence qualifier for moderate confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should identify top dimension[32m 0[2mms[22m[39m
+       [32m✓[39m should identify bottom dimension[32m 0[2mms[22m[39m
+       [32m✓[39m should return strengths for high-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of strengths[32m 0[2mms[22m[39m
+       [32m✓[39m should include factor evidence when available[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array when no high-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should return concerns for low-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of concerns[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array when no low-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should include contradiction-based watchouts[32m 0[2mms[22m[39m
+[31m       [31m×[31m should include burnout risk watchout[39m[32m 4[2mms[22m[39m
+[31m       [31m×[31m should include regret risk watchout[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should include financial-psychological tension watchout[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of watchouts[32m 0[2mms[22m[39m
+       [32m✓[39m should collect evidence from dimensions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by impact and confidence[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should include confidence evidence[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of evidence items[32m 0[2mms[22m[39m
+       [32m✓[39m should include base score explanation[32m 0[2mms[22m[39m
+       [32m✓[39m should include modifier explanations[32m 0[2mms[22m[39m
+       [32m✓[39m should include dimension-specific reasoning[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete risk assessment[32m 0[2mms[22m[39m
+       [32m✓[39m should categorize burnout risk[32m 0[2mms[22m[39m
+       [32m✓[39m should generate mitigations for high risks[32m 0[2mms[22m[39m
+       [32m✓[39m should identify tension pairs[32m 0[2mms[22m[39m
+       [32m✓[39m should not identify tradeoffs when scores are close[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of tradeoffs[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return complete explanation[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should generate recommendations based on score[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should include dimension-specific recommendations[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should include confidence-based recommendations[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should return stretch for excellent scores with high confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should return target for good scores[32m 0[2mms[22m[39m
+       [32m✓[39m should return fallback for moderate scores[32m 0[2mms[22m[39m
+       [32m✓[39m should return avoid for poor scores[32m 0[2mms[22m[39m
+       [32m✓[39m should not return stretch if confidence is low[32m 0[2mms[22m[39m
+       [32m✓[39m should use custom thresholds[32m 0[2mms[22m[39m
+       [32m✓[39m should return fallback suggestions[32m 0[2mms[22m[39m
+       [32m✓[39m should return generic suggestions when no dimensions score well[32m 0[2mms[22m[39m
+       [32m✓[39m should return stretch suggestions[32m 0[2mms[22m[39m
+       [32m✓[39m should return generic suggestions when no dimensions score well[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateWatchouts[2m > [22mshould include burnout risk watchout
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateWatchouts lib/intelligence/scoring/explanation-engine.ts:[2m170:22[22m[39m
+    [90m168|[39m   [35mconst[39m psychologicalScore [33m=[39m dimensionScores[33m.[39mpsychologicalFit[33m;[39m
+    [90m169|[39m
+    [90m170|[39m   [35mif[39m (financialScore[33m.[39mscore [33m>=[39m [34m80[39m [33m&&[39m psychologicalScore[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                      [31m^[39m
+    [90m171|[39m     watchouts.push('High financial potential but psychological misalig…
+    [90m172|[39m   }
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m277:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateWatchouts[2m > [22mshould include regret risk watchout
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateWatchouts lib/intelligence/scoring/explanation-engine.ts:[2m170:22[22m[39m
+    [90m168|[39m   [35mconst[39m psychologicalScore [33m=[39m dimensionScores[33m.[39mpsychologicalFit[33m;[39m
+    [90m169|[39m
+    [90m170|[39m   [35mif[39m (financialScore[33m.[39mscore [33m>=[39m [34m80[39m [33m&&[39m psychologicalScore[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                      [31m^[39m
+    [90m171|[39m     watchouts.push('High financial potential but psychological misalig…
+    [90m172|[39m   }
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m296:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateWatchouts[2m > [22mshould include financial-psychological tension watchout
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateWatchouts lib/intelligence/scoring/explanation-engine.ts:[2m157:20[22m[39m
+    [90m155|[39m   [90m// Add dimension-based watchouts[39m
+    [90m156|[39m   [35mconst[39m burnoutScore [33m=[39m dimensionScores[33m.[39mburnoutRisk[33m;[39m
+    [90m157|[39m   [35mif[39m (burnoutScore[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                    [31m^[39m
+    [90m158|[39m     watchouts.push(`Burnout risk: ${burnoutScore.explanation.split('.'…
+    [90m159|[39m   }
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m315:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateEvidence[2m > [22mshould filter by impact and confidence
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m382:65[22m[39m
+    [90m380|[39m       [35mconst[39m evidence [33m=[39m [34mgenerateEvidence[39m(dimensionScores[33m,[39m [34m0.8[39m)[33m;[39m
+    [90m381|[39m
+    [90m382|[39m       expect(evidence.some(e => e.value === 'Strong evidence')).toBe(t…
+    [90m   |[39m                                                                 [31m^[39m
+    [90m383|[39m       expect(evidence.some(e => e.value === 'Weak evidence')).toBe(fal…
+    [90m384|[39m       expect(evidence.some(e => e.value === 'Low confidence')).toBe(fa…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateExplanation[2m > [22mshould return complete explanation
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateWatchouts lib/intelligence/scoring/explanation-engine.ts:[2m157:20[22m[39m
+    [90m155|[39m   [90m// Add dimension-based watchouts[39m
+    [90m156|[39m   [35mconst[39m burnoutScore [33m=[39m dimensionScores[33m.[39mburnoutRisk[33m;[39m
+    [90m157|[39m   [35mif[39m (burnoutScore[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                    [31m^[39m
+    [90m158|[39m     watchouts.push(`Burnout risk: ${burnoutScore.explanation.split('.'…
+    [90m159|[39m   }
+[90m [2m❯[22m generateExplanation lib/intelligence/scoring/explanation-engine.ts:[2m443:16[22m[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m583:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateRecommendations[2m > [22mshould generate recommendations based on score
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateRecommendations lib/intelligence/scoring/explanation-engine.ts:[2m472:35[22m[39m
+    [90m470|[39m
+    [90m471|[39m   [90m// Dimension-specific recommendations[39m
+    [90m472|[39m   [35mif[39m (dimensionScores[33m.[39mburnoutRisk[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                                   [31m^[39m
+    [90m473|[39m     recommendations.push('Develop proactive burnout prevention strateg…
+    [90m474|[39m   }
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m598:29[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateRecommendations[2m > [22mshould include dimension-specific recommendations
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m620:63[22m[39m
+    [90m618|[39m
+    [90m619|[39m       expect(recommendations.some(r => r.includes('burnout'))).toBe(tr…
+    [90m620|[39m       expect(recommendations.some(r => r.includes('regret'))).toBe(tru…
+    [90m   |[39m                                                               [31m^[39m
+    [90m621|[39m       expect(recommendations.some(r => r.includes('resilience'))).toBe…
+    [90m622|[39m       expect(recommendations.some(r => r.includes('constraint'))).toBe…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/explanation-engine.test.ts[2m > [22mExplanation Engine[2m > [22mgenerateRecommendations[2m > [22mshould include confidence-based recommendations
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'score')[39m
+[36m [2m❯[22m generateRecommendations lib/intelligence/scoring/explanation-engine.ts:[2m472:35[22m[39m
+    [90m470|[39m
+    [90m471|[39m   [90m// Dimension-specific recommendations[39m
+    [90m472|[39m   [35mif[39m (dimensionScores[33m.[39mburnoutRisk[33m.[39mscore [33m<=[39m [34m50[39m) {
+    [90m   |[39m                                   [31m^[39m
+    [90m473|[39m     recommendations.push('Develop proactive burnout prevention strateg…
+    [90m474|[39m   }
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/explanation-engine.test.ts:[2m628:33[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m39 passed[39m[22m[90m (47)[39m
+[2m   Start at [22m 19:24:58
+[2m   Duration [22m 1.00s[2m (transform 61ms, setup 0ms, import 83ms, tests 18ms, environment 724ms)[22m
+

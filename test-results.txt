@@ -1,0 +1,639 @@
+
+> careeros-v2@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/careers/__tests__/taxonomy.test.ts [2m([22m[2m24 tests[22m[2m | [22m[31m23 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m     [31m×[31m should return subcategories for technology[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should return subcategories for medicine[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should return empty array for unknown category[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should return definition for valid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return undefined for invalid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return undefined for invalid category[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return true for valid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return false for invalid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return false for invalid category[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return map of all categories to subcategories[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return related categories for subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return empty array for invalid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return typical roles for subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return empty array for invalid subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return description for each category[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return unknown for invalid category[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should build taxonomy for valid category/subcategory[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should build taxonomy without tags[39m[32m 0[2mms[22m[39m
+     [32m✓[39m should throw for invalid subcategory[32m 1[2mms[22m[39m
+[31m     [31m×[31m should return total count of all subcategories[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should return all typical roles across categories[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have unique roles[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have entry for each category[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have valid subcategory definitions[39m[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/careers/__tests__/types.test.ts [2m([22m[2m21 tests[22m[2m | [22m[31m19 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+[31m       [31m×[31m should return true for valid scores[39m[32m 4[2mms[22m[39m
+[31m       [31m×[31m should return false for out of range scores[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return false for invalid types[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return score for valid values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should throw for invalid values[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should have all expected categories[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have 20 categories[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have unique values[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have all expected motivations[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have 20 motivations[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have all expected traits[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have 16 personality traits[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have all expected strengths[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have 24 strengths[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have correct order[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have 8 levels[39m[32m 0[2mms[22m[39m
+     [32m✓[39m should have 10 dimensions[32m 0[2mms[22m[39m
+     [32m✓[39m should include all expected dimensions[32m 1[2mms[22m[39m
+[31m     [31m×[31m should have 9 dimensions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should include all expected dimensions[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have all expected error codes[39m[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/careers/__tests__/career-database.test.ts [2m([22m[2m44 tests[22m[2m | [22m[31m44 failed[39m[2m)[22m[32m 20[2mms[22m[39m
+[31m       [31m×[31m should load initial careers[39m[32m 5[2mms[22m[39m
+[31m       [31m×[31m should reject duplicate IDs[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject invalid careers[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return career by ID[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return undefined for non-existent ID[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return true for existing career[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return false for non-existent career[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return all careers[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return immutable array[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return all career IDs[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return careers in technology category[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return careers in medicine category[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return empty array for category with no careers[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return careers in specific subcategory[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should throw for invalid subcategory[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by category[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by multiple categories[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by motivations[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by min future demand[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by max automation risk[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by min income potential[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by max burnout risk[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by education level[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by remote compatibility[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should filter by non-remote compatibility[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should combine multiple filters[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return empty result for strict filters[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should include query in result[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should update career successfully[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should fail for non-existent career[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should fail for invalid updates[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should update category index when category changes[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should require reason[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should require source[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return database statistics[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return careers by category[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should export database state[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return singleton instance[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should initialize with default careers[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reset singleton[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should create new database instance[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have unique IDs[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should all be valid careers[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should have adjacent careers that exist[39m[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/careers/__tests__/validator.test.ts [2m([22m[2m44 tests[22m[2m | [22m[31m36 failed[39m[2m)[22m[32m 29[2mms[22m[39m
+[31m     [31m×[31m should validate a correct career[39m[32m 7[2mms[22m[39m
+[31m       [31m×[31m should reject missing ID[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should reject empty ID[32m 0[2mms[22m[39m
+       [32m✓[39m should reject ID with invalid characters[32m 0[2mms[22m[39m
+       [32m✓[39m should accept valid IDs[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject missing title[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject empty title[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject title that is too short[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject title that is too long[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject missing category[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject invalid category[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should accept valid categories[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject invalid subcategory for category[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should accept valid subcategory for category[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject missing description[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject description that is too short[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject empty description[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject scores outside 0-1 range[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject negative scores[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should accept valid scores[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject NaN scores[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject missing psychological fit[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject invalid dimension values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject extra properties[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject null career[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject undefined career[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should reject non-object career[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return true for valid career[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return false for invalid career[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should find duplicate IDs[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return empty array for unique IDs[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should find multiple duplicates[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect simple circular reference[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect complex circular reference[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should not flag valid references[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect invalid references[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should separate valid and invalid careers[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle empty array[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should not throw for valid career[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should throw for invalid career[32m 0[2mms[22m[39m
+[31m     [31m×[31m should throw with descriptive message[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should not throw for valid batch[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should throw for batch with duplicates[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should throw for batch with invalid career[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/careers/__tests__/normalization.test.ts [2m([22m[2m47 tests[22m[2m | [22m[31m41 failed[39m[2m)[22m[32m 26[2mms[22m[39m
+     [32m✓[39m should normalize values within range correctly[32m 2[2mms[22m[39m
+     [32m✓[39m should handle negative ranges[32m 0[2mms[22m[39m
+[31m     [31m×[31m should throw for values outside range[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should throw for invalid range[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should throw for non-finite values[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should normalize values correctly[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle values below min as 0[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should throw for values above max[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should throw for non-positive ranges[39m[32m 0[2mms[22m[39m
+     [32m✓[39m should throw for invalid range[32m 0[2mms[22m[39m
+[31m     [31m×[31m should normalize values correctly[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should throw for values outside range[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle custom steepness[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should calculate z-scores correctly[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should throw for non-positive stdDev[39m[32m 0[2mms[22m[39m
+     [32m✓[39m should throw for non-finite inputs[32m 0[2mms[22m[39m
+[31m     [31m×[31m should normalize without clamping[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should clamp when enabled[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should use linear method[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should use logarithmic method[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should use sigmoid method[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m should throw for unknown method[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should normalize salary ranges[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should throw for salaries above max[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize percentages[32m 0[2mms[22m[39m
+[31m       [31m×[31m should throw for out of range[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should invert risk (higher risk = lower score)[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should normalize competition index[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should normalize years of experience[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should normalize demand growth rates[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should normalize multiple values[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle mixed valid and invalid[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return true for valid values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return false for invalid values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return indices of invalid values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should convert back to original scale[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should throw for invalid normalized values[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should convert back to original scale[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should classify scores correctly[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should invert for inverted dimensions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should compare scores correctly[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should invert for inverted dimensions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate absolute difference[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate weighted average[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should handle different weights[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return 0.5 for empty array[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return 0.5 for zero total weight[39m[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/contradiction-tracker.test.ts [2m([22m[2m13 tests[22m[2m | [22m[31m13 failed[39m[2m)[22m[32m 20[2mms[22m[39m
+[31m       [31m×[31m should return empty array for empty timeline[39m[32m 8[2mms[22m[39m
+[31m       [31m×[31m should detect contradiction from sessions with opposing statements[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should require multiple observations for high confidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track contradiction lifecycle[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate tension level based on evidence strength[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track student awareness progression[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify related patterns[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should not detect contradictions from single session[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track contradiction duration[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should classify contradiction status correctly[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should add new observation to existing contradiction[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect resolution from session[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect tension between stated and actual behavior[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/growth-engine.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m15 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+[31m       [31m×[31m should return empty array for empty sessions[39m[32m 7[2mms[22m[39m
+[31m       [31m×[31m should measure self_awareness growth from insight progression[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should measure emotional_regulation from emotional intensity trends[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should measure decision_maturity from decision speed and quality[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should measure fear_facing from resistance reduction[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should measure value_clarity from value-related insights[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should measure autonomy from self-directed actions[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect regression in growth dimensions[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should provide explainable deltas with evidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate confidence based on evidence quality[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle volatile trajectories[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should require minimum evidence for growth claims[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should aggregate dimension scores[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should weight dimensions appropriately[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should provide explainable score[39m[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/motivation-shifts.test.ts [2m([22m[2m14 tests[22m[2m | [22m[31m14 failed[39m[2m)[22m[32m 22[2mms[22m[39m
+[31m       [31m×[31m should return empty array for empty sessions[39m[32m 8[2mms[22m[39m
+[31m       [31m×[31m should detect money priority increase[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect meaning priority decrease[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect prestige priority decrease[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect autonomy priority increase[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect family approval priority increase[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should require multiple signals for high confidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should not detect shifts from single session[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate velocity of change[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should classify shift significance[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify triggers for shifts[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should link shifts to related contradictions[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should detect reversal shifts[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track stability of shifts[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/pattern-evolution.test.ts [2m([22m[2m13 tests[22m[2m | [22m[31m13 failed[39m[2m)[22m[32m 25[2mms[22m[39m
+[31m       [31m×[31m should return null for empty timeline[39m[32m 10[2mms[22m[39m
+[31m       [31m×[31m should track improving pattern trajectory[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should track worsening pattern trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track stable pattern trajectory[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should track volatile pattern trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should require minimum observations for confidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate pattern intensity from evidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate concern level based on pattern and intensity[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track emerging patterns[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track fading patterns[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate trajectory duration[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track multiple patterns simultaneously[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should filter by minimum confidence[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/insight-generator.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 29[2mms[22m[39m
+       [32m✓[39m should generate insights from pattern evolutions[32m 5[2mms[22m[39m
+[31m       [31m×[31m should generate insights from contradictions[39m[32m 11[2mms[22m[39m
+       [32m✓[39m should generate insights from motivation shifts[32m 1[2mms[22m[39m
+[31m       [31m×[31m should generate insights from growth dimensions[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m should generate regression warnings[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should generate stuck pattern alerts[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should generate breakthrough insights[32m 1[2mms[22m[39m
+       [32m✓[39m should prioritize insights by importance[32m 1[2mms[22m[39m
+       [32m✓[39m should include confidence explanations[32m 1[2mms[22m[39m
+       [32m✓[39m should include implications for each insight[32m 1[2mms[22m[39m
+       [32m✓[39m should calculate mentor context relevance[32m 1[2mms[22m[39m
+       [32m✓[39m should select top insights by relevance[32m 1[2mms[22m[39m
+       [32m✓[39m should respect token budget[32m 0[2mms[22m[39m
+       [32m✓[39m should limit to max 3 insights[32m 0[2mms[22m[39m
+       [32m✓[39m should generate summary from selected insights[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/psychological-state-machine.test.ts [2m([22m[2m22 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 34[2mms[22m[39m
+       [32m✓[39m should return default exploration state for empty sessions[32m 4[2mms[22m[39m
+       [32m✓[39m should detect anxiety state from anxious emotion[32m 2[2mms[22m[39m
+       [32m✓[39m should detect confidence state from confident emotion and commitments[32m 1[2mms[22m[39m
+       [32m✓[39m should detect stuck state from low engagement and repeated patterns[32m 1[2mms[22m[39m
+       [32m✓[39m should detect breakthrough state from breakthrough insights[32m 0[2mms[22m[39m
+[31m       [31m×[31m should detect confusion state from contradictory insights[39m[32m 10[2mms[22m[39m
+       [32m✓[39m should calculate state duration[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify exit triggers[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should calculate confidence based on data quality[32m 1[2mms[22m[39m
+       [32m✓[39m should predict transitions from current state[32m 1[2mms[22m[39m
+       [32m✓[39m should identify most likely transition[32m 1[2mms[22m[39m
+       [32m✓[39m should estimate transition time[32m 0[2mms[22m[39m
+       [32m✓[39m should provide early indicators for transitions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should detect stuck loop from repeated patterns[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should not detect stuck loop from diverse sessions[32m 1[2mms[22m[39m
+       [32m✓[39m should require minimum sessions for stuck detection[32m 0[2mms[22m[39m
+       [32m✓[39m should identify loop pattern[32m 0[2mms[22m[39m
+       [32m✓[39m should detect state sequence over time[32m 1[2mms[22m[39m
+       [32m✓[39m should return single state for few sessions[32m 0[2mms[22m[39m
+       [32m✓[39m should provide appropriate approach for anxiety state[32m 1[2mms[22m[39m
+       [32m✓[39m should provide appropriate approach for stuck state[32m 1[2mms[22m[39m
+       [32m✓[39m should provide appropriate approach for confidence state[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/scoring/__tests__/explanation-engine.test.ts [2m([22m[2m47 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 29[2mms[22m[39m
+       [32m✓[39m should generate excellent fit summary[32m 3[2mms[22m[39m
+       [32m✓[39m should generate good fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should generate moderate fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should generate poor fit summary[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence qualifier for low confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence qualifier for moderate confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should identify top dimension[32m 0[2mms[22m[39m
+       [32m✓[39m should identify bottom dimension[32m 0[2mms[22m[39m
+       [32m✓[39m should return strengths for high-scoring dimensions[32m 1[2mms[22m[39m
+       [32m✓[39m should limit number of strengths[32m 1[2mms[22m[39m
+       [32m✓[39m should include factor evidence when available[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array when no high-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should return concerns for low-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of concerns[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array when no low-scoring dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should include contradiction-based watchouts[32m 0[2mms[22m[39m
+       [32m✓[39m should include burnout risk watchout[32m 0[2mms[22m[39m
+       [32m✓[39m should include regret risk watchout[32m 0[2mms[22m[39m
+       [32m✓[39m should include financial-psychological tension watchout[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of watchouts[32m 0[2mms[22m[39m
+       [32m✓[39m should collect evidence from dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by impact and confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence evidence[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of evidence items[32m 0[2mms[22m[39m
+       [32m✓[39m should include base score explanation[32m 0[2mms[22m[39m
+       [32m✓[39m should include modifier explanations[32m 0[2mms[22m[39m
+       [32m✓[39m should include dimension-specific reasoning[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete risk assessment[32m 1[2mms[22m[39m
+       [32m✓[39m should categorize burnout risk[32m 0[2mms[22m[39m
+       [32m✓[39m should generate mitigations for high risks[32m 0[2mms[22m[39m
+       [32m✓[39m should identify tension pairs[32m 0[2mms[22m[39m
+       [32m✓[39m should not identify tradeoffs when scores are close[32m 0[2mms[22m[39m
+       [32m✓[39m should limit number of tradeoffs[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete explanation[32m 1[2mms[22m[39m
+       [32m✓[39m should generate recommendations based on score[32m 0[2mms[22m[39m
+       [32m✓[39m should include dimension-specific recommendations[32m 0[2mms[22m[39m
+       [32m✓[39m should include confidence-based recommendations[32m 0[2mms[22m[39m
+       [32m✓[39m should return stretch for excellent scores with high confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should return target for good scores[32m 0[2mms[22m[39m
+       [32m✓[39m should return fallback for moderate scores[32m 0[2mms[22m[39m
+       [32m✓[39m should return avoid for poor scores[32m 0[2mms[22m[39m
+       [32m✓[39m should not return stretch if confidence is low[32m 0[2mms[22m[39m
+       [32m✓[39m should use custom thresholds[32m 0[2mms[22m[39m
+[31m       [31m×[31m should return fallback suggestions[39m[32m 8[2mms[22m[39m
+[31m       [31m×[31m should return generic suggestions when no dimensions score well[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should return stretch suggestions[32m 0[2mms[22m[39m
+       [32m✓[39m should return generic suggestions when no dimensions score well[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/scoring.test.ts [2m([22m[2m51 tests[22m[2m | [22m[31m13 failed[39m[2m)[22m[32m 45[2mms[22m[39m
+     [32m✓[39m should return insufficient data for < 2 points[32m 3[2mms[22m[39m
+[31m     [31m×[31m should detect improving trend[39m[32m 11[2mms[22m[39m
+[31m     [31m×[31m should detect worsening trend[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should detect stable trend[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should detect volatile trend[32m 1[2mms[22m[39m
+[31m     [31m×[31m should weight data points by confidence[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should calculate confidence based on sample size[39m[32m 3[2mms[22m[39m
+     [32m✓[39m should calculate confidence based on R²[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle zero variance gracefully[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should handle single data point[32m 1[2mms[22m[39m
+     [32m✓[39m should sort data points by timestamp[32m 0[2mms[22m[39m
+     [32m✓[39m should generate confidence explanation[32m 0[2mms[22m[39m
+     [32m✓[39m should respect minimum data points configuration[32m 0[2mms[22m[39m
+[31m     [31m×[31m should handle negative values[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should handle values outside [0,1] range[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should return zero volatility for < 2 points[32m 0[2mms[22m[39m
+     [32m✓[39m should classify stable volatility[32m 1[2mms[22m[39m
+     [32m✓[39m should classify moderate volatility[32m 0[2mms[22m[39m
+[31m     [31m×[31m should classify volatile[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should classify extreme volatility[32m 0[2mms[22m[39m
+     [32m✓[39m should detect cyclical pattern[32m 0[2mms[22m[39m
+[31m     [31m×[31m should detect trending pattern[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should detect spiking pattern[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should weight volatility calculation[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate variance correctly[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate standard deviation[32m 0[2mms[22m[39m
+     [32m✓[39m should return calibrated confidence[32m 0[2mms[22m[39m
+     [32m✓[39m should apply diminishing returns[32m 0[2mms[22m[39m
+     [32m✓[39m should handle missing factors[32m 0[2mms[22m[39m
+     [32m✓[39m should weight factors appropriately[32m 0[2mms[22m[39m
+     [32m✓[39m should cap at 0.95[32m 0[2mms[22m[39m
+     [32m✓[39m should generate explanation with all factors[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate perfect positive correlation[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate perfect negative correlation[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate zero correlation[32m 0[2mms[22m[39m
+     [32m✓[39m should handle different length arrays[32m 0[2mms[22m[39m
+     [32m✓[39m should return zero for < 2 points[32m 0[2mms[22m[39m
+[31m     [31m×[31m should calculate simple moving average[39m[32m 2[2mms[22m[39m
+     [32m✓[39m should return all points if less than window size[32m 0[2mms[22m[39m
+     [32m✓[39m should weight by data point weight[32m 0[2mms[22m[39m
+     [32m✓[39m should sort by timestamp[32m 0[2mms[22m[39m
+     [32m✓[39m should return empty for < 4 points[32m 0[2mms[22m[39m
+     [32m✓[39m should detect high outliers[32m 0[2mms[22m[39m
+     [32m✓[39m should detect low outliers[32m 0[2mms[22m[39m
+     [32m✓[39m should not flag normal values[32m 0[2mms[22m[39m
+     [32m✓[39m should respect threshold parameter[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate large effect size[32m 0[2mms[22m[39m
+     [32m✓[39m should calculate small effect size[32m 0[2mms[22m[39m
+[31m     [31m×[31m should calculate medium effect size[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should handle negative effect size[32m 0[2mms[22m[39m
+     [32m✓[39m should handle identical groups[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/careers/__tests__/career-knowledge-graph.test.ts [2m([22m[2m147 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[32m 89[2mms[22m[39m
+       [32m✓[39m should return all 15 career categories[32m 5[2mms[22m[39m
+       [32m✓[39m should return unique categories[32m 1[2mms[22m[39m
+       [32m✓[39m should return subcategories for technology[32m 1[2mms[22m[39m
+       [32m✓[39m should return subcategories for medicine[32m 0[2mms[22m[39m
+       [32m✓[39m should return a copy of subcategories array[32m 2[2mms[22m[39m
+       [32m✓[39m should validate correct subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should reject invalid subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should reject subcategory from wrong category[32m 0[2mms[22m[39m
+       [32m✓[39m should find category for valid subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should return null for invalid subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should return all subcategories across categories[32m 0[2mms[22m[39m
+       [32m✓[39m should return proper display name[32m 0[2mms[22m[39m
+       [32m✓[39m should convert snake_case to Title Case[32m 0[2mms[22m[39m
+       [32m✓[39m should validate correct category-subcategory pair[32m 0[2mms[22m[39m
+       [32m✓[39m should reject invalid pair[32m 0[2mms[22m[39m
+       [32m✓[39m should return related categories[32m 0[2mms[22m[39m
+       [32m✓[39m should validate valid category strings[32m 0[2mms[22m[39m
+       [32m✓[39m should reject invalid category strings[32m 0[2mms[22m[39m
+       [32m✓[39m should convert to snake_case[32m 0[2mms[22m[39m
+       [32m✓[39m should handle special characters[32m 0[2mms[22m[39m
+       [32m✓[39m should return dimension by id[32m 0[2mms[22m[39m
+       [32m✓[39m should return undefined for invalid id[32m 0[2mms[22m[39m
+       [32m✓[39m should return all dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should return market dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should return lifestyle dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should sum to approximately 1.0[32m 0[2mms[22m[39m
+       [32m✓[39m should report valid weights[32m 0[2mms[22m[39m
+       [32m✓[39m should return dimensions sorted by weight descending[32m 1[2mms[22m[39m
+       [32m✓[39m should return dimensions sorted by confidence descending[32m 1[2mms[22m[39m
+       [32m✓[39m should return value between 0 and 1[32m 0[2mms[22m[39m
+       [32m✓[39m should return dimensions below threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should calculate weighted average[32m 0[2mms[22m[39m
+       [32m✓[39m should handle empty scores[32m 0[2mms[22m[39m
+       [32m✓[39m should return array of ids[32m 0[2mms[22m[39m
+       [32m✓[39m should validate valid ids[32m 0[2mms[22m[39m
+       [32m✓[39m should reject invalid ids[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize value to 0-1 range[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for values outside range[32m 1[2mms[22m[39m
+       [32m✓[39m should throw for non-finite values[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for invalid range[32m 0[2mms[22m[39m
+       [32m✓[39m should apply exponential compression[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize using logarithmic scale[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for non-positive values[32m 0[2mms[22m[39m
+       [32m✓[39m should apply sigmoid transformation[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for invalid scale[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize salary values[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize percentage to 0-1[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize risk with exponential compression[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize demand with logarithmic expansion[32m 0[2mms[22m[39m
+       [32m✓[39m should validate and normalize valid values[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for values outside 0-1[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for non-finite values[32m 0[2mms[22m[39m
+       [32m✓[39m should normalize all dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should throw for missing dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should accept valid normalized values[32m 0[2mms[22m[39m
+       [32m✓[39m should reject invalid values[32m 0[2mms[22m[39m
+       [32m✓[39m should not throw for valid values[32m 1[2mms[22m[39m
+       [32m✓[39m should throw for invalid values[32m 0[2mms[22m[39m
+       [32m✓[39m should validate object with all valid values[32m 0[2mms[22m[39m
+       [32m✓[39m should report errors for invalid values[32m 0[2mms[22m[39m
+       [32m✓[39m should clamp values to 0-1[32m 0[2mms[22m[39m
+       [32m✓[39m should round to specified decimals[32m 0[2mms[22m[39m
+       [32m✓[39m should compare with epsilon tolerance[32m 0[2mms[22m[39m
+       [32m✓[39m should return correct quartile[32m 0[2mms[22m[39m
+       [32m✓[39m should validate a complete valid career[32m 2[2mms[22m[39m
+       [32m✓[39m should detect missing title[32m 1[2mms[22m[39m
+       [32m✓[39m should detect invalid id format[32m 1[2mms[22m[39m
+       [32m✓[39m should detect duplicate ids[32m 1[2mms[22m[39m
+       [32m✓[39m should detect invalid category[32m 1[2mms[22m[39m
+       [32m✓[39m should detect invalid subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should detect short description[32m 0[2mms[22m[39m
+       [32m✓[39m should detect missing responsibilities[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid normalized values[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid psychological fit values[32m 0[2mms[22m[39m
+       [32m✓[39m should detect missing psychological dimensions[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid education level[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid motivations[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid personality traits[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid strengths[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid failure modes[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid work environments[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid work schedules[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid team size[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid decision making speed[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid confidence score[32m 0[2mms[22m[39m
+       [32m✓[39m should detect future lastUpdated date[32m 0[2mms[22m[39m
+       [32m✓[39m should detect invalid version[32m 0[2mms[22m[39m
+[31m       [31m×[31m should separate valid and invalid careers[39m[32m 11[2mms[22m[39m
+       [32m✓[39m should find duplicate ids[32m 1[2mms[22m[39m
+       [32m✓[39m should return empty for unique ids[32m 0[2mms[22m[39m
+       [32m✓[39m should include field and value in message[32m 0[2mms[22m[39m
+       [32m✓[39m should create specific error[32m 0[2mms[22m[39m
+       [32m✓[39m should create specific error[32m 0[2mms[22m[39m
+       [32m✓[39m should include range in message[32m 0[2mms[22m[39m
+       [32m✓[39m should include valid values in message[32m 0[2mms[22m[39m
+       [32m✓[39m should return career by id[32m 0[2mms[22m[39m
+       [32m✓[39m should return undefined for invalid id[32m 0[2mms[22m[39m
+       [32m✓[39m should return all careers[32m 0[2mms[22m[39m
+       [32m✓[39m should return valid career objects[32m 3[2mms[22m[39m
+       [32m✓[39m should return careers for category[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array for category with no careers[32m 0[2mms[22m[39m
+       [32m✓[39m should return careers for subcategory[32m 0[2mms[22m[39m
+       [32m✓[39m should find careers by title[32m 0[2mms[22m[39m
+       [32m✓[39m should find careers by description[32m 0[2mms[22m[39m
+       [32m✓[39m should be case insensitive[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array for no matches[32m 0[2mms[22m[39m
+       [32m✓[39m should return total career count[32m 0[2mms[22m[39m
+       [32m✓[39m should return counts for all categories[32m 0[2mms[22m[39m
+       [32m✓[39m should return all unique subcategories[32m 0[2mms[22m[39m
+       [32m✓[39m should return careers for multiple ids[32m 0[2mms[22m[39m
+       [32m✓[39m should skip invalid ids[32m 0[2mms[22m[39m
+       [32m✓[39m should return true for existing career[32m 0[2mms[22m[39m
+       [32m✓[39m should return false for non-existing career[32m 0[2mms[22m[39m
+       [32m✓[39m should return adjacent careers[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty for invalid career[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by minFutureDemand[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by maxAutomationRisk[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by minIncomePotential[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by minRemoteCompatibility[32m 0[2mms[22m[39m
+       [32m✓[39m should filter by categories[32m 0[2mms[22m[39m
+       [32m✓[39m should combine multiple filters[32m 0[2mms[22m[39m
+       [32m✓[39m should return database statistics[32m 0[2mms[22m[39m
+       [32m✓[39m should work as standalone function[32m 0[2mms[22m[39m
+       [32m✓[39m should return all careers[32m 0[2mms[22m[39m
+       [32m✓[39m should search careers[32m 0[2mms[22m[39m
+       [32m✓[39m should return count[32m 0[2mms[22m[39m
+       [32m✓[39m should validate all careers in database[32m 2[2mms[22m[39m
+       [32m✓[39m should have all careers with valid category-subcategory pairs[32m 1[2mms[22m[39m
+       [32m✓[39m should have all normalized values in valid range[32m 16[2mms[22m[39m
+[31m       [31m×[31m should have valid adjacent career references[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should have dimension weights summing to 1.0[32m 0[2mms[22m[39m
+[31m       [31m×[31m should handle empty arrays[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle boundary normalized values[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle special characters in descriptions[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should reject overly long titles[32m 0[2mms[22m[39m
+       [32m✓[39m should reject overly long descriptions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should handle very small normalized values[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle values near 1.0[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should retrieve all careers quickly[32m 0[2mms[22m[39m
+       [32m✓[39m should search quickly[32m 0[2mms[22m[39m
+       [32m✓[39m should filter quickly[32m 0[2mms[22m[39m
+       [32m✓[39m should validate careers quickly[32m 1[2mms[22m[39m
+       [32m✓[39m should have careers across multiple categories[32m 0[2mms[22m[39m
+       [32m✓[39m should have high average confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should have mostly high confidence careers[32m 0[2mms[22m[39m
+       [32m✓[39m should have subcategories for all categories[32m 0[2mms[22m[39m
+       [32m✓[39m should have many total subcategories[32m 0[2mms[22m[39m
+ [31m❯[39m lib/intelligence/scoring/__tests__/integration.test.ts [2m([22m[2m24 tests[22m[2m | [22m[31m24 failed[39m[2m)[22m[32m 95[2mms[22m[39m
+[31m       [31m×[31m should calculate all 11 dimension scores[39m[32m 48[2mms[22m[39m
+[31m       [31m×[31m should return scores within valid range[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should return confidence for each dimension[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m should return factors for each dimension[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should return explanation for each dimension[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should calculate different scores for different profiles[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should return complete career intelligence score[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should calculate base and final scores[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should include all modifiers[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should include explanation components[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should include risk assessment[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should assign appropriate tier[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should detect contradictions in profile[39m[32m 9[2mms[22m[39m
+[31m       [31m×[31m should rank multiple careers[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should sort by final score descending[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should filter by minimum score[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should limit results[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include match details[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate statistics[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should generate insights[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle high-achiever in demanding career[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle creative person in creative career[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle introvert in social career with concerns[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle risk-averse person considering entrepreneurship[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/scoring/__tests__/motivation-fit.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m11 failed[39m[2m)[22m[32m 22[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 8[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return composite score within valid range[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should include sub-scores[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should provide explanation[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate confidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/scoring/__tests__/regret-risk.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m11 failed[39m[2m)[22m[32m 20[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 9[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return score within valid range[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should return composite score within valid range[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include sub-scores[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should provide explanation[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate confidence[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should include factors[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/timeline-builder.test.ts [2m([22m[2m17 tests[22m[2m | [22m[31m17 failed[39m[2m)[22m[32m 33[2mms[22m[39m
+[31m       [31m×[31m should create timeline from empty sessions[39m[32m 11[2mms[22m[39m
+[31m       [31m×[31m should create segments from sessions[39m[32m 4[2mms[22m[39m
+[31m       [31m×[31m should sort sessions chronologically[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should extract dominant emotions per segment[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should extract dominant themes from insights[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify patterns in segments[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify contradictions in segments[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should track decisions in segments[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate emotional trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate confidence trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should calculate decision trajectory[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should generate timeline events[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should incorporate core memory data[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should set generated timestamp[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle sessions with missing data[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle very old sessions[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle many sessions efficiently[39m[32m 1[2mms[22m[39m
+ [31m❯[39m lib/memory/extractor/__tests__/extractor.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m lib/intelligence/trajectory/__tests__/integration.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m lib/memory/__tests__/memory-system.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [32m✓[39m lib/intelligence/scoring/__tests__/constraint-fit.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m lib/scoring/__tests__/dimension-scoring-engine.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m lib/scoring/__tests__/confidence-scoring-engine.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m lib/scoring/__tests__/prediction-engine.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m lib/ai/__tests__/ai-layer.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m lib/intelligence/careers/taxonomy/taxonomy.test.ts [2m([22m[2m146 tests[22m[2m)[22m[32m 113[2mms[22m[39m
+ [32m✓[39m lib/intelligence/careers/validation/validation.test.ts [2m([22m[2m158 tests[22m[2m)[22m[32m 124[2mms[22m[39m
+ [32m✓[39m lib/mentor/__tests__/mentor-brain.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m lib/intelligence/careers/schema/schema.test.ts [2m([22m[2m158 tests[22m[2m)[22m[33m 612[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/score-aggregator.test.ts [2m([22m[2m26 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m lib/scoring/__tests__/contradiction-detection-engine.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m lib/scoring/__tests__/signal-aggregation-engine.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/trajectory-modifier.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/confidence.test.ts [2m([22m[2m34 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/growth-potential.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/identity-alignment.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/career-optionality.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/psychological-fit.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/lifestyle-fit.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/index.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/burnout-risk.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/career-ranker.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/future-resilience.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m lib/intelligence/scoring/__tests__/cognitive-fit.test.ts [2m([22m[2m9 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m21 failed[39m[22m[2m | [22m[1m[32m25 passed[39m[22m[90m (46)[39m
+[2m      Tests [22m [1m[31m310 failed[39m[22m[2m | [22m[1m[32m1214 passed[39m[22m[2m | [22m[33m4 skipped[39m[90m (1528)[39m
+[2m   Start at [22m 20:38:21
+[2m   Duration [22m 8.53s[2m (transform 11.07s, setup 0ms, import 13.93s, tests 1.82s, environment 82.38s)[22m
+

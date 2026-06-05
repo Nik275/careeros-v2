@@ -1,0 +1,185 @@
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 14 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould filter by minimum score
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MAX_RESULTS')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m222:33[22m[39m
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m   |[39m                                 [31m^[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+    [90m224|[39m     requireConfidence [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_CONFIDENCE_THRESHOLD[39m[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m26:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould filter by confidence
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m38:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould filter by tier
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m52:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould sort by final score descending
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m66:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould limit results
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m91:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould include match details
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m123:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould calculate statistics
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m140:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould generate insights
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m158:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mrankCareers[2m > [22mshould handle empty scores
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'MIN_SCORE_THRESHOLD')[39m
+[36m [2m❯[22m rankCareers lib/intelligence/scoring/career-ranker.ts:[2m221:31[22m[39m
+    [90m219|[39m )[33m:[39m [33mCareerRanking[39m {
+    [90m220|[39m   [35mconst[39m {
+    [90m221|[39m     minScore [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMIN_SCORE_THRESHOLD[39m[33m,[39m
+    [90m   |[39m                               [31m^[39m
+    [90m222|[39m     maxResults [33m=[39m [33mRANKING_CONFIG[39m[33m.[39m[33mMAX_RESULTS[39m[33m,[39m
+    [90m223|[39m     includeTiers [33m=[39m [[32m'target'[39m[33m,[39m [32m'stretch'[39m[33m,[39m [32m'fallback'[39m][33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m167:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mdetermineTier[2m > [22mshould return stretch for excellent scores with high confidence
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'excellent')[39m
+[36m [2m❯[22m determineTier lib/intelligence/scoring/career-ranker.ts:[2m378:37[22m[39m
+    [90m376|[39m )[33m:[39m [33mCareerTier[39m {
+    [90m377|[39m   [35mconst[39m {
+    [90m378|[39m     stretchThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mexcellent[33m.[39mmin[33m,[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m379|[39m     targetThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mgood[33m.[39mmin[33m,[39m
+    [90m380|[39m     fallbackThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mmoderate[33m.[39mmin[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m342:20[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mdetermineTier[2m > [22mshould return target for good scores
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'excellent')[39m
+[36m [2m❯[22m determineTier lib/intelligence/scoring/career-ranker.ts:[2m378:37[22m[39m
+    [90m376|[39m )[33m:[39m [33mCareerTier[39m {
+    [90m377|[39m   [35mconst[39m {
+    [90m378|[39m     stretchThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mexcellent[33m.[39mmin[33m,[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m379|[39m     targetThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mgood[33m.[39mmin[33m,[39m
+    [90m380|[39m     fallbackThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mmoderate[33m.[39mmin[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m348:20[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mdetermineTier[2m > [22mshould return fallback for moderate scores
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'excellent')[39m
+[36m [2m❯[22m determineTier lib/intelligence/scoring/career-ranker.ts:[2m378:37[22m[39m
+    [90m376|[39m )[33m:[39m [33mCareerTier[39m {
+    [90m377|[39m   [35mconst[39m {
+    [90m378|[39m     stretchThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mexcellent[33m.[39mmin[33m,[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m379|[39m     targetThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mgood[33m.[39mmin[33m,[39m
+    [90m380|[39m     fallbackThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mmoderate[33m.[39mmin[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m354:20[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mdetermineTier[2m > [22mshould return avoid for poor scores
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'excellent')[39m
+[36m [2m❯[22m determineTier lib/intelligence/scoring/career-ranker.ts:[2m378:37[22m[39m
+    [90m376|[39m )[33m:[39m [33mCareerTier[39m {
+    [90m377|[39m   [35mconst[39m {
+    [90m378|[39m     stretchThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mexcellent[33m.[39mmin[33m,[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m379|[39m     targetThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mgood[33m.[39mmin[33m,[39m
+    [90m380|[39m     fallbackThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mmoderate[33m.[39mmin[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m360:20[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/career-ranker.test.ts[2m > [22mCareer Ranker[2m > [22mdetermineTier[2m > [22mshould not return stretch if confidence is low
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'excellent')[39m
+[36m [2m❯[22m determineTier lib/intelligence/scoring/career-ranker.ts:[2m378:37[22m[39m
+    [90m376|[39m )[33m:[39m [33mCareerTier[39m {
+    [90m377|[39m   [35mconst[39m {
+    [90m378|[39m     stretchThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mexcellent[33m.[39mmin[33m,[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m379|[39m     targetThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mgood[33m.[39mmin[33m,[39m
+    [90m380|[39m     fallbackThreshold [33m=[39m [33mSCORE_RANGES[39m[33m.[39mmoderate[33m.[39mmin[33m,[39m
+[90m [2m❯[22m lib/intelligence/scoring/__tests__/career-ranker.test.ts:[2m366:20[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯[22m[39m
+

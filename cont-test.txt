@@ -1,0 +1,66 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/contradiction-engine.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts [2m([22m[2m25 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 11[2mms[22m[39m
+       [32m✓[39m should detect money indifference with prestige focus[32m 2[2mms[22m[39m
+       [32m✓[39m should detect stability seeking with startup attraction[32m 0[2mms[22m[39m
+       [32m✓[39m should detect autonomy valuing with structure needing[32m 0[2mms[22m[39m
+       [32m✓[39m should detect social anxiety with people-facing career desire[32m 0[2mms[22m[39m
+       [32m✓[39m should detect risk aversion with entrepreneurship interest[32m 0[2mms[22m[39m
+       [32m✓[39m should detect introversion with leadership desire[32m 0[2mms[22m[39m
+       [32m✓[39m should detect work-life balance priority with high-intensity career[32m 0[2mms[22m[39m
+       [32m✓[39m should detect creative drive with routine preference[32m 0[2mms[22m[39m
+       [32m✓[39m should detect urgency with low preparation[32m 0[2mms[22m[39m
+       [32m✓[39m should detect high ambition with low effort preference[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array when no contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should return no-contradiction analysis for empty array[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate severity score based on contradiction severity[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should identify impact areas for each contradiction type[32m 1[2mms[22m[39m
+       [32m✓[39m should generate recommendations for each contradiction[32m 0[2mms[22m[39m
+       [32m✓[39m should return empty array for no contradictions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should calculate penalties for impact areas[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should cap penalty at 30[32m 0[2mms[22m[39m
+       [32m✓[39m should return 0 for no contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should calculate penalty based on severity score[32m 0[2mms[22m[39m
+       [32m✓[39m should apply multiplier for multiple contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should cap penalty at 0.5[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete analysis[32m 0[2mms[22m[39m
+       [32m✓[39m should detect and analyze contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should return zero penalty for consistent profile[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts[2m > [22mContradiction Engine[2m > [22manalyzeContradictions[2m > [22mshould calculate severity score based on contradiction severity
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts:[2m191:43[22m[39m
+    [90m189|[39m
+    [90m190|[39m       [34mexpect[39m(analysis[33m.[39mseverityScore)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m191|[39m       [34mexpect[39m(analysis[33m.[39mimpactAreas[33m.[39mlength)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                           [31m^[39m
+    [90m192|[39m     })[33m;[39m
+    [90m193|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts[2m > [22mContradiction Engine[2m > [22mcalculateContradictionImpacts[2m > [22mshould calculate penalties for impact areas
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/contradiction-engine.test.ts:[2m239:30[22m[39m
+    [90m237|[39m       const impacts = calculateContradictionImpacts(contradictions, an…
+    [90m238|[39m
+    [90m239|[39m       [34mexpect[39m(impacts[33m.[39mlength)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                              [31m^[39m
+    [90m240|[39m       [34mexpect[39m(impacts[[34m0[39m][33m.[39mpenalty)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m241|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 19:18:43
+[2m   Duration [22m 968ms[2m (transform 51ms, setup 0ms, import 71ms, tests 11ms, environment 725ms)[22m
+

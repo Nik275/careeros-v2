@@ -1,0 +1,99 @@
+
+> careeros-v2@0.1.0 test
+> vitest run --run lib/intelligence/scoring/__tests__/confidence.test.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90mC:/Users/a/Projects/careeros-v2[39m
+
+ [31m❯[39m lib/intelligence/scoring/__tests__/confidence.test.ts [2m([22m[2m34 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 11[2mms[22m[39m
+       [32m✓[39m should score highly for complete profiles[32m 1[2mms[22m[39m
+       [32m✓[39m should score lower for incomplete profiles[32m 0[2mms[22m[39m
+       [32m✓[39m should consider personality trait count[32m 0[2mms[22m[39m
+[31m       [31m×[31m should consider value count[39m[32m 3[2mms[22m[39m
+       [32m✓[39m should return moderate score for empty longitudinal data[32m 0[2mms[22m[39m
+       [32m✓[39m should increase score for strengthening patterns[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score for weakening patterns[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score more for shifting patterns[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score for contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score for stuck loops[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for extreme personality traits[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for extreme values[32m 0[2mms[22m[39m
+       [32m✓[39m should consider motivation clarity[32m 0[2mms[22m[39m
+       [32m✓[39m should consider motivation stability[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return moderate score for insufficient data[32m 0[2mms[22m[39m
+       [32m✓[39m should score highly for consistent states[32m 0[2mms[22m[39m
+       [32m✓[39m should score lower for volatile states[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score for recent motivation shifts[39m[32m 1[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return perfect score for no contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score for low severity contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should decrease score more for high severity contradictions[32m 0[2mms[22m[39m
+[31m       [31m×[31m should decrease score significantly for critical contradictions[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should accumulate penalties for multiple contradictions[39m[32m 0[2mms[22m[39m
+       [32m✓[39m should not go below minimum threshold[32m 0[2mms[22m[39m
+       [32m✓[39m should return complete confidence calibration[32m 0[2mms[22m[39m
+       [32m✓[39m should include all confidence factors[32m 0[2mms[22m[39m
+       [32m✓[39m should generate recommendations based on factors[32m 0[2mms[22m[39m
+       [32m✓[39m should blend base and dimension confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should penalize for contradictions[32m 0[2mms[22m[39m
+       [32m✓[39m should enforce minimum confidence[32m 0[2mms[22m[39m
+       [32m✓[39m should enforce maximum confidence[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessDataQuality[2m > [22mshould consider value count
+[31m[1mAssertionError[22m: expected 0.4 to be greater than 0.4[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m130:27[22m[39m
+    [90m128|[39m       const sparseQuality = assessDataQuality(sparsePsychological, mot…
+    [90m129|[39m
+    [90m130|[39m       [34mexpect[39m(fullQuality)[33m.[39m[34mtoBeGreaterThan[39m(sparseQuality)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m131|[39m     })[33m;[39m
+    [90m132|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessTemporalConsistency[2m > [22mshould decrease score for recent motivation shifts
+[31m[1mAssertionError[22m: expected 0.849 to be less than 0.6[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m390:27[22m[39m
+    [90m388|[39m
+    [90m389|[39m       [35mconst[39m consistency [33m=[39m [34massessTemporalConsistency[39m(longitudinal)[33m;[39m
+    [90m390|[39m       [34mexpect[39m(consistency)[33m.[39m[34mtoBeLessThan[39m([34m0.6[39m)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m391|[39m     })[33m;[39m
+    [90m392|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessContradictionLevel[2m > [22mshould decrease score significantly for critical contradictions
+[31m[1mAssertionError[22m: expected 0.5 to be less than 0.5[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m449:21[22m[39m
+    [90m447|[39m
+    [90m448|[39m       [35mconst[39m level [33m=[39m [34massessContradictionLevel[39m(longitudinal)[33m;[39m
+    [90m449|[39m       [34mexpect[39m(level)[33m.[39m[34mtoBeLessThan[39m([34m0.5[39m)[33m;[39m
+    [90m   |[39m                     [31m^[39m
+    [90m450|[39m     })[33m;[39m
+    [90m451|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/intelligence/scoring/__tests__/confidence.test.ts[2m > [22mConfidence Calibration[2m > [22massessContradictionLevel[2m > [22mshould accumulate penalties for multiple contradictions
+[31m[1mAssertionError[22m: expected 0.5 to be less than 0.5[39m
+[36m [2m❯[22m lib/intelligence/scoring/__tests__/confidence.test.ts:[2m461:21[22m[39m
+    [90m459|[39m
+    [90m460|[39m       [35mconst[39m level [33m=[39m [34massessContradictionLevel[39m(longitudinal)[33m;[39m
+    [90m461|[39m       [34mexpect[39m(level)[33m.[39m[34mtoBeLessThan[39m([34m0.5[39m)[33m;[39m
+    [90m   |[39m                     [31m^[39m
+    [90m462|[39m     })[33m;[39m
+    [90m463|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m30 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:14:44
+[2m   Duration [22m 974ms[2m (transform 50ms, setup 0ms, import 68ms, tests 11ms, environment 726ms)[22m
+
