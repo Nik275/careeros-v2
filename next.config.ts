@@ -1,16 +1,23 @@
 import type { NextConfig } from "next";
 
+const clerkStagingFrontendApi = 'https://teaching-swine-10.clerk.accounts.dev';
+const clerkImageHost = 'https://img.clerk.com';
+const cloudflareChallengesHost = 'https://challenges.cloudflare.com';
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "form-action 'self'",
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob: ${clerkImageHost}`,
   "font-src 'self' data:",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkStagingFrontendApi} ${cloudflareChallengesHost}`,
+  `script-src-elem 'self' 'unsafe-inline' ${clerkStagingFrontendApi} ${cloudflareChallengesHost}`,
   "style-src 'self' 'unsafe-inline'",
-  "connect-src 'self'",
+  `connect-src 'self' ${clerkStagingFrontendApi}`,
+  "worker-src 'self' blob:",
+  `frame-src 'self' ${cloudflareChallengesHost}`,
   'upgrade-insecure-requests',
 ].join('; ');
 
