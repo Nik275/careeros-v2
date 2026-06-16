@@ -7,6 +7,7 @@ import { SignalNode } from '@/components/landing/SignalNode';
 import { DecisionModel } from '@/components/landing/DecisionModel';
 import { ProductPreviewPanel } from '@/components/landing/ProductPreviewPanel';
 import { HeroAssessmentButton } from '@/components/landing/HeroAssessmentButton';
+import { AuthNavState } from '@/components/auth/AuthNavState';
 
 export default function WelcomePage() {
   return (
@@ -21,12 +22,7 @@ export default function WelcomePage() {
           <Link href="#intelligence" className="hover:text-white transition-colors uppercase">Intelligence</Link>
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="/sign-in"
-            className="rounded-full border border-white/10 px-3 py-2 text-[12px] font-medium tracking-[0.04em] text-white/70 transition-colors hover:border-white/20 hover:text-white sm:px-4"
-          >
-            Sign in
-          </Link>
+          <AuthNavState />
           <Link href="/assessment">
             <motion.button
               whileHover={{ scale: 1.02 }}
