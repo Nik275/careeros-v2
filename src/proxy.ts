@@ -1,11 +1,22 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { hasRouteShadowInternalAccessClaim } from './security/internal-access-claims';
-import { isInternalConstitutionalShadowRoutePath } from './security/internal-route-protection';
+import {
+  isInternalConstitutionalShadowRoutePath,
+  isInternalStagingSmokeRoutePath,
+} from './security/internal-route-protection';
+import { isStagingSmokeHarnessHost } from './security/staging-smoke-harness';
 
 const constitutionalShadowProxy = clerkMiddleware(async (auth, request) => {
-  if (!isInternalConstitutionalShadowRoutePath(request.nextUrl.pathname)) {
+  const isConstitutionalShadowRoute = isInternalConstitutionalShadowRoutePath(request.nextUrl.pathname);
+  const isStagingSmokeRoute = isInternalStagingSmokeRoutePath(request.nextUrl.pathname);
+
+  if (!isConstitutionalShadowRoute && !isStagingSmokeRoute) {
     return NextResponse.next();
+  }
+
+  if (isStagingSmokeRoute && !isStagingSmokeHarnessHost(request.nextUrl.host)) {
+    return new NextResponse(null, { status: 404 });
   }
 
   const authResult = await auth();
@@ -25,5 +36,5 @@ export const proxy = constitutionalShadowProxy;
 export default constitutionalShadowProxy;
 
 export const config = {
-  matcher: ['/api/internal/constitutional-shadow/:path*'],
+  matcher: ['/api/internal/constitutional-shadow/:path*', '/internal/staging-smoke', '/internal/staging-smoke/:path*'],
 };

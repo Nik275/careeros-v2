@@ -40,7 +40,9 @@ describe('staging security contract', () => {
 
     const proxySource = readFileSync(join(process.cwd(), 'src', 'proxy.ts'), 'utf8');
     expect(proxySource).toContain('clerkMiddleware');
-    expect(proxySource).toContain("matcher: ['/api/internal/constitutional-shadow/:path*']");
+    expect(proxySource).toContain("'/api/internal/constitutional-shadow/:path*'");
+    expect(proxySource).toContain("'/internal/staging-smoke'");
+    expect(proxySource).toContain("'/internal/staging-smoke/:path*'");
   });
 
   it('keeps staging secret variables server-only', () => {
