@@ -395,22 +395,29 @@ export class CareerAnalyzer {
    * Get score for a specific dimension from career.
    */
   private getDimensionScore(career: CareerIntelligence, dimension: string): number {
-    const cognitive = career.cognitiveDemands as Record<string, { score: number }>;
-    const motivational = career.motivationalDemands as Record<string, { score: number }>;
-    const lifestyle = career.lifestyleCharacteristics as Record<string, { score: number }>;
-    const workEnv = career.workEnvironment as Record<string, { score: number }>;
-    const risks = career.careerRisks as Record<string, { score: number }>;
-    const advantages = career.careerAdvantages as Record<string, { score: number }>;
-
     return (
-      cognitive[dimension]?.score ??
-      motivational[dimension]?.score ??
-      lifestyle[dimension]?.score ??
-      workEnv[dimension]?.score ??
-      risks[dimension]?.score ??
-      advantages[dimension]?.score ??
+      this.getScoreFromDimensionGroup(career.cognitiveDemands, dimension) ??
+      this.getScoreFromDimensionGroup(career.motivationalDemands, dimension) ??
+      this.getScoreFromDimensionGroup(career.lifestyleCharacteristics, dimension) ??
+      this.getScoreFromDimensionGroup(career.workEnvironment, dimension) ??
+      this.getScoreFromDimensionGroup(career.careerRisks, dimension) ??
+      this.getScoreFromDimensionGroup(career.careerAdvantages, dimension) ??
       50
     );
+  }
+
+  private getScoreFromDimensionGroup(group: object, dimension: string): number | undefined {
+    const value = (group as Record<string, unknown>)[dimension];
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      'score' in value &&
+      typeof value.score === 'number'
+    ) {
+      return value.score;
+    }
+
+    return undefined;
   }
 
   /**

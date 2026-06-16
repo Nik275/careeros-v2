@@ -54,6 +54,12 @@ export {
   createVoIExplanationEngine,
 } from './VoIExplanationEngine';
 
+// Constants
+export {
+  INFORMATION_GAP_CATEGORY_LABELS,
+  DEFAULT_VOI_CONFIG,
+} from './types';
+
 // Types
 export type {
   // Core types
@@ -79,7 +85,4 @@ export type {
   PrioritizationResult,
   ExperimentRecommendationResult,
 
-  // Constants
-  INFORMATION_GAP_CATEGORY_LABELS,
-  DEFAULT_VOI_CONFIG,
 } from './types';

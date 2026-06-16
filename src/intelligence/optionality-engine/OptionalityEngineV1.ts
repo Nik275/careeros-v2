@@ -944,16 +944,3 @@ export function compareCareerOptionality(
   const engine = new OptionalityEngineV1(options);
   return engine.compareOptionality(career1, career2);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  OptionalityAnalysis,
-  OptionalityDimensionScore,
-  AdjacentCareer,
-  SkillCategory,
-  OptionalityWeights,
-  OptionalityCalculationOptions,
-};

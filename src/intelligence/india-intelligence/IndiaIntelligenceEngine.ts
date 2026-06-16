@@ -29,6 +29,8 @@ import {
   DEFAULT_INDIA_INTELLIGENCE_CONFIG,
   IntegratedRecommendation,
   IndiaExamType,
+  EconomicStratum,
+  EngineeringCollegeTier,
 } from './types';
 
 import {
@@ -403,7 +405,7 @@ export class IndiaIntelligenceEngine {
       const rationale: string[] = [];
       let score = 0.5;
 
-      if (college.collegeTier <= 3) score += 0.2; // IIT/NIT
+      if (this.isTopEngineeringTier(college.collegeTier)) score += 0.2; // IIT/NIT
       if (college.placement.tier === 'TIER_1') score += 0.15;
 
       const totalCost = college.fees.total4Years + college.fees.hostelAdditional;
@@ -619,6 +621,14 @@ export class IndiaIntelligenceEngine {
    */
   private generateAnalysisId(): string {
     return `india_analysis_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
+
+  private isTopEngineeringTier(tier: EngineeringCollegeTier): boolean {
+    return [
+      EngineeringCollegeTier.OLD_IIT,
+      EngineeringCollegeTier.NEW_IIT,
+      EngineeringCollegeTier.TOP_NIT,
+    ].includes(tier);
   }
 
   /**

@@ -560,7 +560,7 @@ export class PopulationLearningEngine {
 
     const scores = outcomes.map(o =>
       ['excellent', 'good'].includes(o.successLevel) ? 1 : 0
-    );
+    ) as number[];
     const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
     const variance =
       scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;

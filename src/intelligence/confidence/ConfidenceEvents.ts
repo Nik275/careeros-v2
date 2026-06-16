@@ -165,8 +165,8 @@ export class ConfidenceEventEmitter implements IConfidenceEventEmitter {
       handlers.forEach(handler => {
         try {
           handler(event);
-        } catch (error) {
-          console.error(`Error in confidence event handler for ${event.type}:`, error);
+        } catch {
+          console.error('Confidence event handler failed safely.');
         }
       });
     }

@@ -11,7 +11,6 @@ export {
   createEvidenceCollection,
   calculateAggregateConfidence,
   evidenceSourceToString,
-  confidenceLevelToString,
   validateEvidence,
   generateEvidenceId,
   generateCollectionId,

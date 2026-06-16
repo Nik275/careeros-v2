@@ -51,6 +51,17 @@ export type {
   QualityAuditReport,
 
   // Builder Types
+  CareerV2,
+  CareerCategory,
+  PsychologyProfile,
+  WorkStyleProfile,
+  RewardProfile,
+  RiskProfile,
+  OptionalityProfile,
+  EducationProfile,
+  IndiaRealityProfile,
+  FutureOutlook,
+  LifestyleProfile,
   CareerCreationOptions,
   CareerUpdateOptions,
   CareerEnrichmentOptions,

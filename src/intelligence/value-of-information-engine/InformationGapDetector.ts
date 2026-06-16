@@ -555,7 +555,7 @@ export class InformationGapDetector {
 
     // Check family constraints
     const familyReality = studentBelief.familyReality;
-    const hasFamilyAssessment = familyReality && familyReality.familyStructure;
+    const hasFamilyAssessment = familyReality && familyReality.structure;
 
     if (!hasFamilyAssessment) {
       gaps.push({
@@ -585,7 +585,7 @@ export class InformationGapDetector {
 
     // Check geographic constraints
     const geographicConstraints = (studentBelief.constraints || []).filter(
-      (c) => c.type === 'GEOGRAPHIC'
+      (c) => c.type === 'geographic'
     );
 
     if (geographicConstraints.length === 0) {

@@ -16,10 +16,14 @@ import type {
   ValidationReport,
   ValidationContext,
   ValidationConfig,
-  DEFAULT_VALIDATION_CONFIG,
   ValidationRecommendation,
   RetestRecommendation,
+  ConsistencyAnalysis,
+  ResponsePatternAnalysis,
+  ReliabilityMetrics,
+  QualityMetrics,
 } from './validation-types';
+import { DEFAULT_VALIDATION_CONFIG } from './validation-types';
 
 import { ConsistencyEngine } from './consistency-engine';
 import { ResponsePatternDetector } from './response-pattern-detector';
@@ -156,10 +160,10 @@ export class AssessmentValidator {
    * Identify all validation issues.
    */
   private identifyIssues(
-    consistency: { consistencyScore: number; contradictions: unknown[] },
-    patterns: { detectedPatterns: unknown[]; engagementScore: number },
-    reliability: { overallScore: number },
-    quality: { overallScore: number; completionRate: number }
+    consistency: ConsistencyAnalysis,
+    patterns: ResponsePatternAnalysis,
+    reliability: ReliabilityMetrics,
+    quality: QualityMetrics
   ): ValidationReport['issues'] {
     const issues: ValidationReport['issues'] = [];
 
@@ -181,7 +185,7 @@ export class AssessmentValidator {
         severity: 'WARNING',
         description: `Low consistency score: ${consistency.consistencyScore}%`,
         affectedAreas: consistency.contradictions.length > 0
-          ? consistency.contradictions.flatMap((c: { dimensions: string[] }) => c.dimensions)
+          ? consistency.contradictions.flatMap((c) => c.dimensions)
           : ['general'],
         suggestion: 'Review responses for contradictions or retest',
       });
@@ -193,7 +197,7 @@ export class AssessmentValidator {
         type: 'CONTRADICTORY_SIGNALS',
         severity: 'WARNING',
         description: `${consistency.contradictions.length} contradictions detected`,
-        affectedAreas: consistency.contradictions.flatMap((c: { dimensions: string[] }) => c.dimensions),
+        affectedAreas: consistency.contradictions.flatMap((c) => c.dimensions),
         suggestion: 'Review contradictory responses or retest',
       });
     }
@@ -201,7 +205,7 @@ export class AssessmentValidator {
     // Check patterns
     if (patterns.detectedPatterns.length > 0) {
       const highSeverity = patterns.detectedPatterns.filter(
-        (p: { severity: string }) => p.severity === 'HIGH'
+        (p) => p.severity === 'HIGH'
       );
 
       if (highSeverity.length > 0) {
@@ -255,10 +259,10 @@ export class AssessmentValidator {
    * Generate validation recommendations.
    */
   private generateRecommendations(
-    consistency: { contradictions: unknown[] },
-    patterns: { detectedPatterns: unknown[] },
-    reliability: { overallScore: number },
-    quality: { overallScore: number }
+    consistency: ConsistencyAnalysis,
+    patterns: ResponsePatternAnalysis,
+    reliability: ReliabilityMetrics,
+    quality: QualityMetrics
   ): ValidationRecommendation[] {
     const recommendations: ValidationRecommendation[] = [];
 
@@ -294,7 +298,7 @@ export class AssessmentValidator {
 
     // Pattern-based recommendations
     const highSeverityPatterns = patterns.detectedPatterns.filter(
-      (p: { severity: string }) => p.severity === 'HIGH'
+      (p) => p.severity === 'HIGH'
     );
 
     if (highSeverityPatterns.length > 0) {
@@ -336,13 +340,13 @@ export class AssessmentValidator {
    * Generate retest recommendation.
    */
   private generateRetestRecommendation(
-    reliability: { overallScore: number },
-    quality: { overallScore: number },
-    consistency: { inconsistentDimensions: string[] },
-    patterns: { detectedPatterns: unknown[] }
+    reliability: ReliabilityMetrics,
+    quality: QualityMetrics,
+    consistency: ConsistencyAnalysis,
+    patterns: ResponsePatternAnalysis
   ): RetestRecommendation {
     const highSeverityPatterns = patterns.detectedPatterns.filter(
-      (p: { severity: string }) => p.severity === 'HIGH'
+      (p) => p.severity === 'HIGH'
     );
 
     // Determine retest need

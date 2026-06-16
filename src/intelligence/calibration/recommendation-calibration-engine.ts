@@ -349,6 +349,13 @@ export class RecommendationCalibrationEngine {
   }
 
   /**
+   * Get finalized recommendation calibration observation count.
+   */
+  getObservationCount(): number {
+    return this.baseEngine.getObservationCount();
+  }
+
+  /**
    * Get outcomes by recommendation type
    */
   getOutcomesByType(recommendationType: string): RecommendationOutcome[] {

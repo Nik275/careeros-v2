@@ -14,7 +14,7 @@ import type { MarketSignal, MarketSignalType, MarketSignalSource } from '../mode
 /**
  * Update frequency for data sources.
  */
-export type UpdateFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'continuous';
+export type UpdateFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'continuous';
 
 /**
  * Geographic coverage scope.
@@ -179,6 +179,9 @@ export interface DataProviderConfig {
   /** Whether provider is enabled */
   enabled: boolean;
 
+  /** Whether provider requires authentication */
+  requiresAuth?: boolean;
+
   /** Custom reliability override */
   reliabilityOverride?: number;
 
@@ -248,31 +251,31 @@ export interface DataFetchResult {
  */
 export interface ProviderHealth {
   /** Current status */
-  readonly status: DataSourceStatus;
+  status: DataSourceStatus;
 
   /** Last successful fetch */
-  readonly lastSuccessfulFetch: Date | null;
+  lastSuccessfulFetch: Date | null;
 
   /** Last failed fetch */
-  readonly lastFailedFetch: Date | null;
+  lastFailedFetch: Date | null;
 
   /** Consecutive failures */
-  readonly consecutiveFailures: number;
+  consecutiveFailures: number;
 
   /** Total fetches */
-  readonly totalFetches: number;
+  totalFetches: number;
 
   /** Successful fetches */
-  readonly successfulFetches: number;
+  successfulFetches: number;
 
   /** Average latency (ms) */
-  readonly averageLatencyMs: number;
+  averageLatencyMs: number;
 
   /** Current reliability score (may be adjusted based on recent performance) */
-  readonly currentReliabilityScore: number;
+  currentReliabilityScore: number;
 
   /** Any issues detected */
-  readonly issues: string[];
+  issues: string[];
 }
 
 /**

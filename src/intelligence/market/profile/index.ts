@@ -10,6 +10,15 @@
  * Everything must become CareerMarketProfile before entering the recommendation system.
  */
 
+import { createDemandScoringEngine } from './DemandScoringEngine';
+import { createSalaryScoringEngine } from './SalaryScoringEngine';
+import { createGrowthScoringEngine } from './GrowthScoringEngine';
+import { createScarcityScoringEngine } from './ScarcityScoringEngine';
+import { createAutomationRiskEngine } from './AutomationRiskEngine';
+import { createFutureResilienceEngine } from './FutureResilienceEngine';
+import { createOpportunityScoringEngine } from './OpportunityScoringEngine';
+import type { CareerMarketProfile } from './models/CareerMarketProfile';
+
 // ============================================================================
 // MODELS
 // ============================================================================

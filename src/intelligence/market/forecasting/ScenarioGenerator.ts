@@ -15,6 +15,7 @@
 import type { ForecastScenario, ScenarioType } from './models/ForecastScenario';
 import { createForecastScenario, createScenarioSet } from './models/ForecastScenario';
 import type { ForecastRange } from './models/ForecastRange';
+import type { ForecastSignal } from './models/Forecast';
 
 /**
  * Scenario generator configuration.
@@ -266,7 +267,7 @@ export class ScenarioGenerator {
       baseline: ForecastScenario;
       pessimistic: ForecastScenario;
     },
-    evidence: { direction: 'positive' | 'negative' | 'neutral'; strength: number }[]
+    evidence: Pick<ForecastSignal, 'direction' | 'strength'>[]
   ): { optimistic: number; baseline: number; pessimistic: number } {
     // Start with equal probabilities adjusted by volatility
     const baseProb = 1 / 3;
@@ -321,7 +322,7 @@ export class ScenarioGenerator {
   createContext(params: {
     historicalDemand: number[];
     historicalGrowth: number[];
-    signals: Array<{ type: string; strength: number; direction: 'positive' | 'negative' }>;
+    signals: ForecastSignal[];
     volatility: number;
   }): ScenarioContext {
     // Calculate base values from historical data

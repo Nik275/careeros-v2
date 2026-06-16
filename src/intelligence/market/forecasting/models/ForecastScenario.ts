@@ -63,7 +63,7 @@ export interface ForecastScenario {
   /** Key assumptions */
   assumptions: string[];
 
-  **Critical factors for this scenario */
+  /** Critical factors for this scenario */
   criticalFactors: string[];
 
   /** Evidence supporting this scenario */
@@ -83,6 +83,8 @@ export function createForecastScenario(
   type: ScenarioType,
   params: Omit<ForecastScenario, 'id' | 'type' | 'name' | 'createdAt'>
 ): ForecastScenario {
+  const { probability, ...scenarioParams } = params;
+
   const names: Record<ScenarioType, string> = {
     optimistic: 'Optimistic Scenario',
     baseline: 'Baseline Scenario',
@@ -99,8 +101,8 @@ export function createForecastScenario(
     id: `scenario-${type}-${Date.now()}`,
     type,
     name: names[type],
-    probability: params.probability ?? probabilities[type],
-    ...params,
+    ...scenarioParams,
+    probability: probability ?? probabilities[type],
     createdAt: new Date(),
   };
 }

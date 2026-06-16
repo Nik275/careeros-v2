@@ -17,12 +17,10 @@ import type {
 
 import type {
   Action,
-  ActionType,
-  ActionPriority,
-  TimeHorizon,
   ActionIntelligenceInput,
   ResourceRequirement,
 } from '../types';
+import { ActionPriority, ActionStatus, ActionType, TimeHorizon } from '../types';
 
 /**
  * Action Generator Engine Configuration

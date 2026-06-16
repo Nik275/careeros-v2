@@ -24,6 +24,10 @@ import {
   MatchRanking,
   MatchQuality,
   SimilarityEngineConfig,
+  SimilarityFactor,
+  Difference,
+  OutcomeImplication,
+  SimilarityDimension,
   DEFAULT_SIMILARITY_CONFIG,
 } from './journey-similarity-types';
 
@@ -531,9 +535,11 @@ export class JourneyMatcher {
 
   private calculateJourneyAge(journey: CareerJourney): number {
     const now = new Date();
-    const firstEvent = journey.educationHistory[0]?.startDate || 
-                       journey.careerHistory[0]?.startDate || 
-                       now;
+    const firstEducationYear = journey.educationHistory[0]?.startYear;
+    const firstEducationDate = firstEducationYear !== undefined
+      ? new Date(firstEducationYear, 0, 1)
+      : undefined;
+    const firstEvent = firstEducationDate ?? journey.careerHistory[0]?.startDate ?? now;
     
     return (now.getTime() - firstEvent.getTime()) / (1000 * 60 * 60 * 24 * 365);
   }
@@ -612,12 +618,12 @@ export class JourneyMatcher {
 
   private identifySimilarityFactors(
     dimensionScores: Array<{ dimension: string; score: number; details: string }>
-  ): Array<{ factor: string; dimension: string; impact: 'STRONGLY_POSITIVE' | 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | 'STRONGLY_NEGATIVE'; description: string }> {
+  ): SimilarityFactor[] {
     return dimensionScores
       .filter(d => d.score > 0.6)
       .map(d => ({
         factor: `${d.dimension} alignment`,
-        dimension: d.dimension,
+        dimension: d.dimension as SimilarityDimension,
         impact: d.score > 0.85 ? 'STRONGLY_POSITIVE' : 'POSITIVE',
         description: d.details,
       }));
@@ -625,12 +631,12 @@ export class JourneyMatcher {
 
   private identifyDifferences(
     dimensionScores: Array<{ dimension: string; score: number }>
-  ): Array<{ aspect: string; dimension: string; studentValue: string; journeyValue: string; impact: 'MAJOR' | 'MODERATE' | 'MINOR' | 'NEGLIGIBLE'; outcomeImplication: string }> {
+  ): Difference[] {
     return dimensionScores
       .filter(d => d.score < 0.5)
       .map(d => ({
         aspect: d.dimension,
-        dimension: d.dimension,
+        dimension: d.dimension as SimilarityDimension,
         studentValue: 'Current profile',
         journeyValue: 'Journey profile',
         impact: d.score < 0.3 ? 'MAJOR' : 'MODERATE',
@@ -639,8 +645,8 @@ export class JourneyMatcher {
   }
 
   private calculateOutcomeImplications(
-    differences: Array<{ aspect: string; impact: string }>
-  ): Array<{ difference: string; likelyImpact: 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL' | 'UNCERTAIN'; explanation: string; mitigation?: string }> {
+    differences: Difference[]
+  ): OutcomeImplication[] {
     return differences.map(d => ({
       difference: d.aspect,
       likelyImpact: d.impact === 'MAJOR' ? 'NEGATIVE' : 'UNCERTAIN',
@@ -709,7 +715,7 @@ export class JourneyMatcher {
 
   private inferArchetype(journey: CareerJourney): string {
     // Simple archetype inference
-    if (journey.careerHistory.some(p => p.companyType === 'STARTUP')) return 'FOUNDER';
+    if (journey.careerHistory.some(p => p.companyStage.startsWith('STARTUP_'))) return 'FOUNDER';
     if (journey.careerHistory.length >= 4) return 'PROFESSIONAL';
     return 'GENERAL';
   }

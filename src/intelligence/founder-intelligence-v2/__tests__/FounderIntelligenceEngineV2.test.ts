@@ -12,25 +12,209 @@ import {
   NonFounderProfileV2,
   FounderAnalysisInputV2,
 } from '../index';
+import {
+  DIMENSION_SIGNAL_MAP,
+  NON_FOUNDER_PATTERN_MAP,
+} from '../signals';
+import {
+  CoachingAccess,
+  DecisionConfidence,
+  DecisionUrgency,
+  EducationStage,
+  ExplorationStage,
+  FamilyIncomeBracket,
+  FamilyPressure,
+  GradeScale,
+  LanguageComfort,
+  LocationType,
+  type Motivations,
+  type PsychologyProfile,
+  type RealityConstraints,
+  type StudentProfile,
+} from '../../../domains/student/StudentProfile';
 
 // Test fixtures
-const createMockProfile = (overrides: Partial<FounderAnalysisInputV2['profile']> = {}) => ({
-  id: 'test-student-123',
-  psychology: {
-    openness: 0.7,
-    conscientiousness: 0.6,
-    extraversion: 0.5,
-    neuroticism: 0.4,
-    assertiveness: 0.6,
-  },
+interface FounderPsychologyProfile {
+  openness: number;
+  conscientiousness: number;
+  extraversion: number;
+  neuroticism: number;
+  assertiveness: number;
+}
+
+type FounderStudentProfileFixture = StudentProfile & {
+  psychology: PsychologyProfile & FounderPsychologyProfile;
+  psychologyProfile: FounderPsychologyProfile;
+};
+
+type FounderStudentProfileOverrides = Omit<
+  Partial<FounderStudentProfileFixture>,
+  'psychology' | 'psychologyProfile' | 'motivations' | 'constraints'
+> & {
+  psychology?: Partial<PsychologyProfile & FounderPsychologyProfile>;
+  psychologyProfile?: Partial<FounderPsychologyProfile>;
+  motivations?: Partial<Motivations>;
+  constraints?: Partial<RealityConstraints>;
+};
+
+const createStudentPsychologyFixture = (
+  overrides: Partial<PsychologyProfile & FounderPsychologyProfile> = {}
+): PsychologyProfile & FounderPsychologyProfile => ({
+  analyticalThinking: 0.7,
+  creativity: 0.7,
+  socialOrientation: 0.6,
+  leadership: 0.7,
+  detailOrientation: 0.6,
+  curiosity: 0.8,
+  competitiveness: 0.6,
+  riskTolerance: 0.7,
+  openness: 0.7,
+  conscientiousness: 0.6,
+  extraversion: 0.5,
+  neuroticism: 0.4,
+  assertiveness: 0.6,
   ...overrides,
 });
+
+const createFounderPsychologyFixture = (
+  overrides: Partial<FounderPsychologyProfile> = {}
+): FounderPsychologyProfile => ({
+  openness: 0.7,
+  conscientiousness: 0.6,
+  extraversion: 0.5,
+  neuroticism: 0.4,
+  assertiveness: 0.6,
+  ...overrides,
+});
+
+const createMotivationsFixture = (
+  overrides: Partial<Motivations> = {}
+): Motivations => ({
+  money: 0.6,
+  impact: 0.8,
+  status: 0.5,
+  freedom: 0.8,
+  stability: 0.4,
+  ...overrides,
+});
+
+const createRealityConstraintsFixture = (
+  overrides: Partial<RealityConstraints> = {}
+): RealityConstraints => ({
+  financial: {
+    familyIncomeBracket: FamilyIncomeBracket.BETWEEN_6_12_LPA,
+    hasPersonalIncome: false,
+    hasEducationLoan: false,
+    canAffordCoaching: true,
+    canAffordPrivateCollege: false,
+    ...overrides.financial,
+  },
+  family: {
+    familyPressure: FamilyPressure.MILD,
+    isFirstGeneration: false,
+    dependentCount: 0,
+    expectedToContribute: false,
+    mustStayNearFamily: false,
+    ...overrides.family,
+  },
+  geographic: {
+    locationType: LocationType.TIER_2_CITY,
+    willingToRelocate: true,
+    ...overrides.geographic,
+  },
+  accessibility: {
+    languageComfort: LanguageComfort.FUNCTIONAL_ENGLISH,
+    nativeLanguage: 'English',
+    coachingAccess: CoachingAccess.MODERATE,
+    hasInternetAccess: true,
+    hasLearningDevice: true,
+    localInstitutionQuality: 'good',
+    ...overrides.accessibility,
+  },
+});
+
+const createMockProfile = (
+  overrides: FounderStudentProfileOverrides = {}
+): FounderStudentProfileFixture => {
+  const {
+    psychology,
+    psychologyProfile,
+    motivations,
+    constraints,
+    ...profileOverrides
+  } = overrides;
+
+  return {
+  id: 'test-student-123',
+  studentId: 'test-student-123',
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+  schemaVersion: 1,
+  psychology: createStudentPsychologyFixture(psychology),
+  psychologyProfile: createFounderPsychologyFixture(psychologyProfile),
+  motivations: createMotivationsFixture(motivations),
+  primaryMotivation: 'impact',
+  constraints: createRealityConstraintsFixture(constraints),
+  academic: {
+    performance: {
+      stage: EducationStage.UNDERGRADUATE,
+      gradeScale: GradeScale.PERCENTAGE,
+      overallScore: 0.82,
+      subjectGrades: [],
+    },
+    aptitude: {},
+    examResults: [],
+    interests: {
+      favoriteSubjects: [],
+      dislikedSubjects: [],
+      extracurriculars: [],
+    },
+  },
+  decision: {
+    explorationStage: ExplorationStage.EXPLORING,
+    timeline: { urgency: DecisionUrgency.PLANNING },
+    confidence: {
+      level: DecisionConfidence.SOMEWHAT_CONFIDENT,
+      score: 0.6,
+      confidentAreas: [],
+      uncertainAreas: [],
+    },
+    informationNeeds: {
+      gaps: [],
+      careersToResearch: [],
+      openQuestions: [],
+      hasDoneInformationalInterviews: false,
+    },
+    previousAssessments: [],
+    hasMentor: false,
+  },
+  dataConfidence: 0.8,
+  completeness: 0.8,
+  dataSource: 'assessment',
+  ...profileOverrides,
+  };
+};
 
 const createMockInput = (overrides: Partial<FounderAnalysisInputV2> = {}): FounderAnalysisInputV2 => ({
   profile: createMockProfile(),
   timestamp: Date.now(),
   ...overrides,
 });
+
+const createHighReadinessAssessmentResponses = () => [
+  {
+    questionId: 'risk_tolerance',
+    questionText: 'risk_tolerance uncertainty ambiguity',
+    value: 5,
+    scaleMax: 5,
+  },
+  {
+    questionId: 'resilience',
+    questionText: 'resilience failure setbacks',
+    value: 5,
+    scaleMax: 5,
+  },
+];
 
 describe('FounderIntelligenceEngineV2', () => {
   let engine: ReturnType<typeof createFounderIntelligenceEngineV2>;
@@ -291,6 +475,7 @@ describe('FounderIntelligenceEngineV2', () => {
     it('should assess high potential for strong evidence', () => {
       const input = createMockInput({
         userInput: 'I co-founded a startup, raised funding, and have 1000 paying customers.',
+        assessmentResponses: createHighReadinessAssessmentResponses(),
         projectPortfolio: [
           {
             name: 'Successful Startup',
@@ -304,6 +489,7 @@ describe('FounderIntelligenceEngineV2', () => {
             outcome: 'ongoing',
             demonstratedSkills: ['founding', 'fundraising', 'sales', 'leadership'],
             role: 'CO_FOUNDER',
+            lessonsLearned: ['Recovered from early setbacks and adapted under uncertainty'],
           },
         ],
       });
@@ -345,6 +531,19 @@ describe('FounderIntelligenceEngineV2', () => {
     it('should recommend suitable sectors', () => {
       const input = createMockInput({
         userInput: 'I am a technical founder interested in AI and software.',
+        projectPortfolio: [
+          {
+            name: 'AI Tool',
+            description: 'AI software product',
+            isProduct: true,
+            hadUsers: true,
+            hadRevenue: false,
+            teamSize: 1,
+            durationMonths: 6,
+            outcome: 'ongoing',
+            demonstratedSkills: ['development', 'machine learning', 'software'],
+          },
+        ],
       });
 
       const analysis = engine.analyze(input);
@@ -531,6 +730,7 @@ describe('FounderIntelligenceEngineV2', () => {
           Before this, I built several products and learned from failures.
           I am obsessed with solving this problem and work 12 hours a day on it.
         `,
+        assessmentResponses: createHighReadinessAssessmentResponses(),
         projectPortfolio: [
           {
             name: 'Current Startup',
@@ -545,6 +745,7 @@ describe('FounderIntelligenceEngineV2', () => {
             outcome: 'ongoing',
             demonstratedSkills: ['founding', 'fundraising', 'leadership', 'sales'],
             role: 'CO_FOUNDER',
+            lessonsLearned: ['Learned from failed experiments and adapted through uncertainty'],
           },
         ],
       });
@@ -560,8 +761,6 @@ describe('FounderIntelligenceEngineV2', () => {
 
 describe('Signal Patterns', () => {
   it('should have signal patterns for all dimensions', () => {
-    const { DIMENSION_SIGNAL_MAP } = require('../signals');
-
     for (const dimension of Object.values(FounderDimensionV2)) {
       expect(DIMENSION_SIGNAL_MAP[dimension]).toBeDefined();
       expect(DIMENSION_SIGNAL_MAP[dimension].length).toBeGreaterThan(0);
@@ -569,8 +768,6 @@ describe('Signal Patterns', () => {
   });
 
   it('should have non-founder patterns for all profiles', () => {
-    const { NON_FOUNDER_PATTERN_MAP } = require('../signals');
-
     for (const profile of Object.values(NonFounderProfileV2)) {
       expect(NON_FOUNDER_PATTERN_MAP[profile]).toBeDefined();
       expect(NON_FOUNDER_PATTERN_MAP[profile].length).toBeGreaterThan(0);

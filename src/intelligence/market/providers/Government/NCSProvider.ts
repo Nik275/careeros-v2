@@ -42,13 +42,13 @@ export const NCS_METADATA: DataSourceMetadata = {
   ],
   signalTypes: [
     'job_postings',
-    'skill_demand',
+    'skill_growth',
     'salary_growth',
     'government_push',
   ],
   signalTypeReliability: {
     job_postings: 96,
-    skill_demand: 92,
+    skill_growth: 92,
     salary_growth: 88,
     government_push: 98,
   },

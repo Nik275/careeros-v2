@@ -20,7 +20,16 @@
  */
 
 import { StudentProfile } from '@/domains/student/StudentProfile';
-import { AssessmentResponse } from '@/types/assessment';
+
+export interface FounderAssessmentResponseV2 {
+  readonly questionId?: string;
+  readonly questionText?: string;
+  readonly value?: number | string;
+  readonly scaleMax?: number;
+  readonly response?: string | number;
+  readonly category?: string;
+  readonly type?: string;
+}
 
 // ============================================================================
 // CORE DIMENSIONS
@@ -1126,7 +1135,7 @@ export interface FounderAnalysisInputV2 {
   profile: StudentProfile;
   
   /** Assessment responses */
-  assessmentResponses?: AssessmentResponse[];
+  assessmentResponses?: FounderAssessmentResponseV2[];
   
   /** Explicit statements about entrepreneurship */
   explicitStatements?: string[];

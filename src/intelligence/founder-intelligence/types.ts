@@ -14,7 +14,16 @@
  */
 
 import { StudentProfile } from '@/domains/student/StudentProfile';
-import { AssessmentResponse } from '@/types/assessment';
+
+export interface FounderAssessmentResponse {
+  readonly questionId?: string;
+  readonly questionText?: string;
+  readonly value?: number | string;
+  readonly scaleMax?: number;
+  readonly response?: string | number;
+  readonly category?: string;
+  readonly type?: string;
+}
 
 // ============================================================================
 // FOUNDER POTENTIAL ENUMS
@@ -555,7 +564,7 @@ export interface FounderAnalysisInput {
   profile: StudentProfile;
   
   /** Assessment responses */
-  assessmentResponses?: AssessmentResponse[];
+  assessmentResponses?: FounderAssessmentResponse[];
   
   /** Explicit statements about entrepreneurship */
   explicitStatements?: string[];

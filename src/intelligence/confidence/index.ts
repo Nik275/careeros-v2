@@ -30,7 +30,7 @@ export type {
   CalibrationProfile,
   AggregationMethod,
   ConfidenceExplanation,
-  ConfidenceHistory,
+  ConfidenceHistory as ConfidenceHistorySnapshot,
   CalibrationStatusType,
   ReliabilityBand,
 } from './ConfidenceTypes';

@@ -23,6 +23,7 @@ import {
   MotivationAlignment,
   EconomicStratum,
   FamilyBusinessInvolvement,
+  FamilyPressureSource,
 } from './types';
 
 /**
@@ -186,7 +187,7 @@ export class IndiaMotivationModel {
     }
 
     // Family pressure for status
-    if (input.profile.familyPressureSources.includes('EXTENDED_FAMILY_OPINION')) {
+    if (input.profile.familyPressureSources.includes(FamilyPressureSource.EXTENDED_FAMILY_OPINION)) {
       confidence += 0.15;
       evidence.push('Extended family opinion matters - social status important');
     }
@@ -345,7 +346,7 @@ export class IndiaMotivationModel {
     let confidence = 0.2;
     const evidence: string[] = [];
 
-    if (input.statedPreferences.preferredWorkEnvironment === 'OWN_BUSINESS') {
+    if (input.selfAssessment.preferredWorkEnvironment === 'OWN_BUSINESS') {
       confidence += 0.35;
       evidence.push('Explicitly prefers own business environment');
     }
@@ -395,7 +396,7 @@ export class IndiaMotivationModel {
       evidence.push('Significant family business to continue');
     }
 
-    if (input.profile.familyPressureSources.includes('CULTURAL_OBLIGATION')) {
+    if (input.profile.familyPressureSources.includes(FamilyPressureSource.CULTURAL_OBLIGATION)) {
       confidence += 0.2;
       evidence.push('Cultural obligation pressure suggests legacy expectations');
     }

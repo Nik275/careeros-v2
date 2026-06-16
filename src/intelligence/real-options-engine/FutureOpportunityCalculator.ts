@@ -96,12 +96,12 @@ export class FutureOpportunityCalculator {
   ): FutureOpportunityCalculation['futurePathways'] {
     // Find all possible transitions
     const outgoingEdges = transitionEdges.filter(
-      (e) => e.sourceCareerId === careerId || e.sourceId === careerId
+      (e) => e.sourceCareerId === careerId
     );
 
     // Create pathway objects
     const pathways = outgoingEdges.slice(0, 10).map((edge) => ({
-      name: edge.targetCareerId || edge.targetId || 'Unknown Path',
+      name: edge.targetCareerId || 'Unknown Path',
       probability: (edge.transitionProbability || 0.5) * 100,
       utility: Math.max(0, 100 - edge.transitionDifficulty),
       timeToReach: (edge.transitionTimeMonths || 12) / 12,

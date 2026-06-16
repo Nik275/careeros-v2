@@ -18,6 +18,7 @@ import type {
   UncertaintyModel,
   FutureSimulationConfig,
 } from './future-simulation-types';
+import { DEFAULT_FUTURE_SIMULATION_CONFIG } from './future-simulation-types';
 
 /**
  * Engine for explaining simulations.
@@ -341,7 +342,7 @@ export function createSimulationExplainer(
   config?: Partial<FutureSimulationConfig>
 ): SimulationExplainer {
   const fullConfig: FutureSimulationConfig = {
-    ...import('./future-simulation-types').DEFAULT_FUTURE_SIMULATION_CONFIG,
+    ...DEFAULT_FUTURE_SIMULATION_CONFIG,
     ...config,
   };
 

@@ -146,7 +146,7 @@ export class RecommendationAuditEngine {
 
     // Audit confidence basis
     const confidenceBasis = this.auditConfidenceBasis(
-      input.confidence,
+      input.recommendation.confidence,
       input.evidence,
       input.engines,
       input.historicalOutcomes

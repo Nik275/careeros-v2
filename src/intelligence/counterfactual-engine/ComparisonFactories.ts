@@ -23,8 +23,6 @@ import {
   RESEARCH_SCIENTIST,
 } from '@/data';
 
-import type { Career } from '@/ontology/career-ontology';
-
 import {
   CounterfactualEngine,
   CounterfactualComparison,
@@ -35,6 +33,7 @@ import {
 import {
   adaptCareerToPathData,
   createCareerComparisonPair,
+  CareerAdapterInput,
   CareerAdapterConfig,
   DEFAULT_ADAPTER_CONFIG,
 } from './CareerAdapter';
@@ -141,7 +140,7 @@ export function compareBankingVsEngineering(
  * Government prestige and stability vs private sector growth
  */
 export function compareCivilServicesVsCorporate(
-  corporateCareer: Career = SOFTWARE_ENGINEER,
+  corporateCareer: CareerAdapterInput = SOFTWARE_ENGINEER,
   config?: Partial<CareerAdapterConfig & CounterfactualConfig>
 ): CounterfactualComparison {
   const engine = new CounterfactualEngine(config);
@@ -294,7 +293,7 @@ export function compareCareersBySlug(
   const alternative = getEliteCareerBySlug(alternativeSlug);
 
   if (!primary || !alternative) {
-    console.error(`Career not found: ${!primary ? primarySlug : alternativeSlug}`);
+    console.error('Career comparison input was not found safely.');
     return null;
   }
 
@@ -317,8 +316,8 @@ export function compareCareersBySlug(
  * Compare any two Career objects directly
  */
 export function compareAnyCareers(
-  primary: Career,
-  alternative: Career,
+  primary: CareerAdapterInput,
+  alternative: CareerAdapterInput,
   config?: Partial<CareerAdapterConfig & CounterfactualConfig>
 ): CounterfactualComparison {
   const engine = new CounterfactualEngine(config);
@@ -340,8 +339,8 @@ export function compareAnyCareers(
  * Compare a primary career against multiple alternatives
  */
 export function compareAgainstAlternatives(
-  primary: Career,
-  alternatives: Career[],
+  primary: CareerAdapterInput,
+  alternatives: CareerAdapterInput[],
   config?: Partial<CareerAdapterConfig & CounterfactualConfig>
 ): CounterfactualComparison[] {
   const engine = new CounterfactualEngine(config);
@@ -481,5 +480,3 @@ export function getComparisonsByCategory(
     .filter(s => ids.includes(s.id))
     .map(s => ({ id: s.id, name: s.name, factory: s.factory }));
 }
-
-

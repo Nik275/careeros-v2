@@ -34,6 +34,7 @@ import {
   createRiskEngine,
   createScenarioEngine,
   createDecisionIntelligenceEngine,
+  DecisionInputValidationError,
   
   // Utilities
   analyzeQuickTradeoff,
@@ -56,29 +57,34 @@ import {
  */
 function createBaseInput(type: DecisionType = 'CAREER_CHOICE'): DecisionInput {
   const dimensionScores = new Map([
-    ['analyticalThinking', { percentileScore: 70, confidence: 0.8, sampleSize: 100 }],
-    ['creativity', { percentileScore: 65, confidence: 0.7, sampleSize: 100 }],
-    ['socialSkills', { percentileScore: 60, confidence: 0.75, sampleSize: 100 }],
-    ['leadership', { percentileScore: 55, confidence: 0.7, sampleSize: 100 }],
-    ['technicalSkills', { percentileScore: 75, confidence: 0.8, sampleSize: 100 }],
-    ['resilience', { percentileScore: 65, confidence: 0.75, sampleSize: 100 }],
-    ['adaptability', { percentileScore: 70, confidence: 0.7, sampleSize: 100 }],
-    ['riskTolerance', { percentileScore: 50, confidence: 0.6, sampleSize: 100 }],
-    ['stabilityPreference', { percentileScore: 60, confidence: 0.65, sampleSize: 100 }],
+    ['analyticalThinking', { dimension: 'analyticalThinking', score: 70, confidence: 80, signalCount: 100 }],
+    ['creativity', { dimension: 'creativity', score: 65, confidence: 70, signalCount: 100 }],
+    ['socialSkills', { dimension: 'socialSkills', score: 60, confidence: 75, signalCount: 100 }],
+    ['leadership', { dimension: 'leadership', score: 55, confidence: 70, signalCount: 100 }],
+    ['technicalSkills', { dimension: 'technicalSkills', score: 75, confidence: 80, signalCount: 100 }],
+    ['resilience', { dimension: 'resilience', score: 65, confidence: 75, signalCount: 100 }],
+    ['adaptability', { dimension: 'adaptability', score: 70, confidence: 70, signalCount: 100 }],
+    ['riskTolerance', { dimension: 'riskTolerance', score: 50, confidence: 60, signalCount: 100 }],
+    ['stabilityPreference', { dimension: 'stabilityPreference', score: 60, confidence: 65, signalCount: 100 }],
   ]);
 
   const context: DecisionContext = {
     personalCircumstances: ['Exploring options', 'Some family expectations'],
     familyExpectations: ['Financial stability', 'Respectable career'],
+    peerInfluence: [],
+    culturalFactors: [],
+    economicClimate: 'stable',
     constraints: ['Budget of 10 lakhs', 'Must decide within 3 months'],
     values: ['Growth', 'Impact', 'Balance'],
+    nonNegotiables: [],
     aspirationalGoals: ['Leadership role', 'Financial independence'],
   };
 
   const timeline: DecisionTimeline = {
     decisionBy: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
-    consequencesDuration: 120, // 10 years in months
-    reversibilityWindow: 12,
+    implementationStart: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+    keyMilestones: [],
+    flexibility: 12,
   };
 
   return {
@@ -89,10 +95,80 @@ function createBaseInput(type: DecisionType = 'CAREER_CHOICE'): DecisionInput {
     dimensionScores,
     options: [],
     context,
-    constraints: context.constraints,
+    constraints: [
+      {
+        type: 'FINANCIAL',
+        description: 'Budget of 10 lakhs',
+        severity: 'SOFT',
+        flexibility: 50,
+      },
+      {
+        type: 'PERSONAL',
+        description: 'Must decide within 3 months',
+        severity: 'SOFT',
+        flexibility: 40,
+      },
+    ],
     timeline,
+    psychologyProfile: {
+      analyticalThinking: 0.7,
+      creativity: 0.65,
+      socialOrientation: 0.6,
+      leadership: 0.55,
+      detailOrientation: 0.65,
+      curiosity: 0.7,
+      competitiveness: 0.55,
+      riskTolerance: 0.5,
+    },
+    careerRecommendations: {
+      studentProfileId: 'test-student-001',
+      topRecommendations: [],
+      alternativeRecommendations: [],
+      stretchRecommendations: [],
+      allRecommendations: [],
+      metadata: {
+        totalEvaluated: 0,
+        totalRecommended: 0,
+        generatedAt: new Date(),
+        averageScore: 0,
+        averageConfidence: 0,
+      },
+    },
   };
 }
+
+const createTimeCommitment = (
+  overrides: Partial<DecisionOption['timeCommitment']> = {}
+): DecisionOption['timeCommitment'] => ({
+  duration: 48,
+  flexibility: 'SOME_FLEXIBILITY',
+  intensity: 'FULL_TIME',
+  ...overrides,
+});
+
+const createFinancialImplications = (
+  overrides: Partial<DecisionOption['financialImplications']> = {}
+): DecisionOption['financialImplications'] => ({
+  initialCost: 200000,
+  ongoingCost: 0,
+  expectedIncome: 600000,
+  opportunityCost: 300000,
+  breakEvenTime: 24,
+  roiEstimate: 1.5,
+  ...overrides,
+});
+
+const createLocationOption = (
+  overrides: Partial<NonNullable<DecisionOption['location']>> = {}
+): NonNullable<DecisionOption['location']> => ({
+  city: 'Mumbai',
+  country: 'India',
+  region: 'Metro',
+  costOfLiving: 'MEDIUM',
+  opportunities: 'GOOD',
+  lifestyle: ['urban'],
+  ...overrides,
+});
 
 function createOptionA(): DecisionOption {
   return {
@@ -101,44 +177,36 @@ function createOptionA(): DecisionOption {
     description: 'A stable, traditional career path with predictable outcomes.',
     careerId: 'career-safe',
     riskLevel: 'LOW',
-    timeCommitment: {
+    timeCommitment: createTimeCommitment({
       duration: 48,
-      flexibility: 'MODERATELY_FLEXIBLE',
-      intensity: 'MODERATE',
-    },
-    financialImplications: {
+      flexibility: 'SOME_FLEXIBILITY',
+      intensity: 'FULL_TIME',
+    }),
+    financialImplications: createFinancialImplications({
       initialCost: 200000,
       expectedIncome: 600000,
       opportunityCost: 300000,
       breakEvenTime: 24,
-    },
-    location: {
+    }),
+    location: createLocationOption({
       country: 'India',
       region: 'Metro',
-      costOfLiving: 'MODERATE',
-    },
+      costOfLiving: 'MEDIUM',
+    }),
     educationPath: {
-      type: 'DEGREE',
       institution: 'Good University',
+      degree: 'Degree',
       duration: 48,
       cost: 400000,
-      specialization: false,
+      location: 'India',
+      specialization: 'General',
     },
     reversibility: {
       score: 60,
       type: 'TYPE_2',
-      category: 'PARTIALLY_REVERSIBLE',
-      switchingCost: {
-        financial: 100000,
-        time: 12,
-        social: 40,
-        identity: 30,
-        opportunity: 200000,
-        total: 570000,
-      },
+      switchingCost: 570000,
       timeToReverse: 18,
       explanation: 'Moderately reversible.',
-      comparableDecisions: ['Changing majors'],
     },
     tags: ['stable', 'traditional', 'low-risk'],
   };
@@ -151,44 +219,37 @@ function createOptionB(): DecisionOption {
     description: 'An ambitious path with significant upside potential but higher uncertainty.',
     careerId: 'career-ambitious',
     riskLevel: 'HIGH',
-    timeCommitment: {
+    timeCommitment: createTimeCommitment({
       duration: 60,
       flexibility: 'RIGID',
       intensity: 'INTENSIVE',
-    },
-    financialImplications: {
+    }),
+    financialImplications: createFinancialImplications({
       initialCost: 800000,
       expectedIncome: 1200000,
       opportunityCost: 500000,
       breakEvenTime: 36,
-    },
-    location: {
+      roiEstimate: 1.4,
+    }),
+    location: createLocationOption({
       country: 'India',
       region: 'Top Metro',
       costOfLiving: 'HIGH',
-    },
+    }),
     educationPath: {
-      type: 'DEGREE',
       institution: 'Elite Institution',
+      degree: 'Degree',
       duration: 60,
       cost: 1500000,
-      specialization: true,
+      location: 'India',
+      specialization: 'Specialized',
     },
     reversibility: {
       score: 30,
       type: 'TYPE_1',
-      category: 'MOSTLY_IRREVERSIBLE',
-      switchingCost: {
-        financial: 500000,
-        time: 36,
-        social: 60,
-        identity: 50,
-        opportunity: 800000,
-        total: 2350000,
-      },
+      switchingCost: 2350000,
       timeToReverse: 48,
       explanation: 'Difficult to reverse.',
-      comparableDecisions: ['Dropping out', 'Major career change'],
     },
     tags: ['prestigious', 'high-growth', 'high-stress', 'specialized'],
   };
@@ -606,11 +667,12 @@ describe('Optionality Engine', () => {
       const input = createBaseInput();
       const option = createOptionA();
       option.educationPath = {
-        type: 'DEGREE',
         institution: 'University',
+        degree: 'Degree',
         duration: 48,
         cost: 500000,
-        specialization: false,
+        location: 'India',
+        specialization: 'General',
       };
       
       const analysis = engine.analyzeOptionality(input, option);
@@ -1465,13 +1527,23 @@ describe('Real-World Decision Scenarios', () => {
           ...createOptionA(),
           label: 'High-Paying Corporate Job',
           description: 'High salary, long hours, prestige.',
-          financialImplications: { initialCost: 0, expectedIncome: 2000000, opportunityCost: 0, breakEvenTime: 0 },
+          financialImplications: createFinancialImplications({
+            initialCost: 0,
+            expectedIncome: 2000000,
+            opportunityCost: 0,
+            breakEvenTime: 0,
+          }),
         },
         {
           ...createOptionB(),
           label: 'NGO Social Work',
           description: 'Meaningful work, modest pay, impact.',
-          financialImplications: { initialCost: 0, expectedIncome: 400000, opportunityCost: 0, breakEvenTime: 0 },
+          financialImplications: createFinancialImplications({
+            initialCost: 0,
+            expectedIncome: 400000,
+            opportunityCost: 0,
+            breakEvenTime: 0,
+          }),
           riskLevel: 'LOW',
         },
       ];
@@ -1524,13 +1596,21 @@ describe('Real-World Decision Scenarios', () => {
           ...createOptionA(),
           label: 'MBBS',
           description: 'Medical degree, long training, stable career.',
-          timeCommitment: { duration: 66, flexibility: 'RIGID', intensity: 'INTENSIVE' },
+          timeCommitment: createTimeCommitment({
+            duration: 66,
+            flexibility: 'RIGID',
+            intensity: 'INTENSIVE',
+          }),
         },
         {
           ...createOptionB(),
           label: 'Biotechnology',
           description: 'Research-focused, emerging field.',
-          timeCommitment: { duration: 48, flexibility: 'MODERATELY_FLEXIBLE', intensity: 'MODERATE' },
+          timeCommitment: createTimeCommitment({
+            duration: 48,
+            flexibility: 'SOME_FLEXIBILITY',
+            intensity: 'FULL_TIME',
+          }),
         },
       ];
       
@@ -1553,14 +1633,24 @@ describe('Real-World Decision Scenarios', () => {
           label: 'Campus Placement',
           description: 'Stable job, good package, safe path.',
           riskLevel: 'LOW',
-          financialImplications: { initialCost: 0, expectedIncome: 800000, opportunityCost: 0, breakEvenTime: 0 },
+          financialImplications: createFinancialImplications({
+            initialCost: 0,
+            expectedIncome: 800000,
+            opportunityCost: 0,
+            breakEvenTime: 0,
+          }),
         },
         {
           ...createOptionB(),
           label: 'Start Own Venture',
           description: 'High risk, potential high reward, autonomy.',
           riskLevel: 'VERY_HIGH',
-          financialImplications: { initialCost: 500000, expectedIncome: 0, opportunityCost: 800000, breakEvenTime: 60 },
+          financialImplications: createFinancialImplications({
+            initialCost: 500000,
+            expectedIncome: 0,
+            opportunityCost: 800000,
+            breakEvenTime: 60,
+          }),
         },
       ];
       
@@ -1579,15 +1669,35 @@ describe('Real-World Decision Scenarios', () => {
           ...createOptionA(),
           label: 'Study in India',
           description: 'Stay with family, lower cost, known system.',
-          location: { country: 'India', region: 'Metro', costOfLiving: 'MODERATE' },
-          financialImplications: { initialCost: 500000, expectedIncome: 600000, opportunityCost: 0, breakEvenTime: 12 },
+          location: createLocationOption({
+            country: 'India',
+            region: 'Metro',
+            costOfLiving: 'MEDIUM',
+          }),
+          financialImplications: createFinancialImplications({
+            initialCost: 500000,
+            expectedIncome: 600000,
+            opportunityCost: 0,
+            breakEvenTime: 12,
+          }),
         },
         {
           ...createOptionB(),
           label: 'Study Abroad (USA/UK)',
           description: 'Global exposure, high cost, immigration uncertainty.',
-          location: { country: 'USA', region: 'Major City', costOfLiving: 'VERY_HIGH' },
-          financialImplications: { initialCost: 4000000, expectedIncome: 1500000, opportunityCost: 0, breakEvenTime: 48 },
+          location: createLocationOption({
+            city: 'New York',
+            country: 'USA',
+            region: 'Major City',
+            costOfLiving: 'VERY_HIGH',
+            opportunities: 'EXCELLENT',
+          }),
+          financialImplications: createFinancialImplications({
+            initialCost: 4000000,
+            expectedIncome: 1500000,
+            opportunityCost: 0,
+            breakEvenTime: 48,
+          }),
         },
       ];
       
@@ -1609,13 +1719,21 @@ describe('Real-World Decision Scenarios', () => {
           ...createOptionA(),
           label: 'Take Drop Year',
           description: 'Prepare again for entrance exams, uncertainty, time investment.',
-          timeCommitment: { duration: 12, flexibility: 'MODERATELY_FLEXIBLE', intensity: 'INTENSIVE' },
+          timeCommitment: createTimeCommitment({
+            duration: 12,
+            flexibility: 'SOME_FLEXIBILITY',
+            intensity: 'INTENSIVE',
+          }),
         },
         {
           ...createOptionB(),
           label: 'Join Available College',
           description: 'Start now, save time, compromise on prestige.',
-          timeCommitment: { duration: 48, flexibility: 'MODERATELY_FLEXIBLE', intensity: 'MODERATE' },
+          timeCommitment: createTimeCommitment({
+            duration: 48,
+            flexibility: 'SOME_FLEXIBILITY',
+            intensity: 'FULL_TIME',
+          }),
         },
       ];
       
@@ -1643,7 +1761,11 @@ describe('Real-World Decision Scenarios', () => {
           label: 'Switch to New Field',
           description: 'Start over, retrain, uncertainty, potential fulfillment.',
           riskLevel: 'HIGH',
-          timeCommitment: { duration: 24, flexibility: 'RIGID', intensity: 'INTENSIVE' },
+          timeCommitment: createTimeCommitment({
+            duration: 24,
+            flexibility: 'RIGID',
+            intensity: 'INTENSIVE',
+          }),
         },
       ];
       
@@ -1659,8 +1781,8 @@ describe('Real-World Decision Scenarios', () => {
     it('should analyze CS vs Design school', () => {
       const input = createBaseInput('CAREER_CHOICE');
       input.context.values = ['Creativity', 'Problem solving', 'Job security', 'Passion'];
-      input.dimensionScores.set('creativity', { percentileScore: 85, confidence: 0.8, sampleSize: 100 });
-      input.dimensionScores.set('analyticalThinking', { percentileScore: 75, confidence: 0.8, sampleSize: 100 });
+      input.dimensionScores.set('creativity', { dimension: 'creativity', score: 85, confidence: 80, signalCount: 100 });
+      input.dimensionScores.set('analyticalThinking', { dimension: 'analyticalThinking', score: 75, confidence: 80, signalCount: 100 });
       input.options = [
         {
           ...createOptionA(),
@@ -1704,11 +1826,11 @@ describe('Real-World Decision Scenarios', () => {
       ];
       input.contradictions = [
         {
-          id: 'contradiction-1',
-          between: ['values', 'career-path'],
+          dimensionA: 'values',
+          dimensionB: 'career-path',
           description: 'Values emphasize social impact, but considering corporate path.',
-          severity: 'MODERATE',
-          detectedAt: new Date(),
+          severity: 'MEDIUM',
+          timestamp: new Date(),
         },
       ];
       
@@ -1791,7 +1913,19 @@ describe('Humanized Outputs', () => {
 describe('Configuration and Edge Cases', () => {
   it('should accept custom configuration', () => {
     const engine = createDecisionIntelligenceEngine({
-      risk: { riskAppetite: 'CONSERVATIVE' },
+      risk: {
+        riskAppetite: 'CONSERVATIVE',
+        categoryWeights: new Map([
+          ['IDENTITY', 1.0],
+          ['FINANCIAL', 0.9],
+          ['CAREER', 0.85],
+          ['LIFESTYLE', 0.75],
+          ['BURNOUT', 0.8],
+          ['OPPORTUNITY_COST', 0.7],
+        ]),
+        mitigationEffectiveness: 0.7,
+        horizon: 10,
+      },
     });
     
     expect(engine.getConfig().risk.riskAppetite).toBe('CONSERVATIVE');
@@ -1807,14 +1941,12 @@ describe('Configuration and Edge Cases', () => {
     expect(analysis).toBeDefined();
   });
 
-  it('should handle empty options', () => {
+  it('should reject empty options for full decision analysis', () => {
     const input = createBaseInput();
     input.options = [];
     
     const engine = createDecisionIntelligenceEngine();
-    const analysis = engine.analyze(input);
-    
-    expect(analysis).toBeDefined();
+    expect(() => engine.analyze(input)).toThrow(DecisionInputValidationError);
   });
 
   it('should handle missing values gracefully', () => {

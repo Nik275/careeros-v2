@@ -324,7 +324,7 @@ export class DecisionTimingEngine {
       return { minimumDelay: 14, optimalDelay: 30, maximumDelay: 60 };
     }
 
-    return { minimumDelay: minDelay, optimalDelay, maximumDelay };
+    return { minimumDelay: minDelay, optimalDelay, maximumDelay: maxDelay };
   }
 
   /**

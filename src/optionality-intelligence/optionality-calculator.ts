@@ -24,6 +24,7 @@ import type {
   TransferableSkill,
   AccessibleIndustry,
 } from './optionality-types';
+import { DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG } from './optionality-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
 
@@ -60,7 +61,7 @@ export class OptionalityCalculator {
       careerFlexibility: this.calculateCareerFlexibility(career, fitResult, weights.careerFlexibility),
       pivotPotential: this.calculatePivotPotential(career, fitResult, weights.pivotPotential),
       transferableSkills: this.calculateTransferableSkills(career, weights.transferableSkills),
-      industryMobility: this.calculateIndustryMobility(career, weights.industryMobility),
+      industryMobility: this.calculateIndustryMobilityScore(career, weights.industryMobility),
       geographicMobility: this.calculateGeographicMobility(career, weights.geographicMobility),
       entrepreneurialPotential: this.calculateEntrepreneurialPotential(career, weights.entrepreneurialPotential),
     };
@@ -290,7 +291,7 @@ export class OptionalityCalculator {
    * @param weight - Dimension weight
    * @returns Industry mobility dimension score
    */
-  private calculateIndustryMobility(
+  private calculateIndustryMobilityScore(
     career: CareerIntelligence,
     weight: number
   ): DimensionScore {
@@ -1039,7 +1040,7 @@ export function createOptionalityCalculator(
   config?: Partial<OptionalityIntelligenceConfig>
 ): OptionalityCalculator {
   const fullConfig: OptionalityIntelligenceConfig = {
-    ...import('./optionality-types').DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG,
+    ...DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG,
     ...config,
   };
 

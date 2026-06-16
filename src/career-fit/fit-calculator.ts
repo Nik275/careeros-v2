@@ -23,8 +23,8 @@ import type {
   DimensionFit,
   FitLevel,
   FitCalculationConfig,
-  DEFAULT_FIT_CONFIG,
 } from './career-fit-types';
+import { DEFAULT_FIT_CONFIG } from './career-fit-types';
 
 /**
  * Calculates comprehensive fit scores between student profiles and careers.

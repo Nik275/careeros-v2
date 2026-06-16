@@ -73,6 +73,11 @@ export {
   createMetaDecisionNarrativeEngine,
 } from './MetaDecisionNarrativeEngine';
 
+// Constants
+export {
+  DEFAULT_META_DECISION_CONFIG,
+} from './types';
+
 // Types
 export type {
   // Core types
@@ -96,5 +101,4 @@ export type {
 
   // Configuration
   MetaDecisionConfig,
-  DEFAULT_META_DECISION_CONFIG,
 } from './types';

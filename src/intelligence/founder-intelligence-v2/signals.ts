@@ -48,6 +48,65 @@ export interface SignalPattern {
   countersProfiles?: NonFounderProfileV2[];
 }
 
+export const DIFFERENTIAL_FOUNDER_INDICATOR_DIMENSIONS = {
+  built_product: FounderDimensionV2.OWNERSHIP_ORIENTATION,
+  actual_users: FounderDimensionV2.OWNERSHIP_ORIENTATION,
+  paying_customers_or_revenue: FounderDimensionV2.SALES_CAPABILITY,
+  co_founder_experience: FounderDimensionV2.OWNERSHIP_ORIENTATION,
+  raised_funding: FounderDimensionV2.SALES_CAPABILITY,
+  formed_legal_entity: FounderDimensionV2.OWNERSHIP_ORIENTATION,
+  product_market_fit: FounderDimensionV2.OPPORTUNITY_RECOGNITION,
+  built_team: FounderDimensionV2.TALENT_MAGNETISM,
+  pivoted_venture: FounderDimensionV2.AMBIGUITY_TOLERANCE,
+  built_mvp: FounderDimensionV2.RESOURCEFULNESS,
+  startup_failure_learning: FounderDimensionV2.RESILIENCE,
+} as const satisfies Record<string, FounderDimensionV2>;
+
+export type DifferentialFounderIndicatorKey = keyof typeof DIFFERENTIAL_FOUNDER_INDICATOR_DIMENSIONS;
+
+export interface DifferentialFounderIndicator extends SignalPattern {
+  /** Stable semantic key used for explicit dimension ownership. */
+  key: DifferentialFounderIndicatorKey;
+}
+
+export class DifferentialIndicatorDimensionConfigError extends Error {
+  constructor(indicatorKey: string) {
+    super(`Missing founder dimension mapping for differential founder indicator: ${indicatorKey}`);
+    this.name = 'DifferentialIndicatorDimensionConfigError';
+  }
+}
+
+export function resolveDifferentialIndicatorDimension(indicator: { key: string }): FounderDimensionV2 {
+  const dimension = DIFFERENTIAL_FOUNDER_INDICATOR_DIMENSIONS[indicator.key as DifferentialFounderIndicatorKey];
+
+  if (!dimension) {
+    throw new DifferentialIndicatorDimensionConfigError(indicator.key);
+  }
+
+  return dimension;
+}
+
+export function validateDifferentialFounderIndicatorDimensions(
+  indicators: readonly { key: string }[] = DIFFERENTIAL_FOUNDER_INDICATORS
+): void {
+  const seenKeys = new Set<string>();
+
+  for (const indicator of indicators) {
+    if (seenKeys.has(indicator.key)) {
+      throw new DifferentialIndicatorDimensionConfigError(`duplicate:${indicator.key}`);
+    }
+
+    seenKeys.add(indicator.key);
+    resolveDifferentialIndicatorDimension(indicator);
+  }
+
+  for (const configuredKey of Object.keys(DIFFERENTIAL_FOUNDER_INDICATOR_DIMENSIONS)) {
+    if (!seenKeys.has(configuredKey)) {
+      throw new DifferentialIndicatorDimensionConfigError(`stale:${configuredKey}`);
+    }
+  }
+}
+
 /**
  * Non-founder profile detection pattern.
  */
@@ -476,7 +535,7 @@ export const AMBIGUITY_TOLERANCE_SIGNALS: SignalPattern[] = [
     strength: 0.85,
     evidenceType: FounderEvidenceTypeV2.AMBIGUITY_COMFORT_EVIDENCE,
     description: 'Willingness to pivot',
-    countersProfiles: [NonFounderProfileV2.OBSESSION_CAPACITY],
+    countersProfiles: [],
   },
   
   // MODERATE SIGNALS
@@ -925,7 +984,7 @@ export const OWNERSHIP_ORIENTATION_SIGNALS: SignalPattern[] = [
     strength: 0.95,
     evidenceType: FounderEvidenceTypeV2.OWNERSHIP_BEHAVIOR,
     description: 'Ownership mentality',
-    countersProfiles: [NonFounderProfileV2.EMPLOYEE_MINDSET],
+    countersProfiles: [],
   },
   {
     pattern: /equity|stake|skin\s+in\s+the\s+game/i,
@@ -1358,8 +1417,9 @@ export const INVESTOR_MINDSET_PATTERNS: NonFounderPattern[] = [
  * These are specific signals that indicate true founder potential
  * even when some non-founder patterns are present.
  */
-export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
+export const DIFFERENTIAL_FOUNDER_INDICATORS: readonly DifferentialFounderIndicator[] = [
   {
+    key: 'built_product',
     pattern: /built.*product/i,
     strength: 0.95,
     evidenceType: FounderEvidenceTypeV2.PRODUCT_BUILDING_BEHAVIOR,
@@ -1367,6 +1427,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.FREELANCER, NonFounderProfileV2.CONSULTANT, NonFounderProfileV2.CONTENT_CREATOR],
   },
   {
+    key: 'actual_users',
     pattern: /actual\s+users?|real\s+users?/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.PRODUCT_BUILDING_BEHAVIOR,
@@ -1374,6 +1435,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'paying_customers_or_revenue',
     pattern: /paying\s+customers?|revenue/i,
     strength: 0.95,
     evidenceType: FounderEvidenceTypeV2.SALES_PERSUASION_EVIDENCE,
@@ -1381,6 +1443,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR, NonFounderProfileV2.ARTIST],
   },
   {
+    key: 'co_founder_experience',
     pattern: /co-founder|cofounder/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.PAST_STARTUP_EXPERIENCE,
@@ -1388,6 +1451,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.FREELANCER, NonFounderProfileV2.INDEPENDENT_SPECIALIST],
   },
   {
+    key: 'raised_funding',
     pattern: /raised.*funding|seed\s+round|series\s+[a-z]/i,
     strength: 0.95,
     evidenceType: FounderEvidenceTypeV2.PAST_STARTUP_EXPERIENCE,
@@ -1395,6 +1459,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'formed_legal_entity',
     pattern: /incorporated|registered\s+company|legal\s+entity/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.PAST_STARTUP_EXPERIENCE,
@@ -1402,6 +1467,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'product_market_fit',
     pattern: /product-market\s+fit|pmf/i,
     strength: 0.95,
     evidenceType: FounderEvidenceTypeV2.PRODUCT_BUILDING_BEHAVIOR,
@@ -1409,6 +1475,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'built_team',
     pattern: /hired.*employees?|team\s+of\s+\d+/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.LEADERSHIP_EVIDENCE,
@@ -1416,6 +1483,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.FREELANCER, NonFounderProfileV2.INDEPENDENT_SPECIALIST],
   },
   {
+    key: 'pivoted_venture',
     pattern: /pivot|pivoted/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.PAST_STARTUP_EXPERIENCE,
@@ -1423,6 +1491,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'built_mvp',
     pattern: /mvp|minimum\s+viable\s+product/i,
     strength: 0.9,
     evidenceType: FounderEvidenceTypeV2.PRODUCT_BUILDING_BEHAVIOR,
@@ -1430,6 +1499,7 @@ export const DIFFERENTIAL_FOUNDER_INDICATORS: SignalPattern[] = [
     countersProfiles: [NonFounderProfileV2.WANTREPRENEUR],
   },
   {
+    key: 'startup_failure_learning',
     pattern: /startup\s+(failed|shut\s+down|closed)/i,
     strength: 0.85,
     evidenceType: FounderEvidenceTypeV2.RESILIENCE_EVIDENCE,

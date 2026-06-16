@@ -41,6 +41,7 @@ import {
   
   // Types
   PerturbationConfig,
+  PerturbationId,
   ConsensusConfig,
   ConfidenceWeights,
   StabilityAnalysisConfig,
@@ -230,13 +231,7 @@ function createMockRecommendation(
     lifestyleAlignmentScore: 72,
     riskAlignmentScore: 68,
     marketOpportunityScore: 65,
-    fitResult: {
-      careerId,
-      overallFit: score > 75 ? 'STRONG' : score > 60 ? 'MODERATE' : 'WEAK',
-      fitScore: score,
-      dimensionScores: new Map(),
-      confidence: score * 0.9,
-    },
+    fitResult: createMockFitResult(careerId, score),
     explanation: {
       whyRecommended: ['Strong skill match', 'Good alignment with values'],
       whyNotHigher: [],
@@ -265,6 +260,136 @@ function createMockRecommendation(
     },
     generatedAt: new Date(),
   };
+}
+
+function createMockDimensionFit(score: number) {
+  return {
+    score,
+    studentScore: score,
+    careerDemand: score,
+    gap: 0,
+    isMatch: true,
+    exceedsDemand: false,
+  };
+}
+
+function createMockFitResult(
+  careerId: string,
+  score: number
+): CareerRecommendation['fitResult'] {
+  const dimensionFit = createMockDimensionFit(score);
+
+  return {
+    id: `fit-${careerId}`,
+    studentProfileId: 'test-profile',
+    careerId,
+    overallFitScore: score,
+    fitLevel: score > 75 ? 'GOOD' : score > 60 ? 'MODERATE' : 'POOR',
+    breakdown: {
+      cognitive: {
+        score,
+        analyticalFit: dimensionFit,
+        creativeFit: dimensionFit,
+        systematicFit: dimensionFit,
+        verbalFit: dimensionFit,
+        spatialFit: dimensionFit,
+        quantitativeFit: dimensionFit,
+        dominantMatch: 'analytical',
+        gaps: [],
+      },
+      motivation: {
+        score,
+        achievementFit: dimensionFit,
+        masteryFit: dimensionFit,
+        autonomyFit: dimensionFit,
+        impactFit: dimensionFit,
+        recognitionFit: dimensionFit,
+        securityFit: dimensionFit,
+        primaryMatch: 'achievement',
+        conflicts: [],
+      },
+      lifestyle: {
+        score,
+        incomeFit: dimensionFit,
+        workLifeBalanceFit: dimensionFit,
+        locationFit: dimensionFit,
+        travelFit: dimensionFit,
+        stabilityFit: dimensionFit,
+        dealbreakers: [],
+      },
+      risk: {
+        score,
+        automationRiskFit: dimensionFit,
+        competitionRiskFit: dimensionFit,
+        burnoutRiskFit: dimensionFit,
+        educationBarrierFit: dimensionFit,
+        riskToleranceMatch: score,
+        concerns: [],
+      },
+      workEnvironment: {
+        score,
+        peopleFit: dimensionFit,
+        independenceFit: dimensionFit,
+        leadershipFit: dimensionFit,
+        researchFit: dimensionFit,
+        executionFit: dimensionFit,
+        environmentMatch: 'balanced',
+      },
+      values: {
+        score,
+        moneyFit: dimensionFit,
+        prestigeFit: dimensionFit,
+        familyTimeFit: dimensionFit,
+        freedomFit: dimensionFit,
+        impactFit: dimensionFit,
+        learningFit: dimensionFit,
+        alignment: {
+          highlyAligned: ['achievement'],
+          moderatelyAligned: [],
+          misaligned: [],
+          satisfactionPotential: score > 75 ? 'HIGH' : 'MODERATE',
+        },
+      },
+    },
+    strengths: [],
+    concerns: [],
+    explanations: {
+      strongFitReasons: ['Good fixture fit'],
+      weakFitReasons: [],
+      alignments: ['Stable fixture alignment'],
+      conflicts: [],
+      summary: `Fixture fit for ${careerId}`,
+    },
+    confidence: {
+      overall: score * 0.9,
+      profileConfidence: 75,
+      careerConfidence: 85,
+      evidenceConfidence: 80,
+      calculationConfidence: 80,
+      level: score > 75 ? 'HIGH' : 'MEDIUM',
+    },
+    evaluatedAt: new Date(),
+    metadata: {
+      calculationMethod: 'test-fixture',
+      version: '1.0',
+      profileTimestamp: new Date(),
+      careerTimestamp: new Date(),
+    },
+  };
+}
+
+function createPerturbationId(value: string): PerturbationId {
+  if (value.trim().length === 0) {
+    throw new Error('PerturbationId fixture must be non-empty.');
+  }
+
+  return value as PerturbationId;
+}
+
+function createPerturbedRecommendationMap(
+  entries: ReadonlyArray<readonly [string, RecommendationSet]>
+): Map<PerturbationId, RecommendationSet> {
+  return new Map(entries.map(([id, recommendations]) => [createPerturbationId(id), recommendations]));
 }
 
 /**
@@ -345,7 +470,7 @@ describe('PerturbationEngine', () => {
       const profile = createStableProfile();
       const config: PerturbationConfig = {
         intensity: 'MEDIUM',
-        simulationCount: 100,
+        simulationCount: 500,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -355,15 +480,15 @@ describe('PerturbationEngine', () => {
 
       const result = engine.generatePerturbations(profile, config);
 
-      expect(result.perturbedProfiles).toHaveLength(100);
-      expect(result.config.simulationCount).toBe(100);
+      expect(result.perturbedProfiles).toHaveLength(config.simulationCount);
+      expect(result.config.simulationCount).toBe(config.simulationCount);
     });
 
     it('should preserve dimension keys in perturbed profiles', () => {
       const profile = createStableProfile();
       const config: PerturbationConfig = {
         intensity: 'LIGHT',
-        simulationCount: 10,
+        simulationCount: 50,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -425,7 +550,7 @@ describe('PerturbationEngine', () => {
       const profile = createStableProfile();
       const config: PerturbationConfig = {
         intensity: 'MEDIUM',
-        simulationCount: 10,
+        simulationCount: 50,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -456,7 +581,7 @@ describe('PerturbationEngine', () => {
       const profile = createStableProfile();
       const config: PerturbationConfig = {
         intensity: 'MEDIUM',
-        simulationCount: 10,
+        simulationCount: 50,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -481,7 +606,7 @@ describe('PerturbationEngine', () => {
       const profile = createStableProfile();
       const config: PerturbationConfig = {
         intensity: 'MEDIUM',
-        simulationCount: 100,
+        simulationCount: 500,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -490,7 +615,7 @@ describe('PerturbationEngine', () => {
 
       const result = engine.generatePerturbations(profile, config);
 
-      expect(result.statistics.totalGenerated).toBe(100);
+      expect(result.statistics.totalGenerated).toBe(config.simulationCount);
       expect(result.statistics.averageMagnitude).toBeGreaterThan(0);
       expect(result.statistics.maxMagnitude).toBeGreaterThanOrEqual(
         result.statistics.averageMagnitude
@@ -523,7 +648,7 @@ describe('PerturbationEngine', () => {
       
       const lightConfig: PerturbationConfig = {
         intensity: 'LIGHT',
-        simulationCount: 100,
+        simulationCount: 500,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -533,7 +658,7 @@ describe('PerturbationEngine', () => {
 
       const heavyConfig: PerturbationConfig = {
         intensity: 'HEAVY',
-        simulationCount: 100,
+        simulationCount: 500,
         strategy: 'UNIFORM',
         preserveRankOrder: true,
         minScore: 0,
@@ -590,7 +715,7 @@ describe('RecommendationConsensusEngine', () => {
 
   describe('calculateConsensus', () => {
     it('should calculate primary recommendation correctly', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p2', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p3', createMockRecommendationSet('Product Designer', 'UX Researcher')],
@@ -605,7 +730,7 @@ describe('RecommendationConsensusEngine', () => {
     });
 
     it('should identify runner-up correctly', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p2', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p3', createMockRecommendationSet('Software Engineer', 'Product Designer')],
@@ -618,7 +743,7 @@ describe('RecommendationConsensusEngine', () => {
     });
 
     it('should calculate recommendation distribution', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p2', createMockRecommendationSet('Software Engineer', 'Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer', 'UX Researcher')],
@@ -643,7 +768,7 @@ describe('RecommendationConsensusEngine', () => {
       // This tests that the consensus engine correctly classifies based on career ID frequency
 
       // Strong consensus case - all recommend the same primary career
-      const strongConsensusRecs = new Map([
+      const strongConsensusRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -655,7 +780,7 @@ describe('RecommendationConsensusEngine', () => {
 
       // Test with varied primary recommendations - note that due to mock structure,
       // career-1 always appears in all sets, so consensus remains relatively high
-      const variedRecs = new Map([
+      const variedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Software Engineer')],
         ['p3', createMockRecommendationSet('UX Researcher')],
@@ -672,7 +797,7 @@ describe('RecommendationConsensusEngine', () => {
     it('should calculate entropy correctly', () => {
       // Use identical recommendations to ensure low entropy
       const identicalRec = createMockRecommendationSet('Product Designer');
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', identicalRec],
         ['p2', identicalRec],
         ['p3', identicalRec],
@@ -687,7 +812,7 @@ describe('RecommendationConsensusEngine', () => {
     });
 
     it('should calculate Gini coefficient', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -701,7 +826,7 @@ describe('RecommendationConsensusEngine', () => {
 
   describe('consensus quality', () => {
     it('should calculate consensus quality score', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -715,7 +840,7 @@ describe('RecommendationConsensusEngine', () => {
     });
 
     it('should determine if consensus is actionable', () => {
-      const strongRecs = new Map([
+      const strongRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -727,7 +852,7 @@ describe('RecommendationConsensusEngine', () => {
     });
 
     it('should calculate confidence interval', () => {
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -936,7 +1061,7 @@ describe('StabilityEngine', () => {
         },
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -955,7 +1080,7 @@ describe('StabilityEngine', () => {
       } as any;
 
       // High stability case - all have career-1 at rank 1
-      const stableRecs = new Map([
+      const stableRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -969,7 +1094,7 @@ describe('StabilityEngine', () => {
 
       // Medium stability case - career-1 is always present but rank varies
       // The mock always includes career-1, so we test based on rank consistency
-      const mediumStabilityRecs = new Map([
+      const mediumStabilityRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -990,7 +1115,7 @@ describe('StabilityEngine', () => {
         },
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer')],
@@ -1018,7 +1143,7 @@ describe('StabilityEngine', () => {
         },
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -1035,7 +1160,7 @@ describe('StabilityEngine', () => {
         primaryRecommendation: { careerId: 'career-1', careerTitle: 'Product Designer' },
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -1052,7 +1177,7 @@ describe('StabilityEngine', () => {
         primaryRecommendation: { careerId: 'career-1', careerTitle: 'Product Designer' },
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -1082,7 +1207,7 @@ describe('VolatilityEngine', () => {
         recommendationDistribution: [],
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Software Engineer')],
         ['p3', createMockRecommendationSet('UX Researcher')],
@@ -1101,7 +1226,7 @@ describe('VolatilityEngine', () => {
         recommendationDistribution: [],
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -1123,7 +1248,7 @@ describe('VolatilityEngine', () => {
         ],
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer', 'Software Engineer')],
         ['p2', createMockRecommendationSet('Software Engineer', 'Product Designer')],
         ['p3', createMockRecommendationSet('Product Designer', 'Software Engineer')],
@@ -1141,7 +1266,7 @@ describe('VolatilityEngine', () => {
         recommendationDistribution: [],
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Software Engineer')],
         ['p3', createMockRecommendationSet('UX Researcher')],
@@ -1160,7 +1285,7 @@ describe('VolatilityEngine', () => {
         recommendationDistribution: [],
       } as any;
 
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
         ['p2', createMockRecommendationSet('Product Designer')],
       ]);
@@ -1194,7 +1319,7 @@ describe('SensitivityAnalysisEngine', () => {
         mostPerturbedDimensions: ['creativity'],
         rankOrderPreserved: true,
       }));
-      const perturbedRecs = new Map(
+      const perturbedRecs = createPerturbedRecommendationMap(
         perturbedProfiles.map(p => [p.id, createMockRecommendationSet('Product Designer')])
       );
 
@@ -1210,7 +1335,7 @@ describe('SensitivityAnalysisEngine', () => {
       const perturbedProfiles = [
         { id: 'p1', dimensionScores: new Map(baseProfile), deltas: new Map(), perturbationMagnitude: 5, mostPerturbedDimensions: [], rankOrderPreserved: true },
       ];
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -1234,7 +1359,7 @@ describe('SensitivityAnalysisEngine', () => {
       const perturbedProfiles = [
         { id: 'p1', dimensionScores: new Map(baseProfile), deltas: new Map(), perturbationMagnitude: 5, mostPerturbedDimensions: [], rankOrderPreserved: true },
       ];
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -1248,7 +1373,7 @@ describe('SensitivityAnalysisEngine', () => {
       const perturbedProfiles = [
         { id: 'p1', dimensionScores: new Map(baseProfile), deltas: new Map(), perturbationMagnitude: 5, mostPerturbedDimensions: [], rankOrderPreserved: true },
       ];
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -1262,7 +1387,7 @@ describe('SensitivityAnalysisEngine', () => {
       const perturbedProfiles = [
         { id: 'p1', dimensionScores: new Map(baseProfile), deltas: new Map(), perturbationMagnitude: 5, mostPerturbedDimensions: [], rankOrderPreserved: true },
       ];
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -1276,7 +1401,7 @@ describe('SensitivityAnalysisEngine', () => {
       const perturbedProfiles = [
         { id: 'p1', dimensionScores: new Map(baseProfile), deltas: new Map(), perturbationMagnitude: 5, mostPerturbedDimensions: [], rankOrderPreserved: true },
       ];
-      const perturbedRecs = new Map([
+      const perturbedRecs = createPerturbedRecommendationMap([
         ['p1', createMockRecommendationSet('Product Designer')],
       ]);
 
@@ -2172,3 +2297,4 @@ describe('Test Suite Summary', () => {
     expect(true).toBe(true);
   });
 });
+

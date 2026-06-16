@@ -1,165 +1,142 @@
 @import "tailwindcss";
 
-/* Global Mobile Fix - Prevent horizontal overflow */
 html, body {
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
+  background-color: #000000;
+  color: #ffffff;
 }
 
-/* Premium Animation Keyframes - Global */
-
-/* Floating Particles */
-@keyframes floatingDot {
-  0% { 
-    transform: translate3d(0, 0, 0) scale(0.9); 
-    opacity: 0.25; 
-  }
-  100% { 
-    transform: translate3d(20px, -30px, 0) scale(1.2); 
-    opacity: 0.8; 
-  }
+::selection {
+  background-color: rgba(128, 82, 255, 0.3);
+  color: #ffffff;
 }
 
-/* Sparkle Fade */
-@keyframes sparkleFade {
-  0%, 100% { 
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  50% { 
-    opacity: 0.7;
-    transform: scale(1.1);
-  }
+/* UI-3 Cosmic Intelligence Background Animations */
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2%, 3%) scale(1.05); }
+  66% { transform: translate(-2%, 1%) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
-/* Glow Breathing Animations */
-@keyframes glowSageBreathing {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.85;
-  }
-  100% {
-    transform: translate(15px, 10px) scale(1.04);
-    opacity: 1;
-  }
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
 }
 
-@keyframes glowBlueBreathing {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.82;
-  }
-  100% {
-    transform: translate(-12px, 15px) scale(1.03);
-    opacity: 0.98;
-  }
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes glowGoldBreathing {
-  0% {
-    transform: translateX(-50%) translateY(0) scale(1);
-    opacity: 0.88;
-  }
-  100% {
-    transform: translateX(-50%) translateY(-20px) scale(1.04);
-    opacity: 1;
-  }
+@keyframes rotate-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
 }
 
-@keyframes glowWhiteBreathing {
-  0% {
-    opacity: 0.85;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.02);
-  }
+@keyframes pulse-node {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
 }
 
-/* Constellation Animations */
-@keyframes constellationDrift {
-  0% { 
-    opacity: 0.78;
-    transform: translate(0, 0);
-  }
-  100% { 
-    opacity: 0.92;
-    transform: translate(4px, 3px);
-  }
+@keyframes flow-energy {
+  to { stroke-dashoffset: -100; }
 }
 
-@keyframes nodePulse {
-  0% { 
-    opacity: 0.22;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% { 
-    opacity: 0.45;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
+@keyframes rotate-galaxy {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes pathShimmer {
-  0% { stroke-opacity: 0.05; }
-  100% { stroke-opacity: 0.18; }
+@keyframes shimmer-star {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
-/* Hero Content Float */
-@keyframes heroFloat {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-6px); }
+@keyframes parallax-far {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-/* CTA Breathing */
-@keyframes ctaBreathing {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 18px 45px rgba(109,145,101,0.28), 0 8px 18px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.18);
-  }
-  100% {
-    transform: scale(1.02);
-    box-shadow: 0 24px 58px rgba(109,145,101,0.36), 0 10px 24px rgba(0,0,0,0.10), inset 0 1px 1px rgba(255,255,255,0.22);
-  }
+@keyframes parallax-mid {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 
-@keyframes glowBreathing {
-  0% { opacity: 0.35; }
-  100% { opacity: 0.6; }
+@keyframes parallax-near {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-35px); }
 }
 
-@keyframes arrowIdle {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(3px); }
+.cosmic-glow-drift-1 {
+  animation: drift 25s ease-in-out infinite;
 }
 
-/* Focal Glow */
-@keyframes focalGlowBreathing {
-  0% {
-    opacity: 0.75;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0.92;
-    transform: translate(-50%, -50%) scale(1.03);
-  }
+.cosmic-glow-drift-2 {
+  animation: drift 30s ease-in-out infinite reverse;
 }
 
-/* Cinematic Light Sweep */
-@keyframes cinematicLightSweep {
-  0% {
-    transform: translateX(-100%) rotate(-12deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.5;
-  }
-  90% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(600%) rotate(-12deg);
-    opacity: 0;
+.cosmic-glow-pulse {
+  animation: pulse 15s ease-in-out infinite;
+}
+
+.cosmic-orbit-rotate {
+  animation: rotate-slow 90s linear infinite;
+}
+
+.cosmic-orbit-rotate-slow {
+  animation: rotate-slow 120s linear infinite;
+  transform-origin: center;
+}
+
+.cosmic-orbit-rotate-reverse {
+  animation: rotate-reverse 100s linear infinite;
+  transform-origin: center;
+}
+
+.cosmic-node-pulse-1 { animation: pulse-node 6s ease-in-out infinite; }
+.cosmic-node-pulse-2 { animation: pulse-node 7s ease-in-out infinite 2s; }
+.cosmic-node-pulse-3 { animation: pulse-node 8s ease-in-out infinite 1s; }
+.cosmic-node-pulse-4 { animation: pulse-node 9s ease-in-out infinite 3s; }
+
+.cosmic-flow-1 { animation: flow-energy 60s linear infinite; }
+.cosmic-flow-2 { animation: flow-energy 80s linear infinite reverse; }
+
+.cosmic-galaxy-spin { animation: rotate-galaxy 180s linear infinite; transform-origin: center; }
+.cosmic-galaxy-spin-reverse { animation: rotate-galaxy 240s linear infinite reverse; transform-origin: center; }
+
+.cosmic-parallax-far { animation: parallax-far 30s ease-in-out infinite; }
+.cosmic-parallax-mid { animation: parallax-mid 25s ease-in-out infinite; }
+.cosmic-parallax-near { animation: parallax-near 20s ease-in-out infinite; }
+
+.cosmic-shimmer-1 { animation: shimmer-star 8s ease-in-out infinite; }
+.cosmic-shimmer-2 { animation: shimmer-star 10s ease-in-out infinite 2s; }
+.cosmic-shimmer-3 { animation: shimmer-star 12s ease-in-out infinite 4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-glow-drift-1,
+  .cosmic-glow-drift-2,
+  .cosmic-glow-pulse,
+  .cosmic-orbit-rotate,
+  .cosmic-orbit-rotate-slow,
+  .cosmic-orbit-rotate-reverse,
+  .cosmic-node-pulse-1,
+  .cosmic-node-pulse-2,
+  .cosmic-node-pulse-3,
+  .cosmic-node-pulse-4,
+  .cosmic-flow-1,
+  .cosmic-flow-2,
+  .cosmic-galaxy-spin,
+  .cosmic-galaxy-spin-reverse,
+  .cosmic-parallax-far,
+  .cosmic-parallax-mid,
+  .cosmic-parallax-near,
+  .cosmic-shimmer-1,
+  .cosmic-shimmer-2,
+  .cosmic-shimmer-3 {
+    animation: none !important;
+    transform: none !important;
   }
 }

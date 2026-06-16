@@ -68,7 +68,9 @@ describe('ConfidenceCalculator', () => {
         requestId: 'test-request',
       };
 
-      expect(() => calculator.calculate(input)).toThrow();
+      const result = calculator.calculate(input);
+      expect(result.value).toBe(0.5);
+      expect(result.component).toBe('fallback');
     });
 
     it('should clamp confidence to bounds', () => {

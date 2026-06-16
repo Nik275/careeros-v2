@@ -115,7 +115,7 @@ export class CareerTransitionEngine {
     return {
       bridgeAnalysis: this.analyzeBridge(transition),
       successFactors: this.identifySuccessFactors(transition),
-      timingAnalysis: this.analyzeTransitionTiming(transition),
+      timingAnalysis: this.analyzeTransitionEventTiming(transition),
       alternativePaths: this.identifyAlternativePaths(transition),
       lessons: this.extractTransitionLessons(transition),
     };
@@ -684,7 +684,7 @@ export class CareerTransitionEngine {
     };
   }
 
-  private analyzeTransitionTiming(transition: CareerTransition): {
+  private analyzeTransitionEventTiming(transition: CareerTransition): {
     timingQuality: 'OPTIMAL' | 'GOOD' | 'NEUTRAL' | 'SUBOPTIMAL';
     marketConditions: string;
     personalReadiness: string;

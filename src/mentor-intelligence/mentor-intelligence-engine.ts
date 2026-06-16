@@ -756,7 +756,7 @@ export class MentorIntelligenceEngine {
     // Sort by importance and confidence
     return insights
       .sort((a, b) => {
-        const importanceOrder = { 'CRITICAL': 4, 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };
+        const importanceOrder = { 'CRITICAL': 4, 'HIGH': 3, 'MODERATE': 2, 'LOW': 1 };
         const scoreA = importanceOrder[a.importance] * a.confidence;
         const scoreB = importanceOrder[b.importance] * b.confidence;
         return scoreB - scoreA;
@@ -784,7 +784,7 @@ export class MentorIntelligenceEngine {
       })),
       importance: pattern.outcomeImpact.magnitude === 'TRANSFORMATIONAL' || pattern.outcomeImpact.magnitude === 'MAJOR'
         ? 'HIGH'
-        : 'MEDIUM',
+        : 'MODERATE',
       applicability: {
         archetypes: [],
         careerStages: ['EARLY_CAREER', 'MID_CAREER'], // Default, would be refined
@@ -804,9 +804,21 @@ export class MentorIntelligenceEngine {
       lesson: lesson.lesson,
       type: 'LESSON_LEARNED',
       confidence: lesson.confidence,
-      evidence: lesson.evidence.slice(0, 3),
+      evidence: lesson.evidence.slice(0, 3).map(evidence => ({
+        journeyId: evidence.journeyId,
+        event: evidence.action,
+        outcome: evidence.outcome,
+        strength: evidence.relevance,
+        type: 'DIRECT_OUTCOME',
+      })),
       importance: lesson.importance,
-      applicability: lesson.applicability,
+      applicability: {
+        archetypes: [],
+        careerStages: lesson.applicability.careerStages,
+        industries: [],
+        relevantConstraints: [],
+        minSimilarityScore: lesson.applicability.minSimilarityScore,
+      },
       sourceJourneys: lesson.sourceJourneys,
       extractedAt: lesson.extractedAt,
       extractionVersion: '1.0.0',
@@ -828,7 +840,7 @@ export class MentorIntelligenceEngine {
       })),
       importance: mistake.cost.careerCost === 'SEVERE' || mistake.cost.careerCost === 'SIGNIFICANT'
         ? 'HIGH'
-        : 'MEDIUM',
+        : 'MODERATE',
       applicability: {
         archetypes: [],
         careerStages: ['EARLY_CAREER', 'MID_CAREER'],
@@ -1067,8 +1079,8 @@ export class MentorIntelligenceEngine {
       .sort((a, b) => b[1] - a[1])[0]?.[0] || 'LEARNING';
 
     const failureCategories = new Map<FailureCategory, number>();
-    for (const m of mistakes.allMistakes) {
-      failureCategories.set(m.category, (failureCategories.get(m.category) || 0) + 1);
+    for (const p of patterns.failurePatterns) {
+      failureCategories.set(p.category, (failureCategories.get(p.category) || 0) + 1);
     }
     const mostCommonFailureCategory = Array.from(failureCategories.entries())
       .sort((a, b) => b[1] - a[1])[0]?.[0] || 'STRATEGIC_ERROR';

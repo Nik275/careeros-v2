@@ -250,6 +250,35 @@ export class OutcomeTracker implements IOutcomeTracker {
   }
 
   /**
+   * Record a generic outcome payload.
+   */
+  async recordOutcome(recordId: OutcomeRecordId, outcome: unknown): Promise<void> {
+    const record = await this.store.load(recordId);
+    if (!record) throw new Error(`Record not found: ${recordId}`);
+
+    record.updatedAt = Date.now();
+    record.metadata.version++;
+
+    await this.addTimelineEntry(recordId, {
+      id: generateTimelineEntryId(),
+      timestamp: Date.now(),
+      timepoint: 'IMMEDIATE',
+      eventType: 'MILESTONE_REACHED',
+      title: 'Outcome Recorded',
+      description: 'Generic outcome payload recorded',
+      data: { outcome },
+      metadata: {
+        source: 'SYSTEM',
+        confidence: 80,
+        verified: false,
+      },
+    });
+
+    await this.store.save(record);
+    this.eventEngine.emit(createOutcomeRecordedEvent(record.studentId, 'GENERIC', outcome));
+  }
+
+  /**
    * Record an education outcome
    */
   async recordEducationOutcome(

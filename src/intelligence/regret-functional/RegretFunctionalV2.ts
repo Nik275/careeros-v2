@@ -41,6 +41,12 @@ import type { CriticalityAnalysis } from '../criticality-engine';
 import type { OptionalityAnalysis } from '../optionality-engine';
 import type { CareerTransitionGraphV1, CareerNode } from '../career-transition-graph';
 
+type LegacyStudentBeliefShape = {
+  interests?: { coreInterests?: string[] } | string[];
+  values?: { coreValues?: string[] } | Array<{ name?: string } | string>;
+  profile?: Partial<CareerNode['requiredProfile']> & { age?: number };
+};
+
 // ============================================================================
 // CORE TYPES
 // ============================================================================
@@ -544,7 +550,7 @@ export class RegretFunctionalV2 {
 
     // Component 2: Student-path fit gap
     // Lower fit = higher regret of not finding better fit
-    const studentInterests = this.studentBelief.interests?.coreInterests || [];
+    const studentInterests = this.getStudentInterestNames();
     const pathMatch = this.calculatePathInterestMatch(path, studentInterests);
     const fitRisk = (1 - pathMatch) * 100;
 
@@ -565,7 +571,7 @@ export class RegretFunctionalV2 {
 
     // Component 3: Time sensitivity
     // Some opportunities are time-bound
-    const age = this.studentBelief.profile?.age || 20;
+    const age = this.getStudentAge();
     const timeSensitiveRisk = age > 28 ? Math.min(100, (age - 28) * 5) : 0;
 
     components.push({
@@ -740,7 +746,7 @@ export class RegretFunctionalV2 {
     const mitigations: string[] = [];
 
     // Component 1: Values alignment gap
-    const studentValues = this.studentBelief.values?.coreValues || [];
+    const studentValues = this.getStudentValueNames();
     const valueAlignment = this.calculatePathValueAlignment(path, studentValues);
     const valueGap = (1 - valueAlignment) * 100;
 
@@ -760,7 +766,7 @@ export class RegretFunctionalV2 {
     }
 
     // Component 2: Interest alignment gap
-    const studentInterests = this.studentBelief.interests?.coreInterests || [];
+    const studentInterests = this.getStudentInterestNames();
     const interestAlignment = this.calculatePathInterestMatch(path, studentInterests);
     const interestGap = (1 - interestAlignment) * 100;
 
@@ -1063,6 +1069,44 @@ export class RegretFunctionalV2 {
   }
 
   /**
+   * StudentBeliefV3 does not carry an interests collection; preserve the
+   * existing no-interest fallback rather than inventing a parallel model.
+   */
+  private getStudentInterestNames(): string[] {
+    const interests = (this.studentBelief as unknown as LegacyStudentBeliefShape).interests;
+
+    if (Array.isArray(interests)) {
+      return interests.filter((interest): interest is string => typeof interest === 'string');
+    }
+
+    if (interests && Array.isArray(interests.coreInterests)) {
+      return interests.coreInterests;
+    }
+
+    return [];
+  }
+
+  /**
+   * Get canonical V3 value names for path value matching.
+   */
+  private getStudentValueNames(): string[] {
+    const values = (this.studentBelief as unknown as LegacyStudentBeliefShape).values;
+
+    if (Array.isArray(values)) {
+      return values
+        .map(value => typeof value === 'string' ? value : value.name)
+        .filter((value): value is string => typeof value === 'string')
+        .map(value => value.toLowerCase());
+    }
+
+    if (values && Array.isArray(values.coreValues)) {
+      return values.coreValues.map((value: string) => value.toLowerCase());
+    }
+
+    return [];
+  }
+
+  /**
    * Calculate path value alignment.
    */
   private calculatePathValueAlignment(path: ExploredCareerPath, values: string[]): number {
@@ -1091,7 +1135,7 @@ export class RegretFunctionalV2 {
    * Calculate psychological profile fit.
    */
   private calculateProfileFit(path: ExploredCareerPath): number {
-    const studentProfile = this.studentBelief.profile;
+    const studentProfile = this.derivePsychologicalProfile();
     if (!studentProfile || path.nodes.length === 0) return 0.5;
 
     const lastNode = path.nodes[path.nodes.length - 1];
@@ -1100,7 +1144,7 @@ export class RegretFunctionalV2 {
     if (!requiredProfile) return 0.5;
 
     // Calculate fit across key dimensions
-    const dimensions: Array<keyof typeof studentProfile> = [
+    const dimensions: Array<keyof CareerNode['requiredProfile']> = [
       'analyticalThinking',
       'creativity',
       'socialOrientation',
@@ -1110,12 +1154,54 @@ export class RegretFunctionalV2 {
     ];
 
     const fits = dimensions.map(dim => {
-      const studentVal = studentProfile[dim] || 0.5;
+      const studentVal = studentProfile[dim] ?? 0.5;
       const requiredVal = requiredProfile[dim] || 0.5;
       return 1 - Math.abs(studentVal - requiredVal);
     });
 
     return fits.reduce((sum, f) => sum + f, 0) / fits.length;
+  }
+
+  private derivePsychologicalProfile(): Partial<CareerNode['requiredProfile']> | null {
+    const legacyProfile = (this.studentBelief as unknown as LegacyStudentBeliefShape).profile;
+    if (legacyProfile) {
+      return legacyProfile;
+    }
+
+    const personalityTraits = this.studentBelief.personalityTraits ?? [];
+    if (personalityTraits.length === 0) return null;
+
+    const profile: Partial<CareerNode['requiredProfile']> = {};
+
+    for (const trait of personalityTraits) {
+      const normalizedPosition = (trait.position + 1) / 2;
+
+      switch (trait.dimension) {
+        case 'openness':
+          profile.creativity = normalizedPosition;
+          profile.curiosity = normalizedPosition;
+          break;
+        case 'conscientiousness':
+          profile.detailOrientation = normalizedPosition;
+          profile.analyticalThinking = normalizedPosition;
+          break;
+        case 'extraversion':
+          profile.socialOrientation = normalizedPosition;
+          profile.leadership = normalizedPosition;
+          break;
+        case 'autonomy':
+          profile.riskTolerance = normalizedPosition;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return Object.keys(profile).length > 0 ? profile : null;
+  }
+
+  private getStudentAge(): number {
+    return (this.studentBelief as unknown as LegacyStudentBeliefShape).profile?.age ?? 20;
   }
 
   /**
@@ -1513,19 +1599,3 @@ export function analyzeRegret(
   const engine = new RegretFunctionalV2(studentBelief, pathExplorerResult, graph, coalitionAnalysis);
   return engine.analyze(options);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  RegretAnalysis,
-  PathRegretAnalysis,
-  RegretFactor,
-  RegretComponent,
-  RegretExplanation,
-  RegretPathComparison,
-  RegretAnalysisOptions,
-  RegretAnalysisId,
-  RegretType,
-};

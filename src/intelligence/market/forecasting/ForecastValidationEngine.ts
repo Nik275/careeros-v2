@@ -236,7 +236,7 @@ export class ForecastValidationEngine {
     );
 
     // Calculate confidence calibration
-    const calibration = this.calculateCalibration(
+    const calibration = this.calculateConfidenceCalibration(
       forecast.confidence.overall,
       accuracyScore
     );
@@ -535,7 +535,7 @@ export class ForecastValidationEngine {
     return isWithinRange(projection, demand);
   }
 
-  private calculateCalibration(
+  private calculateConfidenceCalibration(
     predictedConfidence: number,
     actualAccuracy: number
   ): ValidationResult['confidenceCalibration'] {

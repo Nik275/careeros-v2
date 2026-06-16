@@ -725,7 +725,7 @@ export class QualityEngine implements IQualityEngine {
       risks.push('Limited support system');
     }
 
-    if (record.outcomes.careerDecisions.some(d => d.wouldChooseAgain === false)) {
+    if (record.outcomes.careerDecisions.some(d => d.actualOutcome.wouldChooseAgain === false)) {
       risks.push('Previous decision regret');
     }
 

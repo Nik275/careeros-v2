@@ -19,6 +19,9 @@
 
 export type {
   // Core identifiers
+  StudentId,
+  RecommendationId,
+  CareerId,
   LearningQueryId,
   UncertaintyProfileId,
   LearningValueId,
@@ -63,6 +66,7 @@ export type {
 
   // Configuration
   ActiveLearningConfig,
+  ActiveLearningEngineConfig,
 
   // Utility types
   StudentLearningProfile,

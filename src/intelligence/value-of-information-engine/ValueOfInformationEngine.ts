@@ -20,11 +20,14 @@
  * - Compatible with existing engines
  */
 
+import {
+  DEFAULT_VOI_CONFIG,
+} from './types';
+
 import type {
   ValueOfInformationInput,
   ValueOfInformationReport,
   ValueOfInformationEngineConfig,
-  DEFAULT_VOI_CONFIG,
 } from './types';
 
 import { InformationGapDetector, createInformationGapDetector } from './InformationGapDetector';

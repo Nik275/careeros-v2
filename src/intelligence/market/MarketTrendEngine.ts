@@ -6,15 +6,17 @@
  */
 
 import type { NormalizedMarketSignal, AggregateMarketSignal } from './models/MarketSignal';
-import type {
-  MarketTrend,
+import {
+  DEFAULT_TREND_THRESHOLDS,
   MarketTrendDirection,
   MarketTrendMomentum,
+} from './models/MarketTrend';
+import type {
+  MarketTrend,
   MarketTrendType,
   CareerTrendAnalysis,
   TrendChangeDetection,
   TrendThresholds,
-  DEFAULT_TREND_THRESHOLDS,
 } from './models/MarketTrend';
 import type { MarketRepository } from './repositories/MarketRepository';
 import { TREND_CALCULATION_WEIGHTS, TREND_TIME_WINDOW_WEIGHTS } from './constants/MarketWeights';

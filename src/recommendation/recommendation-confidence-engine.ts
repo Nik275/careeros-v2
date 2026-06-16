@@ -65,9 +65,15 @@ export class RecommendationConfidenceEngine {
         profileConfidence,
         careerConfidence,
         constitutionalConfidence,
-        // level removed - no longer using enum
+        level: this.getConfidenceLevel(overall),
       } as RecommendationConfidence,
     };
+  }
+
+  private getConfidenceLevel(confidence: number): RecommendationConfidence['level'] {
+    if (confidence >= 75) return 'HIGH';
+    if (confidence >= 50) return 'MEDIUM';
+    return 'LOW';
   }
 
   /**

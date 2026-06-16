@@ -132,7 +132,7 @@ export class ConsistencyEngine {
     // Apply rules
     for (const rule of this.rules) {
       if (!rule.enabled) continue;
-      const violation = rule.validate(filteredResults);
+      const violation = rule.validate(filteredResults, this.config);
       if (violation) {
         violations.push(violation);
       }
@@ -326,7 +326,7 @@ export class ConsistencyEngine {
           { engine: 'optionality', attribute: 'overallScore', value: optionalityScore, confidence: 0.8 },
           { engine: 'criticality', attribute: 'criticalityScore', value: criticalityScore, confidence: 0.8 },
         ],
-        targetId: optionality.careerId || criticality.careerId,
+        targetId: criticality.careerId,
         resolution: {
           action: 'Review career transition graph data for accuracy',
           reasoning: 'The inverse relationship between optionality and criticality is being violated',
@@ -350,11 +350,7 @@ export class ConsistencyEngine {
 
     // Find regret analysis for this path
     const pathAnalyses = results.regret.pathAnalyses;
-    const pathRegret = pathAnalyses instanceof Map
-      ? pathAnalyses.get(pathId)
-      : Array.isArray(pathAnalyses)
-        ? pathAnalyses.find((p: { pathId: string }) => p.pathId === pathId)
-        : undefined;
+    const pathRegret = pathAnalyses.get(pathId);
     
     if (!pathRegret) return null;
 
@@ -608,7 +604,7 @@ export class ConsistencyEngine {
     results: IntelligenceResults,
     pathId: string,
     engines: EngineSource[]
-  ): Record<EngineSource, number> {
+  ): Partial<Record<EngineSource, number>> {
     const confidences: Partial<Record<EngineSource, number>> = {};
 
     for (const engine of engines) {
@@ -618,15 +614,19 @@ export class ConsistencyEngine {
           confidences[engine] = 0.85;
           break;
         case 'coalition':
-          const coalition = results.coalition?.pathAnalyses instanceof Map
-            ? results.coalition.pathAnalyses.get(pathId)
-            : results.coalition?.pathAnalyses?.find((p: { pathId: string }) => p.pathId === pathId);
+          const coalitionPathAnalyses = results.coalition?.pathAnalyses as
+            | Map<string, { aggregate?: { overallConfidence?: number } }>
+            | Array<{ pathId: string; aggregate?: { overallConfidence?: number } }>
+            | undefined;
+          const coalition = coalitionPathAnalyses instanceof Map
+            ? coalitionPathAnalyses.get(pathId)
+            : Array.isArray(coalitionPathAnalyses)
+              ? coalitionPathAnalyses.find((p) => p.pathId === pathId)
+              : undefined;
           confidences[engine] = coalition?.aggregate?.overallConfidence || 0.7;
           break;
         case 'regret':
-          const regret = results.regret?.pathAnalyses instanceof Map
-            ? results.regret.pathAnalyses.get(pathId)
-            : results.regret?.pathAnalyses?.find((p: { pathId: string }) => p.pathId === pathId);
+          const regret = results.regret?.pathAnalyses.get(pathId);
           confidences[engine] = regret?.aggregate?.overallConfidence || 0.7;
           break;
         case 'recommendation':
@@ -638,7 +638,7 @@ export class ConsistencyEngine {
       }
     }
 
-    return confidences as Record<EngineSource, number>;
+    return confidences;
   }
 
   // ============================================================================
@@ -1502,13 +1502,14 @@ const BUILT_IN_RULES: ConsistencyRule[] = [
     applicableEngines: ['matching', 'coalition', 'regret', 'recommendation'],
     defaultSeverity: 'medium',
     enabled: true,
-    validate: (results) => {
+    validate: (results, config) => {
+      const threshold = config?.minConfidenceThreshold ?? DEFAULT_CONSISTENCY_CONFIG.minConfidenceThreshold;
       const lowConfidenceEngines: string[] = [];
 
-      if (results.matching?.matches?.[0] && !results.matching.matches[0].score) {
+      if (results.matching?.matches?.[0] && results.matching.matches[0].score < threshold) {
         lowConfidenceEngines.push('matching');
       }
-      if (results.coalition?.coalitionHealth?.confidence && results.coalition.coalitionHealth.confidence < 0.5) {
+      if (results.coalition?.coalitionHealth?.confidence && results.coalition.coalitionHealth.confidence < threshold) {
         lowConfidenceEngines.push('coalition');
       }
 

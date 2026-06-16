@@ -19,11 +19,13 @@ import {
   formDecisionCoalition,
   createEmptyCoalitionAssessment,
   DEFAULT_COALITION_SCORING,
-  type AssessmentResult,
-  type AssessmentResponse,
   type DecisionCoalition,
   type CoalitionPressures,
 } from '../DecisionCoalitionEngine';
+import type {
+  AssessmentResult,
+  AssessmentResponse,
+} from '../../student-model/StudentModelEngine';
 
 // ============================================================================
 // TEST FIXTURES

@@ -6,15 +6,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   createDecisionAuthority,
-  DecisionAuthority,
   DEFAULT_DECISION_CONFIG,
   type DecisionInput,
   type DecisionOption,
   type DecisionContext,
 } from '../index';
 
+type DecisionAuthorityInstance = ReturnType<typeof createDecisionAuthority>;
+
 describe('DecisionAuthority', () => {
-  let authority: DecisionAuthority;
+  let authority: DecisionAuthorityInstance;
 
   beforeEach(() => {
     authority = createDecisionAuthority();
@@ -125,8 +126,12 @@ describe('DecisionAuthority', () => {
     it('should emit events during decision', async () => {
       const events: string[] = [];
       
-      authority.on('decision-created', () => events.push('created'));
-      authority.on('decision-completed', () => events.push('completed'));
+      authority.on('decision-created', () => {
+        events.push('created');
+      });
+      authority.on('decision-completed', () => {
+        events.push('completed');
+      });
 
       const input = createTestInput([
         createTestOption('opt-1', 'Option 1', 0.9),
@@ -141,7 +146,9 @@ describe('DecisionAuthority', () => {
     it('should allow unsubscribing from events', async () => {
       const events: string[] = [];
       
-      const unsubscribe = authority.on('decision-created', () => events.push('created'));
+      const unsubscribe = authority.on('decision-created', () => {
+        events.push('created');
+      });
       unsubscribe();
 
       const input = createTestInput([

@@ -20,6 +20,7 @@ import type {
   ArchetypeSignalCollection,
   ArchetypeScoringConfig,
 } from './archetype-types';
+import { DEFAULT_ARCHETYPE_SCORING_CONFIG } from './archetype-types';
 
 /**
  * Calculator for archetype scores.
@@ -328,7 +329,7 @@ export function createArchetypeCalculator(
   config?: Partial<ArchetypeScoringConfig>
 ): ArchetypeCalculator {
   const fullConfig: import('./archetype-types').ArchetypeScoringConfig = {
-    ...import('./archetype-types').DEFAULT_ARCHETYPE_SCORING_CONFIG,
+    ...DEFAULT_ARCHETYPE_SCORING_CONFIG,
     ...config,
   };
 

@@ -13,9 +13,9 @@ import type {
   CareerRecommendation,
   RecommendationType,
   RecommendationDimensions,
-  DEFAULT_RECOMMENDATION_WEIGHTS,
   RankingCriteria,
 } from './recommendation-types';
+import { DEFAULT_RECOMMENDATION_WEIGHTS } from './recommendation-types';
 import type { CareerFitResult } from '../career-fit/career-fit-types';
 import type { CareerIntelligence } from '../career-intelligence/career-types';
 

@@ -15,6 +15,7 @@ import type {
   RegretIntelligenceConfig,
   RegretDimensionType,
 } from './regret-types';
+import { DEFAULT_REGRET_INTELLIGENCE_CONFIG } from './regret-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
 
@@ -47,7 +48,7 @@ export class RegretFactorEngine {
     career: CareerIntelligence,
     fitResult: CareerFitResult
   ): RegretFactor[] {
-    const factors: RegretFactor[] = [];
+    const factors: Array<Omit<RegretFactor, 'id' | 'priority'>> = [];
 
     // Extract factors from each dimension
     factors.push(...this.extractIdentityFactors(breakdown.identity, career));
@@ -402,7 +403,7 @@ export class RegretFactorEngine {
   ): Array<Omit<RegretFactor, 'id' | 'priority'>> {
     const factors: Array<Omit<RegretFactor, 'id' | 'priority'>> = [];
 
-    const overallFit = fitResult.overallFit?.compatibility ?? 50;
+    const overallFit = fitResult.overallFitScore ?? 50;
 
     if (overallFit < 40) {
       factors.push({
@@ -415,12 +416,14 @@ export class RegretFactorEngine {
     }
 
     // Check specific fit dimensions
-    if (fitResult.cognitiveFit?.overall ?? 50 < 45) {
+    const cognitiveFit = fitResult.breakdown.cognitive.score ?? 50;
+
+    if (cognitiveFit < 45) {
       factors.push({
         name: 'Cognitive Mismatch',
         description: 'Your cognitive preferences do not align with career demands',
         category: 'IDENTITY',
-        importance: Math.round(100 - (fitResult.cognitiveFit?.overall ?? 50)),
+        importance: Math.round(100 - cognitiveFit),
         evidence: ['Cognitive fit below threshold'],
       });
     }
@@ -475,7 +478,7 @@ export function createRegretFactorEngine(
   config?: Partial<RegretIntelligenceConfig>
 ): RegretFactorEngine {
   const fullConfig: RegretIntelligenceConfig = {
-    ...import('./regret-types').DEFAULT_REGRET_INTELLIGENCE_CONFIG,
+    ...DEFAULT_REGRET_INTELLIGENCE_CONFIG,
     ...config,
   };
 

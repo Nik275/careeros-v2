@@ -19,6 +19,8 @@
 
 import type {
   DecisionId,
+  DecisionType,
+  DecisionStatus,
   DecisionInput,
   DecisionOutput,
   DecisionConfig,
@@ -43,6 +45,43 @@ import type {
 
 // Wave 2.3 - Meta-Decision Authority Integration
 import type {
+  MetaDecisionInput,
+  MetaDecisionAnalysis,
+  DecisionReadinessAnalysis,
+  DecisionQualityAnalysis,
+  DecisionTimingAnalysis,
+  DecisionState,
+} from './meta/MetaDecisionAuthority';
+
+export type {
+  DecisionId,
+  DecisionType,
+  DecisionStatus,
+  DecisionInput,
+  DecisionOutput,
+  DecisionConfig,
+  DecisionMetrics,
+  DecisionEvent,
+  DecisionEventType,
+  RankingResult,
+  DecisionComparisonResult,
+  ArbitrationResult,
+  SelectionResult,
+  DecisionExplanation,
+  RankedDecisionOption,
+  DecisionOption,
+  DecisionContext,
+  Conflict,
+  RankingConfig,
+  ComparisonConfig,
+  ArbitrationConfig,
+  SelectionConfig,
+  ExplanationConfig,
+  DecisionError,
+  DecisionErrorType,
+} from './DecisionTypes';
+
+export type {
   MetaDecisionInput,
   MetaDecisionAnalysis,
   DecisionReadinessAnalysis,

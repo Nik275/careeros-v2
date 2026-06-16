@@ -17,8 +17,8 @@ import type {
   ResponsePatternType,
   ResponseDistribution,
   PatternThresholds,
-  DEFAULT_PATTERN_THRESHOLDS,
 } from './validation-types';
+import { DEFAULT_PATTERN_THRESHOLDS } from './validation-types';
 
 /**
  * Detects suspicious response patterns in assessment data.

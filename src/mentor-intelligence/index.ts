@@ -18,6 +18,10 @@
 // ============================================================================
 
 export {
+  DEFAULT_EXTRACTION_CONFIG,
+} from './mentor-intelligence-types';
+
+export type {
   // Core Identifiers
   MentorInsightId,
   PatternId,
@@ -42,6 +46,7 @@ export {
   // Failure Pattern Types
   FailurePattern,
   FailureCategory,
+  LongitudinalPattern,
 
   // Decision Outcome Types
   DecisionOutcome,
@@ -76,7 +81,6 @@ export {
 
   // Configuration Types
   ExtractionConfig,
-  DEFAULT_EXTRACTION_CONFIG,
   IntelligenceFocusArea,
 
   // Input/Output Types
@@ -92,11 +96,14 @@ export {
 
 export {
   MentorIntelligenceEngine,
-  MentorIntelligenceEngineConfig,
   DEFAULT_MENTOR_INTELLIGENCE_CONFIG,
+  createMentorIntelligenceEngine,
+} from './mentor-intelligence-engine';
+
+export type {
+  MentorIntelligenceEngineConfig,
   ValidationResult,
   IntelligenceQuery,
-  createMentorIntelligenceEngine,
 } from './mentor-intelligence-engine';
 
 export {

@@ -100,12 +100,12 @@ export class OptionValueCalculator {
   ): OptionValueCalculation['reachableFutures'] {
     // Find all directly reachable careers
     const reachableEdges = transitionEdges.filter(
-      (e) => e.sourceCareerId === careerId || e.sourceId === careerId
+      (e) => e.sourceCareerId === careerId
     );
 
     const careers = reachableEdges.map((edge) => ({
-      careerId: edge.targetCareerId || edge.targetId,
-      name: edge.targetCareerId || edge.targetId,
+      careerId: edge.targetCareerId,
+      name: edge.targetCareerId,
       transitionDifficulty: edge.transitionDifficulty,
       utilityPotential: this.estimateUtilityPotential(edge),
     }));
@@ -147,7 +147,7 @@ export class OptionValueCalculator {
 
     for (const career of reachableFutures.careers) {
       const context = futureContexts.find(
-        (fc) => fc.path?.startingCareerId === career.careerId
+        (fc) => fc.path?.nodes.at(-1)?.id === career.careerId
       );
 
       if (context) {

@@ -14,8 +14,8 @@ import type {
   CareerSimilarity,
   SimilarityDimensions,
   SimilarityWeights,
-  DEFAULT_SIMILARITY_WEIGHTS,
 } from './career-taxonomy-types';
+import { DEFAULT_SIMILARITY_WEIGHTS } from './career-taxonomy-types';
 import type { CareerIntelligence } from '../career-intelligence/career-types';
 
 /**

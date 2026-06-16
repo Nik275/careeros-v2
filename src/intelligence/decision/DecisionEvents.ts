@@ -80,8 +80,8 @@ export class DecisionEvents implements IDecisionEvents {
       for (const handler of specificHandlers) {
         try {
           handler(event);
-        } catch (error) {
-          console.error(`Error in event handler for ${event.type}:`, error);
+        } catch {
+          console.error('Decision event handler failed safely.');
         }
       }
     }
@@ -92,8 +92,8 @@ export class DecisionEvents implements IDecisionEvents {
       for (const handler of allHandlers) {
         try {
           handler(event);
-        } catch (error) {
-          console.error('Error in "all" event handler:', error);
+        } catch {
+          console.error('Decision event wildcard handler failed safely.');
         }
       }
     }

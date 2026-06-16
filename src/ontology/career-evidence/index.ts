@@ -19,6 +19,10 @@ export {
 } from './CareerEvidenceSystem';
 
 export type {
+  CareerId,
+} from '../career-ontology';
+
+export type {
   // Core Types
   EvidenceId,
   EvidenceCollectionId,

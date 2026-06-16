@@ -61,6 +61,8 @@ export {
   createBeliefNarrativeEngine,
 } from './BeliefNarrativeEngine';
 
+export { DEFAULT_BAYESIAN_CONFIG } from './types';
+
 // Types
 export type {
   // Core types
@@ -68,7 +70,8 @@ export type {
   EvidenceId,
   BeliefType,
   EvidenceType,
-  // ConfidenceLevel BANNED - use Confidence from @/intelligence/confidence
+  BeliefConfidenceLevel,
+  ConfidenceLevel,
   StabilityLevel,
 
   // Main interfaces
@@ -90,5 +93,4 @@ export type {
 
   // Configuration
   BayesianBeliefConfig,
-  DEFAULT_BAYESIAN_CONFIG,
 } from './types';

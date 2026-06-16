@@ -110,8 +110,8 @@ export class RecommendationConsistencyEngine {
       try {
         const result = await pathwayRunner(path, baseProfile);
         pathwayResults.push(result);
-      } catch (error) {
-        console.error(`Path failed: ${error}`);
+      } catch {
+        console.error('Recommendation consistency path failed safely.');
       }
     }
 

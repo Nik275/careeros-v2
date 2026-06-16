@@ -280,7 +280,7 @@ export class MarketRiskAdjustmentEngine {
     criticalRisksFound: number;
   } {
     const adjusted = adjustments.filter(a => a.wasAdjusted);
-    const protected = adjustments.filter(a =>
+    const protectedCount = adjustments.filter(a =>
       a.explanation.some(e => e.includes('fit'))
     );
 
@@ -294,7 +294,7 @@ export class MarketRiskAdjustmentEngine {
       averageAdjustment: adjusted.length > 0
         ? adjusted.reduce((sum, a) => sum + a.confidenceAdjustment, 0) / adjusted.length
         : 0,
-      protectedCount: protected.length,
+      protectedCount: protectedCount.length,
       criticalRisksFound: criticalRisks,
     };
   }

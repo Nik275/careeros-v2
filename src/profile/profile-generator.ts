@@ -28,8 +28,8 @@ import type {
   AssessmentResult,
   GeneratedProfile,
   ProfileGenerationConfig,
-  DEFAULT_PROFILE_CONFIG,
 } from './profile-types';
+import { DEFAULT_PROFILE_CONFIG } from './profile-types';
 
 import { ProfileSynthesizer } from './profile-synthesizer';
 import { ProfileInterpreter } from './profile-interpreter';
@@ -140,7 +140,7 @@ export class ProfileGenerator {
         generatedAt: new Date(),
         profileVersion: '1.0.0',
         generationConfidence: result.confidence.score,
-        evidenceCount: result.confidence.evidenceCount,
+        evidenceCount: result.dimensionScores.size,
       },
     };
   }

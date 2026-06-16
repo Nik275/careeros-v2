@@ -20,6 +20,7 @@ import type { ForecastConfidence, ConfidenceFactors } from './models/ForecastCon
 import { calculateConfidence, adjustConfidenceForHorizon } from './models/ForecastConfidence';
 import type { ForecastEvidence } from './models/ForecastEvidence';
 import { scoreEvidenceQuality } from './models/ForecastEvidence';
+import type { ForecastSignal } from './models/Forecast';
 
 /**
  * Confidence engine configuration.
@@ -97,11 +98,7 @@ export interface ConfidenceContext {
   evidence: ForecastEvidence[];
 
   /** Signal history */
-  signals: Array<{
-    timestamp: Date;
-    strength: number;
-    direction: 'positive' | 'negative' | 'neutral';
-  }>;
+  signals: ForecastSignal[];
 
   /** Model fit score (0-100) */
   modelFit: number;
@@ -204,11 +201,7 @@ export class ConfidenceForecastEngine {
    * Assess trend persistence.
    */
   assessTrendPersistence(
-    signals: Array<{
-      timestamp: Date;
-      strength: number;
-      direction: 'positive' | 'negative' | 'neutral';
-    }>
+    signals: ForecastSignal[]
   ): number {
     if (signals.length < 3) return 40;
 
@@ -237,11 +230,7 @@ export class ConfidenceForecastEngine {
    * Assess signal strength.
    */
   assessSignalStrength(
-    signals: Array<{
-      timestamp: Date;
-      strength: number;
-      direction: 'positive' | 'negative' | 'neutral';
-    }>
+    signals: ForecastSignal[]
   ): number {
     if (signals.length === 0) return 0;
 

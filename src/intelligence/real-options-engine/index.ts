@@ -65,6 +65,11 @@ export {
   createOptionNarrativeEngine,
 } from './OptionNarrativeEngine';
 
+// Constants
+export {
+  DEFAULT_REAL_OPTIONS_CONFIG,
+} from './types';
+
 // Types
 export type {
   // Core
@@ -93,5 +98,4 @@ export type {
 
   // Configuration
   RealOptionsEngineConfig,
-  DEFAULT_REAL_OPTIONS_CONFIG,
 } from './types';

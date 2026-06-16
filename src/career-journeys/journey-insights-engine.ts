@@ -754,7 +754,7 @@ export class JourneyInsightsEngine {
     score += impactScores[decision.actualOutcome.impact];
 
     // Confidence calibration
-    if (decision.confidence === 'HIGH' && decision.actualOutcome.positive) score += 1;
+    if (decision.confidence >= 0.7 && decision.actualOutcome.positive) score += 1;
 
     return score;
   }

@@ -24,7 +24,7 @@ import type {
   IndiaRealityProfile,
   FutureOutlook,
   LifestyleProfile,
-} from '../ontology/career-ontology';
+} from '../authoring';
 
 import type { CareerEvidence, EvidenceSource, EvidenceConfidence, EvidenceMethodology } from '../ontology/career-evidence';
 
@@ -140,19 +140,19 @@ const EVIDENCE_SOURCES = {
 
 const HIGH_CONFIDENCE = (factors: string[]): EvidenceConfidence => ({
   score: 0.85,
-  level: 'high',
+  level: 0.85,
   factors,
 });
 
 const VERY_HIGH_CONFIDENCE = (factors: string[]): EvidenceConfidence => ({
   score: 0.95,
-  level: 'very-high',
+  level: 0.95,
   factors,
 });
 
 const MODERATE_CONFIDENCE = (factors: string[]): EvidenceConfidence => ({
   score: 0.65,
-  level: 'moderate',
+  level: 0.65,
   factors,
 });
 

@@ -220,7 +220,7 @@ export class ArchetypeExplanationEngine {
    * @returns Summary text
    */
   private generateConfidenceSummary(confidence: ArchetypeConfidenceDetails): string {
-    const level = confidence.confidenceLevel.toLowerCase().replace('_', ' ');
+    const level = confidenceLevelLabel(confidence.confidenceScore);
 
     if (confidence.confidenceScore >= 80) {
       return `We have ${level} confidence in this archetype assignment. The evidence strongly supports this result.`;
@@ -391,6 +391,14 @@ export class ArchetypeExplanationEngine {
       narratives: this.narrativeEngine.compareNarratives(archetype1, archetype2),
     };
   }
+}
+
+function confidenceLevelLabel(confidenceScore: number): string {
+  if (confidenceScore >= 85) return 'very high';
+  if (confidenceScore >= 70) return 'high';
+  if (confidenceScore >= 50) return 'medium';
+  if (confidenceScore >= 30) return 'low';
+  return 'very low';
 }
 
 /**

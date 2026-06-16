@@ -21,12 +21,15 @@ import {
   CareerCascadeEngine,
   PREDEFINED_PATHWAYS,
 } from './index';
+import type { StudentCareerContext } from './index';
 
 // ============================================================================
 // TEST UTILITIES
 // ============================================================================
 
-function createMockStudentContext(overrides: Partial<any> = {}) {
+function createMockStudentContext(
+  overrides: Partial<StudentCareerContext> = {},
+): StudentCareerContext {
   return {
     studentId: 'student-1',
     currentNodeId: 'pcm-12',

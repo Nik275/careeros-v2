@@ -30,6 +30,8 @@ import {
 
 import type { Confidence } from '../intelligence/confidence';
 
+export type ConfidenceLevel = Confidence;
+
 // ============================================================================
 // CORE IDENTIFIERS
 // ============================================================================
@@ -285,8 +287,15 @@ export interface FailurePattern {
   relatedPatterns: PatternId[];
 }
 
+/**
+ * Longitudinal pattern memory derived from career journeys over time.
+ */
+export type LongitudinalPattern = SuccessPattern | FailurePattern;
+
 /** Categories of failure */
 export type FailureCategory =
+  | 'PREMATURE_DECISION'
+  | 'DELAYED_DECISION'
   | 'PREMATURE_EXIT'
   | 'SKILL_GAP'
   | 'NETWORK_FAILURE'
@@ -597,10 +606,13 @@ export interface MistakeAnalysis {
   sourceJourneys: JourneyId[];
   
   /** Journeys where this was avoided */
-  avoidanceExamples: JourneyId[];
+  avoidanceExamples?: JourneyId[];
   
   /** Related mistakes */
   relatedMistakes: MistakeId[];
+
+  /** Positive deviations that avoided this mistake */
+  positiveDeviations?: string[];
   
   /** When extracted */
   extractedAt: Date;
@@ -610,6 +622,7 @@ export interface MistakeAnalysis {
 export type MistakeCategory =
   | 'PREMATURE_DECISION'
   | 'DELAYED_DECISION'
+  | 'STRATEGIC_ERROR'
   | 'WRONG_SKILL_FOCUS'
   | 'NEGLECTED_NETWORKING'
   | 'POOR_TIMING'
@@ -844,7 +857,7 @@ export interface GenerateAdviceInput {
  * Generated explanation for an insight
  */
 export interface InsightExplanation {
-  insightId: MentorInsightId | PatternId | LessonId | MistakeId;
+  insightId: MentorInsightId | PatternId | DecisionOutcomeId | LessonId | MistakeId;
   
   /** Human-readable explanation */
   explanation: string;

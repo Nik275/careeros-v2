@@ -21,6 +21,7 @@ import {
   TradeoffDimension,
   RegretCategory,
   TimeHorizon,
+  DecisionEngineConfig,
 } from './decision-types';
 
 // ============================================================================
@@ -699,7 +700,7 @@ export const REGRET_PREDICTORS: RegretPredictor[] = [
 // TRADEOFF FRAMEWORKS
 // ============================================================================
 
-import { TradeoffFramework } from './decision-types';
+import type { TradeoffFramework } from './decision-types';
 
 /**
  * Predefined tradeoff frameworks for common decision conflicts
@@ -784,7 +785,7 @@ export const TRADEOFF_FRAMEWORKS: TradeoffFramework[] = [
 /**
  * Default decision engine configuration
  */
-export const DEFAULT_DECISION_ENGINE_CONFIG = {
+export const DEFAULT_DECISION_ENGINE_CONFIG: DecisionEngineConfig = {
   tradeoff: {
     sensitivity: 0.7,
     minEvidenceCount: 2,

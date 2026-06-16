@@ -239,6 +239,9 @@ export interface EvidenceCollection {
 // CAREER ATTRIBUTE EVIDENCE MAPPINGS
 // ============================================================================
 
+/** Generic career attribute evidence record */
+export type CareerAttributeEvidence = CareerEvidence;
+
 /**
  * Evidence for psychology profile attributes
  */
@@ -414,6 +417,7 @@ export interface EvidenceQuery {
   careerIds?: CareerId[];
   attributePaths?: string[];
   sourceTypes?: EvidenceSourceType[];
+  confidenceLevels?: number[];
   /** Constitutional confidence thresholds (0.0-1.0) */
   confidenceMin?: number;
   confidenceMax?: number;
@@ -471,7 +475,7 @@ export const EVIDENCE_SCHEMA_VERSION = '1.0.0';
 /** Default confidence for new evidence */
 export const DEFAULT_CONFIDENCE: EvidenceConfidence = {
   score: 0.5,
-  level: 'moderate',
+  level: 0.5,
   factors: ['Default confidence - requires review'],
 };
 
@@ -583,7 +587,7 @@ export function createEvidenceCollection(
  */
 export function calculateAggregateConfidence(evidenceItems: CareerEvidence[]): EvidenceConfidence {
   if (evidenceItems.length === 0) {
-    return { score: 0, level: 'very-low', factors: ['No evidence'] };
+    return { score: 0, level: 0, factors: ['No evidence'] };
   }
 
   // Weight by source quality and recency

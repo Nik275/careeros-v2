@@ -14,13 +14,21 @@ import {
   type FutureScenario,
   type ScenarioType,
 } from '../index.js';
+import {
+  ConstraintType,
+  PersonalityDimension,
+  StrengthCategory,
+} from '../../types/index.js';
 import type {
   StudentBeliefV3,
-  ExploredCareerPath,
+} from '../../types/index.js';
+import type {
   CareerNode,
   CareerEdge,
-  PathType,
-} from '../../types/index.js';
+} from '../../career-transition-graph/index.js';
+import type {
+  ExploredCareerPath,
+} from '../../path-explorer/index.js';
 import type {
   OptionalityAnalysis,
 } from '../../optionality-engine/OptionalityEngineV1.js';
@@ -35,6 +43,294 @@ import { KnowledgeGraph } from '../../../knowledge-graph/KnowledgeGraphCore.js';
 // ============================================================================
 // MOCK DATA FACTORIES
 // ============================================================================
+
+type ScenarioCareerNodeKind = 'exam' | 'degree' | 'job' | 'career' | 'pivot';
+
+type LegacyScenarioNodeFields = {
+  type: ScenarioCareerNodeKind;
+  typicalDuration: number;
+  financialCost: {
+    min: number;
+    max: number;
+    typical: number;
+  };
+  prerequisites: string[];
+  skillsGained: string[];
+  outcomes: {
+    averageSalary: number;
+    jobSecurity: number;
+    growthPotential: number;
+    workLifeBalance: number;
+  };
+  isTerminal: boolean;
+  popularity: number;
+};
+
+type LegacyScenarioEdgeFields = {
+  fromNodeId: string;
+  toNodeId: string;
+  probability: number;
+  reversibility: number;
+  timeCost: number;
+  difficulty: number;
+  financialCost: {
+    min: number;
+    max: number;
+    typical: number;
+  };
+  prerequisites: string[];
+  newSkillsRequired: string[];
+  description: string;
+};
+
+type ScenarioCareerNode = CareerNode & LegacyScenarioNodeFields;
+type ScenarioCareerEdge = CareerEdge & LegacyScenarioEdgeFields;
+type ScenarioPathMetrics = ExploredCareerPath['metrics'] & {
+  criticality: number;
+  optionality: number;
+  pathProbability: number;
+  reversibility: number;
+  riskScore: number;
+};
+type ScenarioPathExplanation = ExploredCareerPath['explanation'] & {
+  concerns: string[];
+  alignmentRationale: string;
+};
+type ScenarioExploredCareerPath = Omit<
+  ExploredCareerPath,
+  'nodes' | 'edges' | 'metrics' | 'explanation'
+> & {
+  nodes: ScenarioCareerNode[];
+  edges: ScenarioCareerEdge[];
+  metrics: ScenarioPathMetrics;
+  explanation: ScenarioPathExplanation;
+};
+
+const createMockFamilyReality = (): StudentBeliefV3['familyReality'] => ({
+  id: 'family-reality-test-001',
+  structure: {
+    id: 'family-structure-test-001',
+    type: 'NUCLEAR',
+    description: 'Nuclear family with moderate support',
+    dependentCount: 0,
+    isPrimaryBreadwinner: false,
+    householdMembers: [],
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  obligations: [],
+  parentalExpectations: [],
+  support: [{
+    id: 'family-support-test-001',
+    type: 'FINANCIAL',
+    description: 'Family can support education costs',
+    reliability: 0.7,
+    expectedDuration: '4 years',
+    evidence: [],
+    confidence: 0.8,
+  }],
+  culturalConstraints: [],
+  overallInfluence: 0.4,
+  isMajorFactor: false,
+  evidence: [],
+  confidence: 0.8,
+  assessedAt: Date.now(),
+});
+
+const createMockEconomicReality = (): StudentBeliefV3['economicReality'] => ({
+  id: 'economic-reality-test-001',
+  financialSituation: {
+    id: 'financial-situation-test-001',
+    familyIncomeBracket: '6_TO_12_LAKH',
+    estimatedAnnualIncome: 500000,
+    locationType: 'TIER_2',
+    monthlyDiscretionaryBudget: 10000,
+    availableSavings: 1000000,
+    emergencyFundMonths: 6,
+    hasOwnIncome: false,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  educationFinancing: {
+    id: 'education-financing-test-001',
+    fundingSources: [{
+      type: 'FAMILY_SAVINGS',
+      amount: 1000000,
+      duration: '4 years',
+      reliability: 0.7,
+    }],
+    loans: [],
+    scholarships: [],
+    totalEducationDebt: 0,
+    monthlyDebtObligation: 0,
+    isConstraint: false,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  constraints: [],
+  resources: {
+    id: 'resource-availability-test-001',
+    monthlySkillBudget: 5000,
+    certificationBudget: 20000,
+    technologyAccess: 'FULL',
+    mentorshipAccess: 'LIMITED',
+    timeAvailability: 10,
+    canRelocate: true,
+    relocationBudget: 200000,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  riskTolerance: {
+    id: 'financial-risk-tolerance-test-001',
+    canPursuePassion: true,
+    canAffordRetraining: true,
+    canAffordEntrepreneurship: false,
+    canAffordUnpaidWork: false,
+    canAffordDelayedROI: true,
+    financialRunwayMonths: 12,
+    riskToleranceScore: 0.6,
+    evidence: [],
+    confidence: 0.8,
+  },
+  overallBarrierScore: 0.3,
+  isMajorFactor: false,
+  evidence: [],
+  confidence: 0.8,
+  assessedAt: Date.now(),
+});
+
+const createMockEducationalReality = (): StudentBeliefV3['educationalReality'] => ({
+  id: 'educational-reality-test-001',
+  background: {
+    id: 'academic-background-test-001',
+    stream: 'SCIENCE_PCM',
+    board: 'CBSE',
+    currentLevel: 'HIGHER_SECONDARY',
+    yearsCompleted: 12,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  performance: {
+    id: 'academic-performance-test-001',
+    overallStanding: 'GOOD',
+    class10Score: 90,
+    class12Score: 88,
+    percentile: 85,
+    subjectPerformance: [
+      {
+        subject: 'mathematics',
+        score: 90,
+        strength: 'STRONG',
+        careerRelevance: 'HIGH',
+      },
+      {
+        subject: 'science',
+        score: 88,
+        strength: 'STRONG',
+        careerRelevance: 'HIGH',
+      },
+    ],
+    achievements: [],
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  competitiveExams: [],
+  learningProfile: {
+    id: 'learning-profile-test-001',
+    primaryStyle: 'VISUAL',
+    secondaryStyles: ['READING_WRITING'],
+    preferredEnvironment: 'PROJECT_BASED',
+    studyHoursPerWeek: 20,
+    peakLearningTime: 'MORNING',
+    attentionSpanMinutes: 45,
+    breakFrequency: 'MODERATE',
+    selfDiscipline: 'HIGH',
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  opportunities: [],
+  overallPotential: 0.8,
+  barriers: [],
+  isMajorFactor: true,
+  evidence: [],
+  confidence: 0.8,
+  assessedAt: Date.now(),
+});
+
+const createMockDecisionState = (): StudentBeliefV3['decisionState'] => ({
+  id: 'decision-state-test-001',
+  timeline: {
+    id: 'decision-timeline-test-001',
+    urgency: 'MEDIUM_TERM',
+    deadlines: [],
+    daysToNextDecision: 180,
+    daysToFinalDecision: 365,
+    currentPhase: 'EXPLORATION',
+    explorationTimeAvailable: 90,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  pressure: {
+    id: 'decision-pressure-test-001',
+    factors: [],
+    overallPressure: 0.4,
+    isUnhealthy: false,
+    primarySource: 'FAMILY',
+    reportedStressLevel: 0.3,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  information: {
+    id: 'information-status-test-001',
+    needs: [],
+    gapsCount: 0,
+    criticalGapsCount: 0,
+    sufficiencyScore: 0.7,
+    hasAdequateResearch: true,
+    sourcesUsed: [],
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  readiness: {
+    id: 'decision-readiness-test-001',
+    components: [],
+    overallReadiness: 0.7,
+    category: 'NEARLY_READY',
+    canDecideNow: true,
+    recommendedPreparation: [],
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  context: {
+    id: 'decision-context-test-001',
+    lifeSituation: 'IN_SCHOOL',
+    emotionalState: 'OPTIMISTIC',
+    lifeChanges: [],
+    supportSystemAvailable: true,
+    decisionCapacity: 'FULL',
+    isGoodTiming: true,
+    evidence: [],
+    confidence: 0.8,
+    assessedAt: Date.now(),
+  },
+  activeDecision: 'career path selection',
+  alternativesConsidered: ['software engineering'],
+  isStuck: false,
+  evidence: [],
+  confidence: 0.8,
+  assessedAt: Date.now(),
+});
 
 const createMockStudentBeliefV3 = (): StudentBeliefV3 => ({
   id: 'belief-test-001',
@@ -52,7 +348,7 @@ const createMockStudentBeliefV3 = (): StudentBeliefV3 => ({
   strengths: [{
     id: 'str-1',
     name: 'Analytical Thinking',
-    category: 'COGNITIVE',
+    category: StrengthCategory.COGNITIVE,
     description: 'Strong problem-solving abilities',
     level: 0.85,
     evidence: [],
@@ -69,7 +365,7 @@ const createMockStudentBeliefV3 = (): StudentBeliefV3 => ({
   personalityTraits: [{
     id: 'trait-1',
     name: 'Openness',
-    dimension: 'OPENNESS',
+    dimension: PersonalityDimension.OPENNESS,
     position: 0.6,
     confidence: 0.8,
     evidence: [],
@@ -78,36 +374,16 @@ const createMockStudentBeliefV3 = (): StudentBeliefV3 => ({
   constraints: [{
     id: 'con-1',
     name: 'Financial Limitation',
-    type: 'FINANCIAL',
+    type: ConstraintType.FINANCIAL,
     description: 'Limited education budget',
     isHardConstraint: false,
     severity: 0.6,
     evidence: [],
   }],
-  familyReality: {
-    obligations: [],
-    expectations: [],
-    supportLevel: 0.7,
-    culturalFactors: [],
-  },
-  economicReality: {
-    currentIncome: 0,
-    familyIncome: 500000,
-    financialAidEligible: true,
-    educationBudget: 1000000,
-  },
-  educationalReality: {
-    currentLevel: 'high-school',
-    academicPerformance: 0.8,
-    learningStyle: 'analytical',
-    strengths: ['mathematics', 'science'],
-    weaknesses: [],
-  },
-  decisionState: {
-    urgency: 0.5,
-    readiness: 0.7,
-    pressureLevel: 0.4,
-  },
+  familyReality: createMockFamilyReality(),
+  economicReality: createMockEconomicReality(),
+  educationalReality: createMockEducationalReality(),
+  decisionState: createMockDecisionState(),
   overallConfidence: 0.75,
   isValidated: true,
   metadata: {
@@ -121,14 +397,36 @@ const createMockStudentBeliefV3 = (): StudentBeliefV3 => ({
 const createMockCareerNode = (
   id: string,
   name: string,
-  type: CareerNode['type'],
-  options: Partial<CareerNode> = {}
-): CareerNode => ({
+  type: ScenarioCareerNodeKind,
+  options: Partial<ScenarioCareerNode> = {}
+): ScenarioCareerNode => ({
   id,
   name,
   type,
   description: `Description for ${name}`,
-  category: 'Technology',
+  category: 'technology',
+  requiredProfile: {
+    analyticalThinking: 0.8,
+    creativity: 0.5,
+    socialOrientation: 0.4,
+    leadership: 0.5,
+    detailOrientation: 0.7,
+    curiosity: 0.8,
+    competitiveness: 0.6,
+    riskTolerance: 0.5,
+  },
+  keySkills: ['programming', 'problem-solving'],
+  skillCategories: ['technical'],
+  typicalExperienceYears: type === 'degree' ? 0 : type === 'job' ? 1 : 3,
+  incomeLevel: 0.7,
+  isEntryLevel: type === 'degree' || type === 'job',
+  isTerminal: false,
+  relatedCareers: [],
+  metadata: {
+    demandLevel: 0.8,
+    growthOutlook: 0.8,
+    addedAt: Date.now(),
+  },
   typicalDuration: 2,
   financialCost: {
     min: 100000,
@@ -143,7 +441,6 @@ const createMockCareerNode = (
     growthPotential: 0.8,
     workLifeBalance: 0.6,
   },
-  isTerminal: false,
   popularity: 0.75,
   ...options,
 });
@@ -151,12 +448,26 @@ const createMockCareerNode = (
 const createMockCareerEdge = (
   fromId: string,
   toId: string,
-  options: Partial<CareerEdge> = {}
-): CareerEdge => ({
+  options: Partial<ScenarioCareerEdge> = {}
+): ScenarioCareerEdge => ({
   id: `edge-${fromId}-${toId}`,
   fromNodeId: fromId,
   toNodeId: toId,
-  transitionType: 'DEGREE_TO_JOB',
+  transitionDifficulty: 50,
+  transitionTimeYears: 1,
+  skillOverlap: 0.6,
+  probabilityOfSuccess: 0.8,
+  transitionType: 'promotion',
+  description: `Transition from ${fromId} to ${toId}`,
+  prerequisites: [],
+  transferableSkills: [],
+  skillsToAcquire: [],
+  commonPaths: [],
+  metadata: {
+    frequency: 'common',
+    confidence: 0.8,
+    addedAt: Date.now(),
+  },
   probability: 0.8,
   reversibility: 0.3,
   timeCost: 1,
@@ -166,16 +477,13 @@ const createMockCareerEdge = (
     typical: 50000,
   },
   difficulty: 0.5,
-  prerequisites: [],
-  transferableSkills: [],
   newSkillsRequired: [],
-  description: `Transition from ${fromId} to ${toId}`,
   ...options,
 });
 
-const createMockExploredCareerPath = (): ExploredCareerPath => ({
+const createMockExploredCareerPath = (): ScenarioExploredCareerPath => ({
   id: 'path-test-001',
-  type: 'primary' as PathType,
+  type: 'primary',
   name: 'Software Engineer Path',
   nodes: [
     createMockCareerNode('node-1', 'B.Tech Computer Science', 'degree', {
@@ -202,6 +510,19 @@ const createMockExploredCareerPath = (): ExploredCareerPath => ({
   ],
   nodeIds: ['node-1', 'node-2', 'node-3', 'node-4'],
   metrics: {
+    totalYears: 12,
+    transitionCount: 3,
+    incomeRange: {
+      entry: 500000,
+      mid: 800000,
+      senior: 1500000,
+      growthRate: 0.08,
+    },
+    totalDifficulty: 0.5,
+    avgTransitionTime: 1,
+    cumulativeSuccessProbability: 0.65,
+    minReversibility: 0.3,
+    avgSkillOverlap: 0.7,
     criticality: 0.4,
     optionality: 0.7,
     pathProbability: 0.65,
@@ -224,7 +545,12 @@ const createMockExploredCareerPath = (): ExploredCareerPath => ({
   },
   explanation: {
     summary: 'Strong path with good growth potential',
+    details: 'Software engineering has a clear skill progression and strong market demand.',
+    selectionReason: 'Good fit for analytical students',
     strengths: ['High demand', 'Good salary growth'],
+    tradeoffs: ['Requires continuous learning'],
+    preservedOptions: ['Data science', 'Product engineering'],
+    closedOptions: [],
     concerns: ['Requires continuous learning'],
     alignmentRationale: 'Good fit for analytical students',
   },
@@ -371,11 +697,13 @@ const createMockCoalitionAnalysis = (): DecisionCoalitionAnalysis => ({
     paths: [],
     pathsByType: new Map(),
     comparison: {
-      bestOptionalityPath: null,
-      bestGrowthPath: null,
-      safestPath: null,
-      fastestPath: null,
-      tradeOffs: [],
+      bestForGrowth: 'primary',
+      bestForOptionality: 'primary',
+      bestForStability: 'primary',
+      safestPath: 'primary',
+      riskiestPath: 'high-growth',
+      comparisonText: 'Single test path comparison',
+      keyDifferences: [],
     },
     recommendations: [],
     generatedAt: Date.now(),

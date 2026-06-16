@@ -39,6 +39,35 @@ import {
 // TEST FIXTURES
 // ============================================================================
 
+type MockConstraintOverrides = {
+  [K in keyof RealityConstraints]?: Partial<RealityConstraints[K]>;
+};
+
+type MockCareerOverrides = Partial<
+  Omit<
+    Career,
+    | 'psychologicalProfile'
+    | 'workStyle'
+    | 'rewardProfile'
+    | 'riskProfile'
+    | 'optionality'
+    | 'education'
+    | 'indiaReality'
+    | 'evolution'
+    | 'salary'
+  >
+> & {
+  psychologicalProfile?: Partial<PsychologicalProfile>;
+  workStyle?: Partial<WorkStyleProfile>;
+  rewardProfile?: Partial<RewardProfile>;
+  riskProfile?: Partial<Career['riskProfile']>;
+  optionality?: Partial<Career['optionality']>;
+  education?: Partial<Career['education']>;
+  indiaReality?: Partial<Career['indiaReality']>;
+  evolution?: Partial<Career['evolution']>;
+  salary?: Partial<Career['salary']>;
+};
+
 const createMockStudentPsychology = (overrides: Partial<PsychologyProfile> = {}): PsychologyProfile => ({
   analyticalThinking: 0.7,
   creativity: 0.6,
@@ -60,7 +89,7 @@ const createMockMotivations = (overrides: Partial<Motivations> = {}): Motivation
   ...overrides,
 });
 
-const createMockConstraints = (overrides: Partial<RealityConstraints> = {}): RealityConstraints => ({
+const createMockConstraints = (overrides: MockConstraintOverrides = {}): RealityConstraints => ({
   financial: {
     familyIncomeBracket: FamilyIncomeBracket.BETWEEN_6_12_LPA,
     hasPersonalIncome: false,
@@ -93,7 +122,21 @@ const createMockConstraints = (overrides: Partial<RealityConstraints> = {}): Rea
   },
 });
 
-const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
+const createMockCareer = (overrides: MockCareerOverrides = {}): Career => {
+  const {
+    psychologicalProfile: psychologicalProfileOverrides,
+    workStyle: workStyleOverrides,
+    rewardProfile: rewardProfileOverrides,
+    riskProfile: riskProfileOverrides,
+    optionality: optionalityOverrides,
+    education: educationOverrides,
+    indiaReality: indiaRealityOverrides,
+    evolution: evolutionOverrides,
+    salary: salaryOverrides,
+    ...careerOverrides
+  } = overrides;
+
+  return {
   id: 'software-engineer',
   name: 'Software Engineer',
   slug: 'software-engineer',
@@ -109,7 +152,7 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
     curiosity: 0.9,
     competitiveness: 0.6,
     riskTolerance: 0.5,
-    ...overrides.psychologicalProfile,
+    ...psychologicalProfileOverrides,
   },
   workStyle: {
     remoteWork: 0.8,
@@ -120,7 +163,7 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
     soloOrientation: 0.4,
     structuredEnvironment: 0.5,
     unstructuredEnvironment: 0.5,
-    ...overrides.workStyle,
+    ...workStyleOverrides,
   },
   rewardProfile: {
     incomePotential: 0.9,
@@ -128,26 +171,26 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
     impactPotential: 0.6,
     freedomPotential: 0.8,
     stabilityPotential: 0.7,
-    ...overrides.rewardProfile,
+    ...rewardProfileOverrides,
   },
   riskProfile: {
     burnoutRisk: 0.6,
     automationRisk: 0.3,
     competitionLevel: 0.7,
     incomeVolatility: 0.4,
-    ...overrides.riskProfile,
+    ...riskProfileOverrides,
   },
   optionality: {
     careerFlexibility: 0.9,
     transferableSkills: 0.9,
     entrepreneurshipPotential: 0.8,
-    ...overrides.optionality,
+    ...optionalityOverrides,
   },
   education: {
     minimumLevel: 'bachelors' as any,
     typicalDegrees: ['B.Tech', 'B.E.', 'B.Sc CS'] as any[],
     certifications: [],
-    ...overrides.education,
+    ...educationOverrides,
   },
   indiaReality: {
     coachingDependency: 0.2,
@@ -155,24 +198,25 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
     englishDependency: 0.6,
     migrationRequirement: 0.2,
     reservationApplicable: false,
-    ...overrides.indiaReality,
+    ...indiaRealityOverrides,
   },
   evolution: {
     adjacentCareers: [],
     futureCareerPaths: [],
-    ...overrides.evolution,
+    ...evolutionOverrides,
   },
   salary: {
     entrySalaryIndia: { min: 400000, max: 1500000, median: 800000 },
     midCareerSalaryIndia: { min: 1200000, max: 4000000, median: 2500000 },
     seniorSalaryIndia: { min: 3000000, max: 10000000, median: 6000000 },
-    ...overrides.salary,
+    ...salaryOverrides,
   },
   createdAt: new Date(),
   updatedAt: new Date(),
   schemaVersion: 1,
-  ...overrides,
-});
+  ...careerOverrides,
+  };
+};
 
 // ============================================================================
 // PSYCHOLOGICAL FIT TESTS
@@ -669,7 +713,7 @@ describe('matchStudentToCareers', () => {
       constraints: createMockConstraints(),
       academic: {
         performance: {
-          stage: EducationStage.HIGH_SCHOOL_12,
+          stage: EducationStage.HIGH_SCHOOL_11_12,
           gradeScale: GradeScale.PERCENTAGE,
           overallScore: 0.85,
           subjectGrades: [],
@@ -715,7 +759,7 @@ describe('matchStudentToCareers', () => {
       constraints: createMockConstraints(),
       academic: {
         performance: {
-          stage: EducationStage.HIGH_SCHOOL_12,
+          stage: EducationStage.HIGH_SCHOOL_11_12,
           gradeScale: GradeScale.PERCENTAGE,
           overallScore: 0.85,
           subjectGrades: [],

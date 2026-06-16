@@ -48,11 +48,11 @@ describe('ConfidenceAuthority', () => {
       const invalidRequest = {
         requestId: '',
         requestingSystem: '',
-        predictionType: '',
+        predictionType: 'career-fit',
         prediction: {},
         evidence: [],
         context: { timestamp: Date.now() },
-      } as ConfidenceRequest;
+      } satisfies ConfidenceRequest;
 
       // Should return fallback confidence, not throw
       const result = await authority.calculateConfidence(invalidRequest);
@@ -81,6 +81,7 @@ describe('ConfidenceAuthority', () => {
   describe('calculateUncertainty', () => {
     it('should calculate uncertainty profile', async () => {
       const result = await authority.calculateUncertainty({
+        requestId: 'uncertainty-request',
         requestingSystem: 'test-system',
         predictionType: 'career-fit',
         prediction: { test: 'data' },

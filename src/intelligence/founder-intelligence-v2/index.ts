@@ -81,51 +81,51 @@
 export {
   FounderIntelligenceEngineV2,
   createFounderIntelligenceEngineV2,
-  FounderIntelligenceEngineConfigV2,
 } from './FounderIntelligenceEngineV2';
+export type { FounderIntelligenceEngineConfigV2 } from './FounderIntelligenceEngineV2';
 
 // Sub-engines
 export {
   DimensionScoringEngineV2,
   createDimensionScoringEngineV2,
-  DimensionScoringConfigV2,
 } from './DimensionScoringEngine';
+export type { DimensionScoringConfigV2 } from './DimensionScoringEngine';
 
 export {
   FalsePositiveProtectionEngineV2,
   createFalsePositiveProtectionEngineV2,
-  FalsePositiveProtectionConfigV2,
 } from './FalsePositiveProtectionEngine';
+export type { FalsePositiveProtectionConfigV2 } from './FalsePositiveProtectionEngine';
 
 export {
   FounderClassificationEngineV2,
   createFounderClassificationEngineV2,
-  FounderClassificationConfigV2,
 } from './FounderClassificationEngine';
+export type { FounderClassificationConfigV2 } from './FounderClassificationEngine';
 
 export {
   FounderMarketFitEngineV2,
   createFounderMarketFitEngineV2,
-  MarketFitConfigV2,
 } from './FounderMarketFitEngine';
+export type { MarketFitConfigV2 } from './FounderMarketFitEngine';
 
 export {
   FounderRiskProfileEngineV2,
   createFounderRiskProfileEngineV2,
-  RiskProfileConfigV2,
 } from './FounderRiskProfileEngine';
+export type { RiskProfileConfigV2 } from './FounderRiskProfileEngine';
 
 export {
   FounderExplanationEngineV2,
   createFounderExplanationEngineV2,
-  ExplanationConfigV2,
 } from './FounderExplanationEngine';
+export type { ExplanationConfigV2 } from './FounderExplanationEngine';
 
 export {
   FounderRoadmapEngineV2,
   createFounderRoadmapEngineV2,
-  RoadmapConfigV2,
 } from './FounderRoadmapEngine';
+export type { RoadmapConfigV2 } from './FounderRoadmapEngine';
 
 // Types
 export * from './types';

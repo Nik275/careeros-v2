@@ -2,8 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AmbientBlobs } from '@/components/background/AmbientBlobs';
-import { ActiveParticles } from '@/components/background/ActiveParticles';
+import { CareerGlobeBackground } from '@/components/landing/CareerGlobeBackground';
 import { AssessmentWelcome } from '@/components/assessment/AssessmentWelcome';
 import { PsychologyQuestions } from '@/components/assessment/PsychologyQuestions';
 import { AnalysisScreen } from '@/components/assessment/AnalysisScreen';
@@ -100,37 +99,12 @@ export default function AssessmentPage() {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: '#F8F5EE',
+            backgroundColor: '#000000',
           }}
         />
 
-        {/* Blobs */}
-        <AmbientBlobs />
-
-        {/* Particles */}
-        <ActiveParticles />
-
-        {/* Light Flow */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '85%',
-            height: '80%',
-            transform: 'translate(-50%, -50%)',
-            animation: 'lightFlow 12s ease-in-out infinite alternate',
-          }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, rgba(252,250,245,0.04) 50%, transparent 80%)',
-              filter: 'blur(60px)',
-            }}
-          />
-        </div>
+        {/* Cosmic Background */}
+        <CareerGlobeBackground variant="assessment" />
       </div>
 
       {/* Screen Container */}
@@ -247,17 +221,6 @@ export default function AssessmentPage() {
       </main>
 
       <style jsx global>{`
-        @keyframes lightFlow {
-          0% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0.08;
-          }
-          100% {
-            transform: translate(-50%, -50%) scale(1.06);
-            opacity: 0.16;
-          }
-        }
-
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;

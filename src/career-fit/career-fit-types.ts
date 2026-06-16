@@ -454,6 +454,9 @@ export interface FitConfidence {
 
   /** Confidence level */
   level: 'HIGH' | 'MEDIUM' | 'LOW';
+
+  /** Constitutional confidence value (0.0-1.0) for ConfidenceAuthority compatibility */
+  constitutionalConfidence?: number;
 }
 
 /**

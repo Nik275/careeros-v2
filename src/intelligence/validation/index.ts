@@ -61,7 +61,7 @@ export {
 export { ConfidenceCalibrationEngine } from './confidence-calibration-engine';
 export type {
   CalibrationConfig,
-  PredictionRecord,
+  CalibrationInput,
 } from './confidence-calibration-engine';
 
 export { RecommendationStabilityEngine } from './recommendation-stability-engine';

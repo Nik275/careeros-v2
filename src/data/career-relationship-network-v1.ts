@@ -446,7 +446,6 @@ const PRODUCT_MANAGER_RELATIONSHIPS: CareerRelationshipV1[] = [
     from: 'product-manager',
     to: 'software-engineer',
     type: 'specialization',
-    type: 'specialization',
     strength: 6,
     confidence: 0.68,
     description: 'Technical PMs can move to engineering but rare',

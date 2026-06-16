@@ -8,7 +8,27 @@
  * @version 1.0.0
  */
 
-import type { Career } from '@/ontology/career-ontology';
+import { normalizeCareerData } from '@/ontology/career-ontology';
+import type { CareerV2 } from '@/authoring';
+import type {
+  Career,
+  CareerId,
+  CareerSlug,
+  CoachingLevel,
+  DemandLevel,
+  EducationLevel,
+  EnglishDependency,
+  ExamType,
+  FamilyAcceptance,
+  GrowthLevel,
+  RemoteWorkLevel,
+  RiskLevel,
+  StressLevel,
+  TeamOrientation,
+  TravelRequirement,
+  UrbanAdvantage,
+  WorkLifeBalance,
+} from '@/ontology/career-ontology';
 import type { PathComparisonData, Opportunity, OpportunityCategory } from './CounterfactualEngine';
 import type { CareerTransitionGraphV1, CareerNode } from '../career-transition-graph';
 import { createCareerTransitionGraph, findCareerTransitionPath, getReachableCareersFrom } from '../career-transition-graph';
@@ -41,6 +61,8 @@ export interface CareerAdapterConfig {
   /** Discount rate for future value */
   discountRate: number;
 }
+
+export type CareerAdapterInput = Career | CareerV2;
 
 /**
  * Default adapter configuration
@@ -98,6 +120,341 @@ const STRESS_SCORES: Record<string, number> = {
   'extreme': 10,
 };
 
+function isOntologyCareer(career: CareerAdapterInput): career is Career {
+  return 'identity' in career && 'future' in career;
+}
+
+function normalizeTenPointScore(value: number | undefined, fallback = 0.5): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return fallback;
+  }
+
+  const normalized = value > 1 ? value / 10 : value;
+  return Math.max(0, Math.min(1, normalized));
+}
+
+function normalizeBooleanScore(value: boolean | number | undefined, fallback: boolean): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'number') {
+    return value >= 5;
+  }
+
+  return fallback;
+}
+
+function normalizeRiskLevel(value: number | undefined, fallback: RiskLevel = 'moderate'): RiskLevel {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return fallback;
+  }
+
+  if (value <= 2) return 'minimal';
+  if (value <= 4) return 'low';
+  if (value <= 6) return 'moderate';
+  if (value <= 8) return 'high';
+  return 'severe';
+}
+
+function normalizeDemandLevel(value: number | undefined): DemandLevel {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'stable';
+  }
+
+  if (value <= 2) return 'declining';
+  if (value <= 4) return 'stable';
+  if (value <= 6) return 'growing';
+  if (value <= 8) return 'high-growth';
+  return 'booming';
+}
+
+function normalizeGrowthLevel(value: number | undefined): GrowthLevel {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'moderate';
+  }
+
+  if (value <= 2) return 'declining';
+  if (value <= 4) return 'stagnant';
+  if (value <= 6) return 'slow';
+  if (value <= 8) return 'moderate';
+  return 'rapid';
+}
+
+function normalizeRemoteWorkLevel(value: string | number | undefined): RemoteWorkLevel {
+  if (typeof value === 'string') {
+    if (value === 'none') return 'none';
+    if (value === 'possible' || value === 'hybrid') return 'hybrid';
+    if (value === 'preferred' || value === 'remote-first') return 'remote-first';
+  }
+
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'hybrid';
+  }
+
+  if (value <= 1) return 'none';
+  if (value <= 4) return 'limited';
+  if (value <= 7) return 'hybrid';
+  if (value <= 9) return 'fully-remote';
+  return 'remote-first';
+}
+
+function normalizeTravelRequirement(value: string | number | undefined): TravelRequirement {
+  if (typeof value === 'string') {
+    if (value === 'minimal') return 'occasional';
+    if (value === 'moderate') return 'frequent';
+    if (value === 'high') return 'extensive';
+  }
+
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'occasional';
+  }
+
+  if (value <= 1) return 'none';
+  if (value <= 4) return 'occasional';
+  if (value <= 7) return 'frequent';
+  if (value <= 9) return 'extensive';
+  return 'constant';
+}
+
+function normalizeTeamOrientation(value: string | number | undefined): TeamOrientation {
+  if (typeof value === 'string') {
+    if (value === 'small') return 'small-team';
+    if (value === 'medium') return 'medium-team';
+    if (value === 'large') return 'large-team';
+    if (value === 'solo' || value === 'fluid') return value;
+  }
+
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'medium-team';
+  }
+
+  if (value <= 2) return 'solo';
+  if (value <= 4) return 'small-team';
+  if (value <= 7) return 'medium-team';
+  if (value <= 9) return 'large-team';
+  return 'fluid';
+}
+
+function normalizeCoachingLevel(value: number | undefined): CoachingLevel {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'moderate';
+  }
+
+  if (value <= 1) return 'none';
+  if (value <= 3) return 'minimal';
+  if (value <= 6) return 'moderate';
+  if (value <= 8) return 'high';
+  return 'essential';
+}
+
+function normalizeEnglishDependency(value: number | undefined): EnglishDependency {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'helpful';
+  }
+
+  if (value <= 1) return 'none';
+  if (value <= 3) return 'minimal';
+  if (value <= 5) return 'helpful';
+  if (value <= 8) return 'important';
+  return 'essential';
+}
+
+function normalizeUrbanAdvantage(value: number | undefined): UrbanAdvantage {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'moderate';
+  }
+
+  if (value <= 1) return 'none';
+  if (value <= 3) return 'slight';
+  if (value <= 6) return 'moderate';
+  if (value <= 8) return 'significant';
+  return 'essential';
+}
+
+function normalizeFamilyAcceptance(value: number | undefined): FamilyAcceptance {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'high';
+  }
+
+  if (value <= 3) return 'low';
+  if (value <= 6) return 'moderate';
+  if (value <= 8) return 'high';
+  return 'very-high';
+}
+
+function normalizeWorkLifeBalance(value: number | undefined): WorkLifeBalance {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'average';
+  }
+
+  if (value >= 9) return 'excellent';
+  if (value >= 7) return 'good';
+  if (value >= 5) return 'average';
+  if (value >= 3) return 'poor';
+  return 'very-poor';
+}
+
+function normalizeStressLevel(value: number | undefined): StressLevel {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'moderate';
+  }
+
+  if (value >= 9) return 'extreme';
+  if (value >= 7) return 'very-high';
+  if (value >= 5) return 'high';
+  if (value >= 3) return 'moderate';
+  return 'low';
+}
+
+function inferEducationLevel(minimumEducation: string | undefined): EducationLevel {
+  const normalized = minimumEducation?.toLowerCase() ?? '';
+
+  if (normalized.includes('post-doctoral') || normalized.includes('postdoctoral')) return 'post-doctoral';
+  if (normalized.includes('doctor') || normalized.includes('phd')) return 'doctorate';
+  if (normalized.includes('mbbs') || normalized.includes('md') || normalized.includes('llb') || normalized.includes('ca')) return 'professional-degree';
+  if (normalized.includes('master') || normalized.includes('m.tech') || normalized.includes('mtech') || normalized.includes('mca')) return 'master';
+  if (normalized.includes('bachelor') || normalized.includes('b.tech') || normalized.includes('btech') || normalized.includes('b.e') || normalized.includes('bca')) return 'bachelor';
+  if (normalized.includes('diploma')) return 'diploma';
+  if (normalized.includes('high school') || normalized.includes('12th')) return 'high-school';
+
+  return 'bachelor';
+}
+
+function inferExamType(exams: string[]): ExamType {
+  if (exams.length === 0) {
+    return 'none';
+  }
+
+  const joined = exams.join(' ').toLowerCase();
+  if (joined.includes('license') || joined.includes('licensing')) return 'licensing';
+  if (joined.includes('certification')) return 'certification';
+  if (joined.includes('upsc') || joined.includes('civil') || joined.includes('ca')) return 'competitive';
+  if (joined.includes('jee') || joined.includes('neet') || joined.includes('cat') || joined.includes('entrance')) return 'entrance';
+
+  return 'professional';
+}
+
+function estimateYearsOfStudy(level: EducationLevel): number {
+  const yearsByLevel: Record<EducationLevel, number> = {
+    none: 0,
+    'high-school': 2,
+    diploma: 3,
+    associate: 2,
+    bachelor: 4,
+    master: 6,
+    doctorate: 8,
+    'professional-degree': 5,
+    'post-doctoral': 10,
+  };
+
+  return yearsByLevel[level];
+}
+
+function normalizeCareerAdapterInput(career: CareerAdapterInput): Career {
+  if (isOntologyCareer(career)) {
+    return career;
+  }
+
+  const minimumEducation = inferEducationLevel(career.education.minimumEducation);
+  const exams = career.education.exams ?? [];
+
+  return normalizeCareerData({
+    identity: {
+      id: career.id as CareerId,
+      slug: career.slug as CareerSlug,
+      name: career.name,
+      category: career.category,
+      description: career.description,
+      metadata: {
+        createdAt: career.lastUpdated,
+        updatedAt: career.lastUpdated,
+        schemaVersion: career.version,
+        isVerified: true,
+        source: 'career-authoring-v2',
+      },
+    },
+    psychology: {
+      analyticalThinking: normalizeTenPointScore(career.psychology.analyticalThinking),
+      creativity: normalizeTenPointScore(career.psychology.creativity),
+      socialOrientation: normalizeTenPointScore(career.psychology.socialOrientation),
+      leadership: normalizeTenPointScore(career.psychology.leadership),
+      detailOrientation: normalizeTenPointScore(career.psychology.detailOrientation),
+      curiosity: normalizeTenPointScore(career.psychology.curiosity),
+      competitiveness: normalizeTenPointScore(career.psychology.competitiveness),
+      riskTolerance: normalizeTenPointScore(career.psychology.riskTolerance),
+    },
+    workStyle: {
+      remoteWork: normalizeRemoteWorkLevel(career.workStyle.remoteWork),
+      officeWork: normalizeBooleanScore(career.workStyle.officeWork, true),
+      fieldWork: normalizeBooleanScore(career.workStyle.fieldWork, false),
+      travelRequirement: normalizeTravelRequirement(career.workStyle.travelRequirement),
+      teamOrientation: normalizeTeamOrientation(career.workStyle.teamOrientation),
+      soloOrientation: normalizeBooleanScore(career.workStyle.soloOrientation, true),
+      structuredEnvironment: normalizeBooleanScore(career.workStyle.structuredEnvironment, true),
+      unstructuredEnvironment: normalizeBooleanScore(career.workStyle.unstructuredEnvironment, false),
+    },
+    reward: {
+      incomePotential: normalizeTenPointScore(career.reward.incomePotential),
+      statusPotential: normalizeTenPointScore(career.reward.statusPotential),
+      impactPotential: normalizeTenPointScore(career.reward.impactPotential),
+      freedomPotential: normalizeTenPointScore(career.reward.freedomPotential),
+      stabilityPotential: normalizeTenPointScore(career.reward.stabilityPotential),
+    },
+    risk: {
+      burnoutRisk: normalizeRiskLevel(career.risk.burnoutRisk),
+      automationRisk: normalizeRiskLevel(career.risk.automationRisk),
+      competitionLevel: normalizeRiskLevel(career.risk.competitionLevel),
+      incomeVolatility: normalizeRiskLevel(career.risk.incomeVolatility, 'low'),
+    },
+    optionality: {
+      careerFlexibility: normalizeTenPointScore(career.optionality.careerFlexibility ?? career.optionality.transferabilityScore),
+      transferableSkills: normalizeTenPointScore(career.optionality.transferableSkills ?? career.optionality.transferabilityScore),
+      entrepreneurshipPotential: normalizeTenPointScore(career.optionality.entrepreneurshipPotential),
+    },
+    education: {
+      minimumEducation,
+      typicalDegrees: career.education.commonDegrees ?? career.education.requiredDegrees ?? [],
+      certifications: career.education.certifications,
+      optionalCertifications: career.education.preferredDegrees,
+      examRequirements: {
+        type: inferExamType(exams),
+        exams,
+        difficulty: normalizeRiskLevel(career.risk.competitionLevel),
+        preparationMonths: exams.length > 0 ? 12 : 0,
+      },
+      yearsOfStudy: estimateYearsOfStudy(minimumEducation),
+      educationCostRange: {
+        min: 0,
+        max: 1000000,
+        typical: 500000,
+      },
+    },
+    indiaReality: {
+      coachingDependency: normalizeCoachingLevel(career.indiaReality.coachingDependency),
+      englishDependency: normalizeEnglishDependency(career.indiaReality.englishDependency),
+      urbanAdvantage: normalizeUrbanAdvantage(career.indiaReality.urbanAdvantage),
+      migrationRequirement: normalizeBooleanScore(career.indiaReality.migrationRequirement, false),
+      reservationSensitivity: normalizeBooleanScore(career.indiaReality.reservationSensitivity, false),
+      familyAcceptance: normalizeFamilyAcceptance(career.indiaReality.familyAcceptance),
+      socioEconomicBarriers: normalizeRiskLevel(career.indiaReality.coachingDependency),
+    },
+    future: {
+      aiDisruptionRisk: normalizeRiskLevel(career.futureOutlook.aiDisruptionRisk),
+      futureDemand: normalizeDemandLevel(career.futureOutlook.futureDemand ?? career.futureOutlook.indiaDemand),
+      globalMobility: normalizeTenPointScore(career.futureOutlook.globalMobility),
+      industryGrowth: normalizeGrowthLevel(career.futureOutlook.industryGrowth),
+      emergingOpportunities: career.futureOutlook.emergingSpecializations,
+    },
+    lifestyle: {
+      workLifeBalance: normalizeWorkLifeBalance(career.lifestyle.workLifeBalance),
+      stressLevel: normalizeStressLevel(career.lifestyle.stressLevel),
+      scheduleFlexibility: normalizeTenPointScore(career.lifestyle.scheduleFlexibility ?? career.lifestyle.flexibility),
+      geographicFreedom: normalizeTenPointScore(career.lifestyle.geographicFreedom),
+    },
+  });
+}
+
 // ============================================================================
 // ADAPTER FUNCTIONS
 // ============================================================================
@@ -106,10 +463,11 @@ const STRESS_SCORES: Record<string, number> = {
  * Convert a Career to PathComparisonData for counterfactual analysis
  */
 export function adaptCareerToPathData(
-  career: Career,
+  inputCareer: CareerAdapterInput,
   config: Partial<CareerAdapterConfig> = {}
 ): PathComparisonData {
   const fullConfig = { ...DEFAULT_ADAPTER_CONFIG, ...config };
+  const career = normalizeCareerAdapterInput(inputCareer);
 
   // Build path ID from career identity
   const pathId = career.identity.slug;
@@ -564,7 +922,7 @@ function generateCriticalityExplanation(career: Career, score: number): string {
  * Adapt multiple careers for comparison
  */
 export function adaptCareersForComparison(
-  careers: Career[],
+  careers: CareerAdapterInput[],
   config?: Partial<CareerAdapterConfig>
 ): PathComparisonData[] {
   return careers.map(career => adaptCareerToPathData(career, config));
@@ -574,8 +932,8 @@ export function adaptCareersForComparison(
  * Create comparison data for two specific careers
  */
 export function createCareerComparisonPair(
-  primary: Career,
-  alternative: Career,
+  primary: CareerAdapterInput,
+  alternative: CareerAdapterInput,
   config?: Partial<CareerAdapterConfig>
 ): { primary: PathComparisonData; alternative: PathComparisonData } {
   return {
@@ -583,5 +941,3 @@ export function createCareerComparisonPair(
     alternative: adaptCareerToPathData(alternative, config),
   };
 }
-
-

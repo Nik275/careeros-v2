@@ -47,7 +47,7 @@ function generateTraceId(): string {
 export function createOutcomeRecordedEvent(
   studentId: StudentId,
   outcomeType: string,
-  outcomeData: Record<string, unknown>
+  outcomeData: unknown
 ): OutcomeEvent {
   return {
     id: generateEventId(),
@@ -341,12 +341,12 @@ export class OutcomeEventEngine {
         try {
           const result = handler(processedEvent);
           if (result instanceof Promise) {
-            result.catch(err => {
-              console.error(`Error in async event handler for ${processedEvent.type}:`, err);
+            result.catch(() => {
+              console.error('Outcome event async handler failed safely.');
             });
           }
-        } catch (err) {
-          console.error(`Error in event handler for ${processedEvent.type}:`, err);
+        } catch {
+          console.error('Outcome event handler failed safely.');
         }
       }
     }
@@ -358,12 +358,12 @@ export class OutcomeEventEngine {
         try {
           const result = handler(processedEvent);
           if (result instanceof Promise) {
-            result.catch(err => {
-              console.error(`Error in async wildcard handler:`, err);
+            result.catch(() => {
+              console.error('Outcome wildcard async handler failed safely.');
             });
           }
-        } catch (err) {
-          console.error(`Error in wildcard handler:`, err);
+        } catch {
+          console.error('Outcome wildcard handler failed safely.');
         }
       }
     }

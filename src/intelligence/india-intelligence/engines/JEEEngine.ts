@@ -19,6 +19,7 @@ import {
   EngineeringCollegeTier,
   EngineeringBranch,
   PlacementTier,
+  EconomicStratum,
   TierVsBranchTradeoff,
   CollegeVsLocationTradeoff,
   FeesVsPlacementTradeoff,
@@ -48,6 +49,23 @@ export const DEFAULT_JEE_CONFIG: JEEEngineConfig = {
   minRankImprovementForDropYear: 20000,
   considerFinancialConstraints: true,
   csePremiumMultiplier: 1.5,
+};
+
+const ENGINEERING_COLLEGE_TIER_RANK: Record<EngineeringCollegeTier, number> = {
+  [EngineeringCollegeTier.OLD_IIT]: 1,
+  [EngineeringCollegeTier.NEW_IIT]: 2,
+  [EngineeringCollegeTier.TOP_NIT]: 3,
+  [EngineeringCollegeTier.OTHER_NIT]: 4,
+  [EngineeringCollegeTier.IIIT_HYDERABAD]: 5,
+  [EngineeringCollegeTier.IIIT_BANGALORE]: 6,
+  [EngineeringCollegeTier.OTHER_IIIT]: 7,
+  [EngineeringCollegeTier.BITS]: 8,
+  [EngineeringCollegeTier.DTU_NSIT]: 9,
+  [EngineeringCollegeTier.TOP_STATE_GOV]: 10,
+  [EngineeringCollegeTier.OTHER_STATE_GOV]: 11,
+  [EngineeringCollegeTier.PRIVATE_TIER1]: 12,
+  [EngineeringCollegeTier.PRIVATE_TIER2]: 13,
+  [EngineeringCollegeTier.PRIVATE_TIER3]: 14,
 };
 
 /**
@@ -86,7 +104,7 @@ export class JEEEngine {
     // Analyze tradeoffs
     const tierVsBranch = this.analyzeTierVsBranch(eligibleColleges, input);
     const collegeVsLocation = this.analyzeCollegeVsLocation(eligibleColleges, input);
-    const feesVsPlacement = this.analyzeFeesVsPlacement(eligibleColleges, input);
+    const feesVsPlacement = this.analyzeFeesVsPlacement(eligibleColleges);
     
     // Generate recommendations
     const recommendations = this.generateRecommendations(
@@ -121,9 +139,7 @@ export class JEEEngine {
    */
   private extractJEEAttempts(attempts: ExamAttempt[]): ExamAttempt[] {
     return attempts.filter(a => 
-      a.examType === 'JEE' || 
-      a.examType === 'JEE_MAIN' || 
-      a.examType === 'JEE_ADVANCED'
+      a.examType === 'JEE'
     );
   }
   
@@ -413,7 +429,10 @@ export class JEEEngine {
     location: string,
     tier: EngineeringCollegeTier,
     nirfRank?: number,
-    overrides?: Partial<JEEOutcome['placement']> & Partial<JEEOutcome['fees']>
+    overrides?: Partial<JEEOutcome['placement']> &
+      Partial<JEEOutcome['fees']> & {
+        fees?: Partial<JEEOutcome['fees']>;
+      }
   ): JEEOutcome {
     const defaultFees = this.getDefaultFees(tier);
     const defaultPlacement = this.getDefaultPlacement(tier);
@@ -424,9 +443,13 @@ export class JEEEngine {
       branch: EngineeringBranch.CSE, // Default, should be configurable
       location,
       fees: {
-        perYear: overrides?.perYear || defaultFees.perYear,
-        total4Years: overrides?.total4Years || defaultFees.total4Years,
-        hostelAdditional: overrides?.hostelAdditional || defaultFees.hostelAdditional,
+        perYear: overrides?.fees?.perYear || overrides?.perYear || defaultFees.perYear,
+        total4Years:
+          overrides?.fees?.total4Years || overrides?.total4Years || defaultFees.total4Years,
+        hostelAdditional:
+          overrides?.fees?.hostelAdditional ||
+          overrides?.hostelAdditional ||
+          defaultFees.hostelAdditional,
       },
       placement: {
         tier: overrides?.tier || defaultPlacement.tier,
@@ -499,9 +522,9 @@ export class JEEEngine {
     const tier2Recruiters = ['Infosys', 'TCS', 'Wipro', 'Accenture', 'Cognizant', 'Capgemini', 'Deloitte'];
     const tier3Recruiters = ['HCL', 'Tech Mahindra', 'Mindtree', 'LTI', 'Mphasis', 'Hexaware'];
     
-    if (tier <= EngineeringCollegeTier.NEW_IIT) return tier1Recruiters;
-    if (tier <= EngineeringCollegeTier.BITS) return [...tier1Recruiters.slice(0, 4), ...tier2Recruiters];
-    if (tier <= EngineeringCollegeTier.TOP_STATE_GOV) return tier2Recruiters;
+    if (this.isTierAtOrAbove(tier, EngineeringCollegeTier.NEW_IIT)) return tier1Recruiters;
+    if (this.isTierAtOrAbove(tier, EngineeringCollegeTier.BITS)) return [...tier1Recruiters.slice(0, 4), ...tier2Recruiters];
+    if (this.isTierAtOrAbove(tier, EngineeringCollegeTier.TOP_STATE_GOV)) return tier2Recruiters;
     return tier3Recruiters;
   }
   
@@ -509,14 +532,14 @@ export class JEEEngine {
    * Get opportunities for college tier
    */
   private getOpportunities(tier: EngineeringCollegeTier): JEEOutcome['opportunities'] {
-    const highTier = tier <= EngineeringCollegeTier.NEW_IIT || tier === EngineeringCollegeTier.IIIT_HYDERABAD;
-    const midTier = tier <= EngineeringCollegeTier.TOP_STATE_GOV;
+    const highTier = this.isTierAtOrAbove(tier, EngineeringCollegeTier.NEW_IIT) || tier === EngineeringCollegeTier.IIIT_HYDERABAD;
+    const midTier = this.isTierAtOrAbove(tier, EngineeringCollegeTier.TOP_STATE_GOV);
     
     return {
       higherEducationAbroad: highTier ? 'HIGH' : midTier ? 'MODERATE' : 'LOW',
-      coreJobs: tier <= EngineeringCollegeTier.BITS ? 'HIGH' : 'MODERATE',
+      coreJobs: this.isTierAtOrAbove(tier, EngineeringCollegeTier.BITS) ? 'HIGH' : 'MODERATE',
       itJobs: 'HIGH',
-      psuJobs: tier <= EngineeringCollegeTier.OTHER_NIT ? 'HIGH' : 'MODERATE',
+      psuJobs: this.isTierAtOrAbove(tier, EngineeringCollegeTier.OTHER_NIT) ? 'HIGH' : 'MODERATE',
       mbaTopCollege: highTier ? 'HIGH' : midTier ? 'MODERATE' : 'LOW',
       startups: highTier ? 'HIGH' : 'MODERATE',
     };
@@ -538,7 +561,7 @@ export class JEEEngine {
     // Check location constraints
     if (!input.profile.canRelocate && college.location !== input.profile.homeState) {
       // Allow if it's a top-tier college (worth relocating for)
-      if (college.collegeTier > EngineeringCollegeTier.NEW_IIT) {
+      if (!this.isTierAtOrAbove(college.collegeTier, EngineeringCollegeTier.NEW_IIT)) {
         return false;
       }
     }
@@ -650,6 +673,17 @@ export class JEEEngine {
     if (rank <= 100000) return EngineeringCollegeTier.TOP_STATE_GOV;
     return EngineeringCollegeTier.PRIVATE_TIER1;
   }
+
+  private getTierRank(tier: EngineeringCollegeTier): number {
+    return ENGINEERING_COLLEGE_TIER_RANK[tier];
+  }
+
+  private isTierAtOrAbove(
+    tier: EngineeringCollegeTier,
+    threshold: EngineeringCollegeTier
+  ): boolean {
+    return this.getTierRank(tier) <= this.getTierRank(threshold);
+  }
   
   /**
    * Generate state CET options
@@ -676,13 +710,13 @@ export class JEEEngine {
   ): TierVsBranchTradeoff {
     // Find highest tier with non-CSE branch
     const higherTierLowerBranch = colleges
-      .filter(c => c.collegeTier <= EngineeringCollegeTier.TOP_NIT)
-      .sort((a, b) => a.collegeTier - b.collegeTier)[0];
+      .filter(c => this.isTierAtOrAbove(c.collegeTier, EngineeringCollegeTier.TOP_NIT))
+      .sort((a, b) => this.getTierRank(a.collegeTier) - this.getTierRank(b.collegeTier))[0];
     
     // Find lower tier with CSE branch
     const lowerTierHigherBranch = colleges
       .filter(c => c.branch === EngineeringBranch.CSE)
-      .sort((a, b) => b.collegeTier - a.collegeTier)[0];
+      .sort((a, b) => this.getTierRank(b.collegeTier) - this.getTierRank(a.collegeTier))[0];
     
     const recommendation: 'TIER' | 'BRANCH' | 'CONTEXT_DEPENDENT' = 
       input.profile.familyIncome <= EconomicStratum.LOWER_MIDDLE 
@@ -695,13 +729,13 @@ export class JEEEngine {
         pros: ['Better alumni network', 'More prestigious', 'Better higher studies options', 'PSU eligibility'],
         cons: ['Lower initial salary', 'Limited IT job options', 'Core sector dependence'],
         bestFor: ['Students planning MS/MTech', 'PSU aspirants', 'Research interest'],
-      } : undefined as any,
+      } : undefined,
       lowerTierHigherBranch: lowerTierHigherBranch ? {
         option: lowerTierHigherBranch,
         pros: ['Higher starting salary', 'More IT job options', 'Startup friendly', 'Better immediate ROI'],
         cons: ['Less prestigious college', 'Limited PSU options', 'Weaker alumni network'],
         bestFor: ['Immediate income priority', 'IT/Software interest', 'Startup plans'],
-      } : undefined as any,
+      } : undefined,
       recommendation,
       rationale: recommendation === 'BRANCH' 
         ? 'For your economic background, CSE offers faster financial returns'
@@ -718,11 +752,11 @@ export class JEEEngine {
   ): CollegeVsLocationTradeoff {
     const betterCollegeFar = colleges
       .filter(c => c.location !== input.profile.homeState)
-      .sort((a, b) => a.collegeTier - b.collegeTier)[0];
+      .sort((a, b) => this.getTierRank(a.collegeTier) - this.getTierRank(b.collegeTier))[0];
     
     const worseCollegeNear = colleges
       .filter(c => c.location === input.profile.homeState)
-      .sort((a, b) => a.collegeTier - b.collegeTier)[0];
+      .sort((a, b) => this.getTierRank(a.collegeTier) - this.getTierRank(b.collegeTier))[0];
     
     return {
       betterCollegeFar: betterCollegeFar ? {
@@ -730,12 +764,12 @@ export class JEEEngine {
         relocation: true,
         pros: ['Better college reputation', 'Better placements', 'Exposure to new city', 'Independence'],
         cons: ['Higher costs (travel, living)', 'Away from family support', 'Cultural adjustment'],
-      } : undefined as any,
+      } : undefined,
       worseCollegeNear: worseCollegeNear ? {
         option: worseCollegeNear,
         pros: ['Lower costs', 'Family support', 'Known environment', 'Local network'],
         cons: ['Lower tier college', 'Limited exposure', 'Potentially weaker placements'],
-      } : undefined as any,
+      } : undefined,
       recommendation: input.profile.canRelocate ? 'RELOCATE' : 'STAY',
     };
   }
@@ -759,12 +793,12 @@ export class JEEEngine {
         roi: (expensiveGoodPlacements.placement.averagePackage * 4) / 
              expensiveGoodPlacements.fees.total4Years,
         loanRequired: expensiveGoodPlacements.fees.total4Years > 1500000,
-      } : undefined as any,
+      } : undefined,
       affordableAveragePlacements: affordableAvgPlacements ? {
         option: affordableAvgPlacements,
         roi: (affordableAvgPlacements.placement.averagePackage * 4) / 
              affordableAvgPlacements.fees.total4Years,
-      } : undefined as any,
+      } : undefined,
       recommendation: 'CONTEXT_DEPENDENT',
     };
   }
@@ -821,7 +855,7 @@ export class JEEEngine {
       score += (college.placement.averagePackage / 3000000) * 40;
       
       // Tier score (30%)
-      const tierScore = 1 - (college.collegeTier / 15);
+      const tierScore = 1 - (this.getTierRank(college.collegeTier) / 15);
       score += tierScore * 30;
       
       // Affordability score (20%)

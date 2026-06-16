@@ -56,6 +56,16 @@ export interface IDecisionSelector {
   ): { valid: boolean; errors: string[] };
 
   /**
+   * Select the top N pre-scored options synchronously.
+   */
+  selectTop<T = unknown>(
+    options: ReadonlyArray<DecisionOption<T> & { readonly score: number }>,
+    config?: { readonly count?: number }
+  ): {
+    selected: ReadonlyArray<DecisionOption<T> & { readonly score: number }>;
+  };
+
+  /**
    * Get selector version.
    */
   getVersion(): string;
@@ -152,6 +162,20 @@ export class DecisionSelector implements IDecisionSelector {
     }
 
     return result;
+  }
+
+  selectTop<T = unknown>(
+    options: ReadonlyArray<DecisionOption<T> & { readonly score: number }>,
+    config: { readonly count?: number } = {}
+  ): {
+    selected: ReadonlyArray<DecisionOption<T> & { readonly score: number }>;
+  } {
+    const count = config.count ?? this.config.defaultWinnerCount;
+    return {
+      selected: [...options]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, count),
+    };
   }
 
   /**

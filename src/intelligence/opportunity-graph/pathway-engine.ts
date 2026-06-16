@@ -449,9 +449,10 @@ export class PathwayEngine implements IPathwayEngine {
 
   private createPathwayFromSteps(startNode: string, steps: PathwayStep[], endNode?: string): PathwayAnalysis {
     const totalDuration = steps.reduce((sum, step) => sum + (step.duration || 0), 0);
+    const pathNodeIds = steps.map(step => step.nodeId).join('-');
 
     return {
-      id: `pathway-${startNode}-${endNode || steps[steps.length - 1]?.nodeId || 'open'}`,
+      id: `pathway-${pathNodeIds || startNode}`,
       startNode,
       endNode: endNode || steps[steps.length - 1]?.nodeId,
       steps,
@@ -468,6 +469,11 @@ export class PathwayEngine implements IPathwayEngine {
   }
 
   private calculatePathFlexibility(nodeId: string): number {
+    const node = this.graph.nodes.get(nodeId);
+    if (node && 'optionalityScore' in node && typeof node.optionalityScore === 'number') {
+      return node.optionalityScore;
+    }
+
     const transitions = this.graph.adjacencyList.get(nodeId)?.length || 0;
     return Math.min(transitions / 5, 1);
   }

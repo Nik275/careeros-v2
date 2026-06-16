@@ -53,6 +53,17 @@ export interface IDecisionRanker {
   ): Promise<RankingResult<T>>;
 
   /**
+   * Rank pre-scored options synchronously.
+   *
+   * Used by authority modules that already own a canonical score and only need
+   * deterministic ordering plus RankedDecisionOption wrapping.
+   */
+  rankByScore<T = unknown>(
+    options: ReadonlyArray<DecisionOption<T> & { readonly score: number }>,
+    direction?: 'asc' | 'desc'
+  ): ReadonlyArray<RankedDecisionOption<T>>;
+
+  /**
    * Get ranker version.
    */
   getVersion(): string;
@@ -172,6 +183,30 @@ export class DecisionRanker implements IDecisionRanker {
     }
 
     return result;
+  }
+
+  rankByScore<T = unknown>(
+    options: ReadonlyArray<DecisionOption<T> & { readonly score: number }>,
+    direction: 'asc' | 'desc' = 'desc'
+  ): ReadonlyArray<RankedDecisionOption<T>> {
+    return [...options]
+      .sort((a, b) => (direction === 'asc' ? a.score - b.score : b.score - a.score))
+      .map((option, index) => {
+        const score = this.roundScore(option.score);
+        return {
+          ...option,
+          rank: index + 1,
+          score,
+          normalizedScore: score,
+          scoreBreakdown: {
+            baseScore: score,
+            confidenceAdjustment: 0,
+            constraintPenalty: 0,
+            stakeholderWeighting: 0,
+            finalScore: score,
+          },
+        };
+      });
   }
 
   /**

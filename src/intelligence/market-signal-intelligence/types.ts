@@ -16,6 +16,8 @@ import type {
   NormalizedSignalType,
 } from '@/market-data-ingestion/types.js';
 
+export type { AggregatedMarketSignal, NormalizedEntityType, NormalizedSignalType };
+
 // ============================================================================
 // CORE IDENTIFIERS
 // ============================================================================
@@ -343,7 +345,7 @@ export interface MarketIntelligenceReport {
   trend: MarketTrend;
   opportunity: MarketOpportunity;
   risks: MarketRisk[];
-  momentum: MarketMomentum;
+  momentum?: MarketMomentum;
   emergingStatus?: EmergingCareer;
   narrative: MarketNarrative;
 

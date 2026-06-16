@@ -11,6 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import type { CalibrationProfile } from './calibration-types';
 import {
   // Types
   CalibrationStatus,
@@ -1461,7 +1462,7 @@ describe('ReliabilityEngine', () => {
         {
           id: 'sys2',
           name: 'System 2',
-          status: CalibrationStatus.GOOD,
+          status: CalibrationStatus.WELL_CALIBRATED,
           reliabilityBand: ReliabilityBand.GOOD,
           reliabilityScore: 0.78,
           calibrationError: 0.12,

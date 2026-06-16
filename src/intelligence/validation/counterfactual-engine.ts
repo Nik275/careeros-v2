@@ -248,8 +248,8 @@ export class CounterfactualEngine {
               ),
             });
           }
-        } catch (error) {
-          console.error(`Scenario failed for ${variable.name}:`, error);
+        } catch {
+          console.error('Counterfactual scenario generation failed safely.');
         }
       }
     }

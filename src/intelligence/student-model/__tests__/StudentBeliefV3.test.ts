@@ -6,7 +6,13 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EvidenceSource } from '../../types';
+import {
+  ConstraintType,
+  EvidenceSource,
+  LifestyleCategory,
+  PersonalityDimension,
+  StrengthCategory,
+} from '../../types';
 import type {
   StudentBelief,
   StudentBeliefV3,
@@ -63,7 +69,7 @@ function createMockV2Belief(): StudentBelief {
     strengths: [{
       id: 'strength_analytical',
       name: 'Analytical Thinking',
-      category: 'COGNITIVE',
+      category: StrengthCategory.COGNITIVE,
       description: 'Breaking down complex problems',
       level: 0.75,
       evidence: [evidence],
@@ -80,7 +86,7 @@ function createMockV2Belief(): StudentBelief {
     personalityTraits: [{
       id: 'trait_structured',
       name: 'Structured & Organized',
-      dimension: 'CONSCIENTIOUSNESS',
+      dimension: PersonalityDimension.CONSCIENTIOUSNESS,
       position: 0.7,
       confidence: 0.75,
       evidence: [evidence],
@@ -88,7 +94,7 @@ function createMockV2Belief(): StudentBelief {
     lifestylePreferences: [{
       id: 'lifestyle_office',
       name: 'Office Environment',
-      category: 'WORK_ENVIRONMENT',
+      category: LifestyleCategory.WORK_ENVIRONMENT,
       description: 'Preferred work environment: Office & team environment',
       preference: 'Office & team environment',
       importance: 0.75,
@@ -97,7 +103,7 @@ function createMockV2Belief(): StudentBelief {
     constraints: [{
       id: 'constraint_location',
       name: 'Location Constraint',
-      type: 'GEOGRAPHIC',
+      type: ConstraintType.GEOGRAPHIC,
       description: 'Must stay in current city',
       severity: 0.6,
       evidence: [evidence],
@@ -636,7 +642,7 @@ describe('V2 to V3 Migration', () => {
       v2Belief.constraints.push({
         id: 'constraint_family',
         name: 'Family Location',
-        type: 'GEOGRAPHIC',
+        type: ConstraintType.GEOGRAPHIC,
         description: 'Must stay near family',
         severity: 0.7,
         evidence: [],
@@ -654,7 +660,7 @@ describe('V2 to V3 Migration', () => {
       v2Belief.constraints.push({
         id: 'constraint_financial',
         name: 'Financial Limit',
-        type: 'FINANCIAL',
+        type: ConstraintType.FINANCIAL,
         description: 'Limited budget for education',
         severity: 0.8,
         evidence: [],
@@ -672,7 +678,7 @@ describe('V2 to V3 Migration', () => {
       v2Belief.strengths.push({
         id: 'strength_math',
         name: 'Mathematics',
-        category: 'COGNITIVE',
+        category: StrengthCategory.COGNITIVE,
         description: 'Strong in math',
         level: 0.9,
         evidence: [],
@@ -953,7 +959,7 @@ describe('Edge Cases', () => {
     input.competitiveExams = [
       { examType: 'JEE_MAIN', status: 'TAKEN_WAITING', year: 2024 },
       { examType: 'JEE_ADVANCED', status: 'PREPARING', year: 2024 },
-      { examType: 'BITSAT', status: 'NOT_TAKEN', year: 2024 },
+      { examType: 'OTHER', status: 'NOT_TAKEN', year: 2024 },
     ];
 
     const v2Belief = createMockV2Belief();

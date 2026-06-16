@@ -96,7 +96,7 @@ export class FlexibilityCalculator {
   ): FlexibilityCalculation['pivotingEase'] {
     // Find transitions from this career
     const outgoingEdges = transitionEdges.filter(
-      (e) => e.sourceCareerId === careerId || e.sourceId === careerId
+      (e) => e.sourceCareerId === careerId
     );
 
     if (outgoingEdges.length === 0) {
@@ -153,9 +153,7 @@ export class FlexibilityCalculator {
     optionalityAnalysis: OptionalityAnalysis
   ): FlexibilityCalculation['transferableSkills'] {
     // Use optionality engine's transferable skills score
-    const transferableSkillsDimension = optionalityAnalysis.dimensions?.find(
-      (d) => d.name === 'Transferable Skills'
-    );
+    const transferableSkillsDimension = optionalityAnalysis.dimensions?.transferableSkills;
 
     const score = transferableSkillsDimension
       ? transferableSkillsDimension.score * 100
@@ -198,7 +196,7 @@ export class FlexibilityCalculator {
 
     // Calculate lateral moves (similar level)
     const lateralMoves = adjacentCareers.filter(
-      (c) => c.transitionEase === 'high' || c.transitionEase === 'very-high'
+      (c) => c.transitionEase >= 0.7
     ).length;
 
     // Calculate upward mobility

@@ -10,7 +10,7 @@ import {
   ConfidenceCalibration,
   resetConfidenceCalibration,
 } from '../ConfidenceCalibration';
-import type { CalibrationObservation } from '../ConfidenceTypes';
+import type { CalibrationObservation, ConfidenceValue } from '../ConfidenceTypes';
 
 describe('ConfidenceCalibration', () => {
   let calibration: ConfidenceCalibration;
@@ -70,7 +70,7 @@ describe('ConfidenceCalibration', () => {
 
   describe('calibrateConfidence', () => {
     it('should return uncalibrated for insufficient data', () => {
-      const confidence = {
+      const confidence: ConfidenceValue = {
         value: 0.8,
         lineageId: 'test',
         authority: 'ConfidenceAuthority',
@@ -114,7 +114,7 @@ describe('ConfidenceCalibration', () => {
         });
       }
 
-      const confidence = {
+      const confidence: ConfidenceValue = {
         value: 0.8,
         lineageId: 'test',
         authority: 'ConfidenceAuthority',

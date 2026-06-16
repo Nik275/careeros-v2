@@ -24,6 +24,7 @@ import type {
   UtilityDimension,
   SubDimensionScore,
 } from './utility-types';
+import { DEFAULT_UTILITY_INTELLIGENCE_CONFIG } from './utility-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { GeneratedProfile, IdentifiedStrength } from '@/profile/profile-types';
@@ -484,8 +485,8 @@ export class UtilityCalculator {
     // Learning opportunities - based on cognitive demands and research intensity
     const researchIntensity = workEnvironment.researchIntensity?.score ?? 50;
     const cognitiveComplexity = Math.round(
-      (cognitiveDemands.analyticalDemand?.score ?? 50 +
-        cognitiveDemands.creativeDemand?.score ?? 50) / 2
+      ((cognitiveDemands.analyticalDemand?.score ?? 50) +
+        (cognitiveDemands.creativeDemand?.score ?? 50)) / 2
     );
 
     const learningScore = Math.round(
@@ -507,7 +508,7 @@ export class UtilityCalculator {
     const masteryScore = Math.round(
       masteryDemand * 0.5 +
       systematicDemand * 0.3 +
-      advantages.careerMobility?.score ?? 50 * 0.2
+      (advantages.careerMobility?.score ?? 50) * 0.2
     );
 
     const mastery: SubDimensionScore = {
@@ -594,7 +595,7 @@ export class UtilityCalculator {
     const autonomyScore = Math.round(
       motivationFit.autonomyFit.score * 0.5 +
       independenceLevel * 0.3 +
-      (100 - workEnvironment.peopleIntensity?.score ?? 50) * 0.2
+      (100 - (workEnvironment.peopleIntensity?.score ?? 50)) * 0.2
     );
 
     const autonomy: SubDimensionScore = {
@@ -1086,7 +1087,7 @@ export function createUtilityCalculator(
   config?: Partial<UtilityIntelligenceConfig>
 ): UtilityCalculator {
   const fullConfig: UtilityIntelligenceConfig = {
-    ...import('./utility-types').DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
+    ...DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
     ...config,
   };
 

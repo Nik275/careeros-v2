@@ -22,7 +22,6 @@ import type {
   CareerMarketProfile,
   CareerMarketProfileId,
   GeographicPresence,
-  ScoreBreakdown,
 } from './models/CareerMarketProfile';
 import type { OpportunityAnalysis } from './models/OpportunityAnalysis';
 import type { CompleteScoreBreakdown } from './models/MarketScoreBreakdown';
@@ -165,7 +164,7 @@ export class CareerMarketProfileEngine {
           success: false,
           error: {
             code: 'INVALID_INPUT',
-            message: validation.error,
+            message: validation.error ?? 'Invalid profile generation input',
           },
           metadata: {
             careerId: input.careerId,
@@ -242,7 +241,6 @@ export class CareerMarketProfileEngine {
         trendDirection: 'stable', // Will be determined
         geographicPresence: this.calculateGeographicPresence(input.normalizedSignals),
         topRegions: [], // Will be populated
-        breakdowns: {} as CareerMarketProfile['breakdowns'], // Will be built
         insights: [], // Will be populated
         riskFlags: [], // Will be populated
       };
@@ -255,10 +253,8 @@ export class CareerMarketProfileEngine {
       // Calculate opportunity score
       const opportunityResult = this.opportunityEngine.calculateScore({
         ...partialProfile,
-        id: this.generateProfileId(input.careerId),
         confidence,
-        opportunityScore: 0,
-      } as CareerMarketProfile);
+      });
 
       // Determine outlook and trend
       const outlook = this.determineOutlook(
@@ -279,13 +275,13 @@ export class CareerMarketProfileEngine {
 
       // Build complete breakdowns
       const breakdowns: CareerMarketProfile['breakdowns'] = {
-        demand: demandResult.breakdown as ScoreBreakdown,
-        salary: salaryResult.breakdown as ScoreBreakdown,
-        growth: growthResult.breakdown as ScoreBreakdown,
-        scarcity: scarcityResult.breakdown as ScoreBreakdown,
-        automationRisk: automationRiskResult.breakdown as ScoreBreakdown,
-        resilience: resilienceResult.breakdown as ScoreBreakdown,
-        opportunity: opportunityResult.breakdown as ScoreBreakdown,
+        demand: demandResult.breakdown,
+        salary: salaryResult.breakdown,
+        growth: growthResult.breakdown,
+        scarcity: scarcityResult.breakdown,
+        automationRisk: automationRiskResult.breakdown,
+        resilience: resilienceResult.breakdown,
+        opportunity: opportunityResult.breakdown,
       };
 
       // Generate insights and risk flags

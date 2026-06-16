@@ -11,6 +11,7 @@
  */
 
 import type { AssessmentResponse, AssessmentSignal } from '../assessment-types';
+export type { AssessmentResponse, AssessmentSignal, DimensionScoreMap } from '../assessment-types';
 
 /**
  * Complete validation report for an assessment.

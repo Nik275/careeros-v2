@@ -105,6 +105,10 @@ export type KnowledgeNode =
   | IndustryNode
   | RoleNode;
 
+export type KnowledgeNodeUpdate = Partial<Omit<KnowledgeNode, 'id' | 'type' | 'metadata'>> & {
+  metadata?: Partial<NodeMetadata>;
+};
+
 // ============================================================================
 // EDGE TYPES
 // ============================================================================
@@ -160,6 +164,10 @@ export interface KnowledgeEdge {
   /** Is edge bidirectional */
   bidirectional: boolean;
 }
+
+export type KnowledgeEdgeUpdate = Partial<Omit<KnowledgeEdge, 'id' | 'metadata'>> & {
+  metadata?: Partial<EdgeMetadata>;
+};
 
 // ============================================================================
 // GRAPH CONFIGURATION
@@ -520,7 +528,7 @@ export class KnowledgeGraph {
   /**
    * Update a node
    */
-  updateNode(id: string, updates: Partial<Omit<KnowledgeNode, 'id' | 'type'>>): boolean {
+  updateNode(id: string, updates: KnowledgeNodeUpdate): boolean {
     const node = this.nodes.get(id);
     if (!node) {
       return false;
@@ -746,7 +754,7 @@ export class KnowledgeGraph {
   /**
    * Update an edge
    */
-  updateEdge(id: string, updates: Partial<Omit<KnowledgeEdge, 'id'>>): boolean {
+  updateEdge(id: string, updates: KnowledgeEdgeUpdate): boolean {
     const edge = this.edges.get(id);
     if (!edge) {
       return false;

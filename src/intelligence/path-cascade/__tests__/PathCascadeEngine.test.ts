@@ -18,12 +18,12 @@ import {
   CareerNode,
   CareerEdge,
   createIndiaCareerGraph,
-  DEFAULT_PATH_CONFIG,
 } from '../CareerGraph';
 import {
   PathCascadeEngine,
   createPathCascadeEngine,
   analyzeCareerPaths,
+  DEFAULT_PATH_CONFIG,
   type PathCascadeResult,
   type PathExplanations,
 } from '../PathCascadeEngine';

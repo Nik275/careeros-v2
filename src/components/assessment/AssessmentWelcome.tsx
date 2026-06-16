@@ -66,12 +66,12 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              backgroundColor: 'rgba(255, 255, 255, 0.52)',
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
               backdropFilter: 'blur(18px) saturate(150%)',
               WebkitBackdropFilter: 'blur(18px) saturate(150%)',
               borderRadius: '9999px',
-              boxShadow: '0 2px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.4)',
-              border: '1px solid rgba(255,255,255,0.3)',
+              boxShadow: '0 2px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
             }}
           >
             <svg
@@ -79,7 +79,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               height="12"
               viewBox="0 0 24 24"
               fill="none"
-              style={{ color: '#7D9C74' }}
+              style={{ color: '#8052ff' }}
             >
               <path
                 d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
@@ -88,7 +88,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
             </svg>
             <span
               style={{
-                color: '#171312',
+                color: '#ffffff',
                 fontWeight: 600,
                 fontSize: '13px',
                 letterSpacing: '-0.02em',
@@ -108,18 +108,18 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
             width: '72px',
             height: '72px',
             borderRadius: '24px',
-            background: 'linear-gradient(135deg, rgba(125, 156, 116, 0.15) 0%, rgba(130, 165, 200, 0.12) 100%)',
+            background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.15) 0%, rgba(100, 50, 200, 0.12) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: '1px solid rgba(125, 156, 116, 0.2)',
-            boxShadow: '0 8px 32px rgba(125, 156, 116, 0.12)',
+            border: '1px solid rgba(128, 82, 255, 0.2)',
+            boxShadow: '0 8px 32px rgba(128, 82, 255, 0.12)',
           }}
         >
           <Sparkles
             size={32}
             strokeWidth={1.5}
-            style={{ color: 'rgba(125, 156, 116, 0.8)' }}
+            style={{ color: '#8052ff' }}
           />
         </motion.div>
 
@@ -132,13 +132,13 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               fontWeight: 680,
               lineHeight: '1.12',
               letterSpacing: '-0.028em',
-              color: '#0d0b09',
+              color: '#ffffff',
               margin: 0,
             }}
           >
             Let's understand
             <br />
-            <span style={{ color: '#789c70' }}>who you are</span>
+            <span style={{ color: '#8052ff' }}>who you are</span>
           </h1>
         </motion.div>
 
@@ -150,7 +150,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               fontSize: 'clamp(16px, 4vw, 18px)',
               fontWeight: 400,
               lineHeight: '1.7',
-              color: 'rgba(26, 24, 22, 0.58)',
+              color: 'rgba(255, 255, 255, 0.58)',
               margin: 0,
             }}
           >
@@ -165,7 +165,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
+            gap: '8px',
             width: '100%',
             maxWidth: '400px',
             marginBottom: '48px',
@@ -190,10 +190,10 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
                 alignItems: 'center',
                 gap: '16px',
                 padding: '16px 20px',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(252,252,251,0.85) 100%)',
+                background: 'linear-gradient(135deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.85) 100%)',
                 borderRadius: '16px',
-                border: '1px solid rgba(125, 156, 116, 0.12)',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(128, 82, 255, 0.12)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
               }}
             >
               <div
@@ -201,11 +201,11 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'rgba(125, 156, 116, 0.12)',
+                  background: 'rgba(128, 82, 255, 0.12)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid rgba(125, 156, 116, 0.2)',
+                  border: '1px solid rgba(128, 82, 255, 0.2)',
                 }}
               >
                 <span
@@ -213,7 +213,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '18px',
                     fontWeight: 700,
-                    color: 'rgba(125, 156, 116, 1)',
+                    color: '#8052ff',
                   }}
                 >
                   {item.number}
@@ -225,7 +225,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '15px',
                     fontWeight: 600,
-                    color: '#0d0b09',
+                    color: '#ffffff',
                     marginBottom: '2px',
                   }}
                 >
@@ -236,7 +236,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: 'rgba(26, 24, 22, 0.5)',
+                    color: 'rgba(255, 255, 255, 0.5)',
                   }}
                 >
                   {item.desc}
@@ -276,18 +276,18 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               fontFamily: 'Inter, system-ui, sans-serif',
               color: 'white',
               background: isHovered
-                ? 'linear-gradient(180deg, #759b6d 0%, #558050 100%)'
-                : 'linear-gradient(180deg, #6d9165 0%, #4d7548 100%)',
+                ? 'linear-gradient(180deg, #9065ff 0%, #7c52eb 100%)'
+                : 'linear-gradient(180deg, #8052ff 0%, #6c42db 100%)',
               gap: '10px',
               letterSpacing: '-0.012em',
               whiteSpace: 'nowrap',
               border: 'none',
               cursor: 'pointer',
               boxShadow: isPressed
-                ? '0 12px 30px rgba(109,145,101,0.25), 0 4px 12px rgba(0,0,0,0.08), inset 0 2px 4px rgba(0,0,0,0.1)'
+                ? '0 12px 30px rgba(128,82,255,0.25), 0 4px 12px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.1)'
                 : isHovered
-                ? '0 24px 60px rgba(109,145,101,0.42), 0 10px 24px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.25)'
-                : '0 18px 45px rgba(109,145,101,0.32), 0 8px 18px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.2)',
+                ? '0 24px 60px rgba(128,82,255,0.42), 0 10px 24px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.25)'
+                : '0 18px 45px rgba(128,82,255,0.32), 0 8px 18px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.2)',
               transition: 'background 0.4s ease, box-shadow 0.4s ease',
               overflow: 'hidden',
             }}
@@ -324,8 +324,9 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: '13px',
             fontWeight: 400,
-            color: 'rgba(26, 24, 22, 0.4)',
+            color: 'rgba(255, 255, 255, 0.6)',
             marginTop: '24px',
+            marginBottom: '24px',
             letterSpacing: '-0.01em',
           }}
         >

@@ -6,7 +6,7 @@
  * coalition stability, regret risk, and long-term flexibility.
  */
 
-import type { StudentBeliefV3 } from '../student-model';
+import type { StudentBeliefV3, Value } from '../types';
 import type { CareerPathExplorerResult, ExploredCareerPath } from '../path-explorer';
 import type { RegretAnalysis, PathRegretAnalysis } from '../regret-functional';
 import type { DecisionCoalitionAnalysis, PathCoalitionAnalysis } from '../decision-coalition-v3';
@@ -125,6 +125,15 @@ export interface DecisionRecommendationOutput {
   generatedAt: number;
 }
 
+interface LegacyStudentValueShape {
+  coreValues?: string[];
+  valuePriorities?: ReadonlyMap<string, number> | Record<string, number>;
+}
+
+type StudentBeliefV3Readable = Omit<StudentBeliefV3, 'values'> & {
+  values?: StudentBeliefV3['values'] | LegacyStudentValueShape;
+};
+
 // ============================================================================
 // DEFAULT CONFIGURATION
 // ============================================================================
@@ -152,6 +161,10 @@ function clamp(value: number, min: number, max: number): number {
 
 function normalizeScore(value: number, min = 0, max = 100): number {
   return clamp((value - min) / (max - min), 0, 1);
+}
+
+function normalizeValueIdentifier(value: string): string {
+  return value.trim().toLowerCase().replace(/^value[_-]/, '').replace(/[\s_]+/g, '-');
 }
 
 function getTierFromScore(score: number, confidence: number): DecisionTier {
@@ -318,12 +331,54 @@ export class DecisionIntelligenceEngineV1 {
     factors++;
 
     // Stability preference match
-    const stabilityValue = this.studentBelief.values?.valuePriorities?.get('stability') ?? 0.5;
+    const stabilityValue = this.readStudentValuePriority('stability', 0.5);
     const stabilityMatch = 1 - Math.abs(stabilityValue - path.scores.stabilityScore / 100);
     score += stabilityMatch * 0.2;
     factors++;
 
     return clamp(score, 0, 1);
+  }
+
+  /**
+   * Read a student value priority from canonical StudentBeliefV3 values.
+   * Keeps legacy fixture compatibility local while preserving the V3 Value[] contract.
+   */
+  private readStudentValuePriority(valueName: string, fallback: number): number {
+    const values = (this.studentBelief as StudentBeliefV3Readable).values;
+
+    if (!values) {
+      return fallback;
+    }
+
+    if (Array.isArray(values)) {
+      const matchingValue = values.find((value) => this.matchesStudentValue(value, valueName));
+      return matchingValue ? clamp(matchingValue.importance, 0, 1) : fallback;
+    }
+
+    const legacyPriority = this.readLegacyValuePriority(values.valuePriorities, valueName);
+    return legacyPriority === undefined ? fallback : clamp(legacyPriority, 0, 1);
+  }
+
+  private matchesStudentValue(value: Value, valueName: string): boolean {
+    const target = normalizeValueIdentifier(valueName);
+    return [value.id, value.name].some((candidate) => normalizeValueIdentifier(candidate) === target);
+  }
+
+  private readLegacyValuePriority(
+    priorities: LegacyStudentValueShape['valuePriorities'],
+    valueName: string
+  ): number | undefined {
+    if (!priorities) {
+      return undefined;
+    }
+
+    if (priorities instanceof Map) {
+      return priorities.get(valueName) ?? priorities.get(normalizeValueIdentifier(valueName));
+    }
+
+    const target = normalizeValueIdentifier(valueName);
+    const matchingEntry = Object.entries(priorities).find(([key]) => normalizeValueIdentifier(key) === target);
+    return matchingEntry?.[1];
   }
 
   /**
@@ -362,25 +417,7 @@ export class DecisionIntelligenceEngineV1 {
     if (!coalitionAnalysis) return 0.5;
 
     const aggregate = coalitionAnalysis.aggregate;
-
-    // Weighted agreement is primary factor
-    let score = aggregate.weightedAgreement;
-
-    // Adjust for conflicts
-    if (aggregate.criticalConflictCount > 0) {
-      score *= 0.5;
-    } else if (aggregate.conflictCount > 0) {
-      score *= 0.8;
-    }
-
-    // Stability bonus
-    if (aggregate.overallStability === 'stable') {
-      score = Math.min(1, score * 1.1);
-    } else if (aggregate.overallStability === 'tense') {
-      score *= 0.9;
-    }
-
-    return clamp(score, 0, 1);
+    return normalizeScore(aggregate.stabilityScore);
   }
 
   /**
@@ -696,7 +733,7 @@ export class DecisionIntelligenceEngineV1 {
       psychologicalFit: scores.psychologicalFit / 100,
       optionality: scores.optionality / 100,
       criticality: scores.criticality / 100,
-      coalition: coalitionAnalysis?.aggregate.overallConfidence ?? scores.coalition / 100,
+      coalition: scores.coalition / 100,
       regret: regretAnalysis?.aggregate.overallConfidence ?? scores.regret / 100,
       flexibility: scores.flexibility / 100,
       confidenceExplanation,

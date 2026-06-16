@@ -22,6 +22,7 @@ import {
   ProjectInfoV2,
   DEFAULT_DIMENSION_WEIGHTS,
 } from './types';
+import type { FounderAssessmentResponseV2 } from './types';
 import { DIMENSION_SIGNAL_MAP, SignalPattern, DIFFERENTIAL_FOUNDER_INDICATORS } from './signals';
 
 /**
@@ -75,6 +76,8 @@ interface TextSource {
   source: string;
   timestamp?: number;
 }
+
+type FounderAssessmentResponse = FounderAssessmentResponseV2;
 
 /**
  * Dimension Scoring Engine V2
@@ -665,7 +668,7 @@ export class DimensionScoringEngineV2 {
    */
   private extractFromAssessments(
     dimension: FounderDimensionV2,
-    responses: AssessmentResponse[]
+    responses: FounderAssessmentResponse[]
   ): FounderEvidenceV2[] {
     const evidence: FounderEvidenceV2[] = [];
     

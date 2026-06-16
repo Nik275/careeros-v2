@@ -29,6 +29,12 @@ import { CareerTransitionGraphV1, type CareerNode, type CareerEdge } from '../..
 // MOCK DATA FACTORIES
 // ============================================================================
 
+type LegacyRegretStudentBeliefOverrides = {
+  interests?: { coreInterests?: string[]; interestStrengths?: Map<string, number>; topInterestCategories?: string[] } | string[];
+  values?: { coreValues?: string[]; valuePriorities?: Map<string, number>; topValueCategories?: string[] } | Array<{ name?: string } | string>;
+  profile?: Partial<CareerNode['requiredProfile']> & { age?: number };
+};
+
 const createMockCareerNode = (overrides: Partial<CareerNode> & { id?: string; name?: string } = {}): CareerNode => ({
   id: overrides.id || 'test-node',
   name: overrides.name || 'Test Node',
@@ -157,7 +163,9 @@ const createMockCareerPathExplorerResult = (
   ...overrides,
 });
 
-const createMockStudentBeliefV3 = (overrides: Partial<StudentBeliefV3> = {}): StudentBeliefV3 => ({
+const createMockStudentBeliefV3 = (
+  overrides: Omit<Partial<StudentBeliefV3>, 'interests' | 'values'> & LegacyRegretStudentBeliefOverrides = {}
+): StudentBeliefV3 => ({
   studentId: 'student-1',
   interests: {
     coreInterests: ['technology', 'engineering'],
@@ -185,7 +193,7 @@ const createMockStudentBeliefV3 = (overrides: Partial<StudentBeliefV3> = {}): St
   confidence: 0.8,
   lastUpdated: Date.now(),
   ...overrides,
-} as StudentBeliefV3);
+} as unknown as StudentBeliefV3);
 
 // ============================================================================
 // REGRET FUNCTIONAL V2 TESTS

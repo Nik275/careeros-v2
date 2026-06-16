@@ -17,11 +17,11 @@ import type {
   CareerRecommendation,
   RecommendationSet,
   RecommendationConfig,
-  DEFAULT_RECOMMENDATION_CONFIG,
   RankingCriteria,
   RecommendationFilter,
   CareerOption,
 } from './recommendation-types';
+import { DEFAULT_RECOMMENDATION_CONFIG } from './recommendation-types';
 
 import { RecommendationRanker } from './recommendation-ranker';
 import { RecommendationExplainer } from './recommendation-explainer';

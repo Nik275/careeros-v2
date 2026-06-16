@@ -102,13 +102,14 @@ export class ConfidenceHistory {
   getTrend(systemId: string, periods: number = 10): {
     direction: 'improving' | 'stable' | 'degrading';
     rate: number;
+    periods: number;
     average: number;
   } {
     const history = this.getHistory(systemId);
     const entries = history.entries.slice(0, periods);
 
     if (entries.length < 2) {
-      return { direction: 'stable', rate: 0, average: 0.5 };
+      return { direction: 'stable', rate: 0, periods: entries.length, average: 0.5 };
     }
 
     const values = entries.map(e => e.confidence);
@@ -136,6 +137,7 @@ export class ConfidenceHistory {
     return {
       direction,
       rate: slope,
+      periods: entries.length,
       average,
     };
   }

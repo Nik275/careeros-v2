@@ -62,6 +62,7 @@ export type {
 
   // Main interfaces
   DecisionTreeNode,
+  DecisionTreeNodeMetrics,
   DecisionTreeEdge,
   DecisionTree,
   DecisionPathEvaluation,

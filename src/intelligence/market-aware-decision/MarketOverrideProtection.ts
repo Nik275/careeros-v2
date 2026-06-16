@@ -283,12 +283,12 @@ export class MarketOverrideProtection {
     }>
   ): {
     total: number;
-    protected: number;
+    protectedCount: number;
     trendChasingBlocked: number;
     trendChasingWarned: number;
     averageConfidence: number;
   } {
-    const protected = decisions.filter(d => d.protection.isProtected).length;
+    const protectedCount = decisions.filter(d => d.protection.isProtected).length;
     const blocked = decisions.filter(d => d.trendDetection.recommendation === 'block').length;
     const warned = decisions.filter(d => d.trendDetection.recommendation === 'warn').length;
 
@@ -299,7 +299,7 @@ export class MarketOverrideProtection {
 
     return {
       total: decisions.length,
-      protected,
+      protectedCount,
       trendChasingBlocked: blocked,
       trendChasingWarned: warned,
       averageConfidence: avgConfidence,

@@ -8,7 +8,6 @@
  * @version 1.0.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import type {
   Confidence,
   ConfidenceValue,
@@ -18,6 +17,7 @@ import type {
   ConfidenceRequest,
   ValidatedConfidence,
 } from './ConfidenceTypes';
+import { uuidv4 } from './ConfidenceId';
 import {
   validateConfidence,
   getReliabilityBand,
@@ -166,9 +166,9 @@ export class ConfidenceCalculator {
       };
 
       return confidenceValue;
-    } catch (error) {
+    } catch {
       // Return fallback confidence on error
-      console.error('Confidence calculation error:', error);
+      console.error('Confidence calculation failed safely.');
       return this.createFallbackConfidence(lineageId, calculatedAt, input.evidence);
     }
   }

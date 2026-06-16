@@ -1,199 +1,352 @@
 /**
  * CareerOS Active Learning Engine - Type Definitions
- * 
- * Core types for intelligent learning prioritization:
- * - Uncertainty measurement
- * - Learning value estimation
- * - Decision boundary detection
- * - Outcome prioritization
- * - Evidence gap identification
+ *
+ * Compatibility contract for the active-learning engines. These types describe
+ * the runtime shapes already produced and consumed by the active-learning
+ * implementation; they do not introduce new routing or behavior.
  */
 
-import { StudentProfile } from '@/types/student';
-import { CareerPathway } from '@/types/career';
-import { Recommendation } from '@/types/recommendation';
-import { OutcomeSnapshot } from '@/intelligence/outcome-tracking/outcome-types';
+import type { StudentId, RecommendationId } from '../outcome-tracking/outcome-types.js';
 
-// ============================================================================
-// UNCERTAINTY TYPES
-// ============================================================================
+export type { StudentId, RecommendationId };
+export type CareerId = string & { readonly __brand: 'CareerId' };
 
-export type UncertaintyLevel = 'very_low' | 'low' | 'medium' | 'high' | 'very_high' | 'critical';
+export type LearningQueryId = string & { readonly __brand: 'LearningQueryId' };
+export type UncertaintyProfileId = string & { readonly __brand: 'UncertaintyProfileId' };
+export type LearningValueId = string & { readonly __brand: 'LearningValueId' };
+export type DecisionBoundaryId = string & { readonly __brand: 'DecisionBoundaryId' };
+export type EvidenceGapId = string & { readonly __brand: 'EvidenceGapId' };
 
-export interface UncertaintyComponent {
-  value: number; // 0-1 scale
+export interface StudentProfile {
+  id: string;
+  studentId?: string;
+  skills?: string[];
+  interests?: string[];
+  values?: string[];
+  traits?: string[];
+  workPreferences?: string[];
+  careerPathways?: string[];
+  careerExpectations?: Record<string, unknown>;
+  education?: unknown;
+  experience?: Array<{
+    sector?: string;
+    [key: string]: unknown;
+  }>;
+  demographics?: Record<string, unknown>;
+  challenges?: unknown[];
+  constraints?: unknown[];
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface Recommendation {
+  id?: string;
+  recommendationId?: string;
+  careerId?: string;
+  score?: number;
+  confidence?: number;
+  rank?: number;
+  explanation?: {
+    factors?: unknown[];
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+export interface OutcomeMetrics {
+  outcome: string;
+  timestamp: Date;
+  success: boolean;
+  score?: number;
+}
+
+export enum UncertaintyLevel {
+  VERY_LOW = 'very_low',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  VERY_HIGH = 'very_high',
+  CRITICAL = 'critical',
+}
+
+export type UncertaintyDimension =
+  | 'model'
+  | 'decision'
+  | 'outcome'
+  | 'recommendation'
+  | 'career'
+  | 'education'
+  | 'skills'
+  | 'geography'
+  | 'timing';
+
+export interface UncertaintyScore {
+  value: number;
   level: UncertaintyLevel;
   confidence: number;
-  factors: string[];
+  factors?: string[];
+}
+
+export interface ModelUncertainty {
+  predictionVariance: UncertaintyScore;
+  totalUncertainty: UncertaintyScore;
+  epistemicUncertainty: UncertaintyScore;
+  aleatoricUncertainty: UncertaintyScore;
+  confidence?: number;
+  factors?: string[];
+}
+
+export interface DecisionUncertainty {
+  optionAmbiguity: UncertaintyScore;
+  outcomeUncertainty: UncertaintyScore;
+  preferenceUncertainty: UncertaintyScore;
+  temporalUncertainty: UncertaintyScore;
+  preferenceInstability?: UncertaintyScore;
+  tradeoffClarity?: UncertaintyScore;
+  confidence?: number;
+  factors?: string[];
+}
+
+export interface OutcomeUncertainty {
+  probabilityUncertainty: UncertaintyScore;
+  timingUncertainty: UncertaintyScore;
+  magnitudeUncertainty: UncertaintyScore;
+  causalUncertainty: UncertaintyScore;
+  timelineUncertainty?: UncertaintyScore;
+  varianceEstimate?: UncertaintyScore;
+  confidence?: number;
+  factors?: string[];
+}
+
+export interface RecommendationUncertainty {
+  rankUncertainty: UncertaintyScore;
+  scoreUncertainty: UncertaintyScore;
+  stabilityUncertainty: UncertaintyScore;
+  explanationUncertainty: UncertaintyScore;
+  rankingInstability?: UncertaintyScore;
+  evidenceStrength?: UncertaintyScore;
+  confidence?: number;
+  factors?: string[];
 }
 
 export interface UncertaintyProfile {
+  profileId?: UncertaintyProfileId;
   studentId: string;
   timestamp: Date;
-  
-  // Model uncertainty - how uncertain is the underlying model
-  modelUncertainty: UncertaintyComponent;
-  
-  // Decision uncertainty - how uncertain are the student's choices
-  decisionUncertainty: UncertaintyComponent;
-  
-  // Outcome uncertainty - how uncertain are predicted outcomes
-  outcomeUncertainty: UncertaintyComponent;
-  
-  // Recommendation uncertainty - how uncertain are specific recommendations
-  recommendationUncertainty: UncertaintyComponent;
-  
-  // Composite uncertainty score
-  compositeUncertainty: number;
-  compositeLevel: UncertaintyLevel;
-  
-  // Breakdown by dimension
-  dimensions: {
-    career: UncertaintyComponent;
-    education: UncertaintyComponent;
-    skills: UncertaintyComponent;
-    geography: UncertaintyComponent;
-    timing: UncertaintyComponent;
-  };
+  modelUncertainty: ModelUncertainty;
+  decisionUncertainty: DecisionUncertainty;
+  outcomeUncertainty: OutcomeUncertainty;
+  recommendationUncertainty: RecommendationUncertainty;
+  compositeUncertainty: UncertaintyScore;
+  dominantUncertaintySource?: string;
+  uncertaintyTrend?: 'increasing' | 'decreasing' | 'stable';
+  dimensions?: Partial<Record<UncertaintyDimension, UncertaintyScore>>;
+  trend?: UncertaintyScore[];
 }
 
-// ============================================================================
-// LEARNING VALUE TYPES
-// ============================================================================
+export enum LearningValueTier {
+  TRIVIAL = 'trivial',
+  LOW = 'low',
+  MODERATE = 'moderate',
+  HIGH = 'high',
+  EXCEPTIONAL = 'exceptional',
+  CRITICAL = 'critical',
+}
 
-export type LearningValueTier = 'minimal' | 'low' | 'moderate' | 'high' | 'exceptional';
+export enum LearningActionType {
+  DEEP_INTERVIEW = 'deep_interview',
+  A_B_TEST = 'a_b_test',
+  SKILL_ASSESSMENT = 'skill_assessment',
+  EXPERT_REVIEW = 'expert_review',
+  CAREER_EXPLORATION = 'career_exploration',
+  OUTCOME_TRACKING = 'outcome_tracking',
+}
 
-export interface LearningValueFactor {
+export interface LearningValueComponent {
   name: string;
-  score: number; // 0-1
+  score: number;
   weight: number;
+  explanation: string;
+}
+
+export type LearningValueFactor = LearningValueComponent;
+
+export interface LearningValueComponents {
+  uncertainty?: LearningValueComponent | number;
+  volatility?: LearningValueComponent | number;
+  rarity?: LearningValueComponent | number;
+  contradiction?: LearningValueComponent | number;
+  novelty?: LearningValueComponent | number;
+  diversity?: LearningValueComponent | number;
+  uncertaintyComponent?: LearningValueComponent | number;
+  volatilityComponent?: LearningValueComponent | number;
+  rarityComponent?: LearningValueComponent | number;
+  contradictionComponent?: LearningValueComponent | number;
+  noveltyComponent?: LearningValueComponent | number;
+  diversityComponent?: LearningValueComponent | number;
+}
+
+export interface LearningAction {
+  type: LearningActionType;
   description: string;
+  expectedGain?: number;
+  expectedValue: number;
+  cost: number;
+  effort?: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: PriorityLevel | number;
 }
 
 export interface LearningValueScore {
+  scoreId?: LearningValueId;
   studentId: string;
-  timestamp: Date;
-  
-  // Overall learning value (0-1)
-  overallScore: number;
+  timestamp?: Date;
+  totalScore: number;
   tier: LearningValueTier;
-  
-  // Component scores
-  uncertaintyValue: LearningValueFactor;
-  volatilityValue: LearningValueFactor;
-  rarityValue: LearningValueFactor;
-  contradictionValue: LearningValueFactor;
-  noveltyValue: LearningValueFactor;
-  boundaryValue: LearningValueFactor;
-  
-  // Weighted composite
-  weightedScore: number;
-  
-  // Expected information gain (bits)
-  expectedInformationGain: number;
-  
-  // Priority ranking
+  components: LearningValueComponents | LearningValueComponent[];
+  componentScores?: LearningValueComponents;
+  expectedLearningGain?: number;
+  expectedInformationGain?: number;
+  estimatedInformationGain: number;
+  estimatedModelImprovement: number;
+  priority?: PriorityLevel;
+  priorityRank?: number;
+  recommendedActions: Array<LearningAction | string>;
+  confidence: number;
   globalRank?: number;
   percentile?: number;
 }
 
-// ============================================================================
-// DECISION BOUNDARY TYPES
-// ============================================================================
-
-export type BoundaryType = 
-  | 'career_domain'
-  | 'education_path'
-  | 'work_environment'
-  | 'risk_tolerance'
-  | 'geography'
+export type CareerCategory =
+  | 'design'
+  | 'engineering'
+  | 'medicine'
+  | 'biotech'
+  | 'government'
+  | 'startup'
+  | 'research'
   | 'industry'
-  | 'role_type'
-  | 'company_stage'
-  | 'specialization';
+  | string;
 
-export type BoundaryProximity = 'distant' | 'approaching' | 'near' | 'at_boundary' | 'crossing';
-
-export interface DecisionBoundary {
-  id: string;
-  type: BoundaryType;
-  name: string;
-  description: string;
-  
-  // The two sides of the boundary
-  sideA: {
-    name: string;
-    characteristics: string[];
-    examples: string[];
-  };
-  sideB: {
-    name: string;
-    characteristics: string[];
-    examples: string[];
-  };
-  
-  // Importance weight
-  importance: number; // 0-1
-  
-  // How many students are at this boundary
-  studentCount: number;
-  
-  // Learning value multiplier for boundary students
-  learningMultiplier: number;
+export interface BoundaryCharacteristics {
+  overlapScore: number;
+  distinctionClarity: number;
+  transitionDifficulty: number;
+  commonConfusionPatterns: string[];
 }
 
-export interface BoundaryPosition {
-  boundaryId: string;
-  boundaryType: BoundaryType;
-  
-  // Position relative to boundary (-1 to 1, 0 is exactly on boundary)
-  position: number;
-  
-  // Distance from boundary (0 = on boundary, 1 = far away)
-  distance: number;
-  
-  // Proximity classification
-  proximity: BoundaryProximity;
-  
-  // Which side the student leans toward
-  leaning: 'side_a' | 'side_b' | 'neutral';
-  leaningConfidence: number;
-  
-  // Factors pushing toward each side
-  factorsA: string[];
-  factorsB: string[];
-  
-  // Learning value from this boundary position
-  learningValue: number;
+export interface BoundaryHistoricalData {
+  totalStudentsAtBoundary: number;
+  misclassificationRate: number;
+  satisfactionDifferential: number;
+  outcomeVariance: number;
+}
+
+export interface BoundaryApproachStrategy {
+  strategyType: 'clarification' | 'exploration' | 'experimentation' | 'mentorship' | string;
+  steps: string[];
+  expectedResolution: number;
+  timeline: string;
+}
+
+export interface DecisionBoundary {
+  id: DecisionBoundaryId | string;
+  type?: BoundaryType;
+  name: string;
+  description: string;
+  categoryA: BoundaryCategory;
+  categoryB: BoundaryCategory;
+  sideA?: BoundarySide;
+  sideB?: BoundarySide;
+  boundaryCharacteristics: BoundaryCharacteristics;
+  historicalData: BoundaryHistoricalData;
+  importance?: number;
+  studentCount?: number;
+  learningMultiplier?: number;
+}
+
+export interface BoundaryCategory {
+  id: CareerCategory;
+  name: string;
+  traits: string[];
+  skills: string[];
+  values: string[];
+  workStyles: string[];
+}
+
+export interface BoundarySide {
+  name: string;
+  characteristics: string[];
+  examples: string[];
+}
+
+export type BoundaryType =
+  | 'CAREER_DOMAIN'
+  | 'EDUCATION_PATH'
+  | 'WORK_ENVIRONMENT'
+  | 'RISK_TOLERANCE'
+  | 'GEOGRAPHY'
+  | 'INDUSTRY'
+  | 'ROLE_TYPE'
+  | 'COMPANY_STAGE'
+  | 'SPECIALIZATION'
+  | string;
+
+export interface BoundaryProximity {
+  boundaryId: DecisionBoundaryId | string;
+  boundaryName?: string;
+  studentId: string;
+  proximityScore: number;
+  learningValue?: number;
+  distance?: number;
+  distanceToCategoryA?: number;
+  distanceToCategoryB?: number;
+  ambiguityFactors?: string[];
+  recommendedClarification?: string | string[];
+  proximity?: 'distant' | 'approaching' | 'near' | 'at_boundary' | 'crossing';
+  leaning?: 'side_a' | 'side_b' | 'neutral';
+  leaningConfidence?: number;
+  factorsA?: string[];
+  factorsB?: string[];
+}
+
+export interface BoundaryStudent {
+  studentId: string;
+  profile: StudentProfile;
+  boundaries: BoundaryProximity[];
+  primaryBoundary: DecisionBoundary;
+  learningValue: LearningValueScore;
+  recommendedApproach: BoundaryApproachStrategy;
+}
+
+export interface DecisionBoundaryZone {
+  zoneId: string;
+  boundaries: string[];
+  students: string[];
+  learningIntensity: number;
 }
 
 export interface DecisionBoundaryProfile {
   studentId: string;
   timestamp: Date;
-  
-  // All boundary positions for this student
-  boundaries: BoundaryPosition[];
-  
-  // Primary boundary (highest learning value)
-  primaryBoundary?: BoundaryPosition;
-  
-  // Number of boundaries the student is near
+  boundaries: BoundaryProximity[];
+  primaryBoundary?: BoundaryProximity;
   nearBoundaryCount: number;
-  
-  // Composite boundary score
   boundaryScore: number;
-  
-  // Is this student at a decision point?
   atDecisionPoint: boolean;
 }
 
-// ============================================================================
-// OUTCOME PRIORITY TYPES
-// ============================================================================
+export type PriorityLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'DEFERRED';
+export type OutcomeUrgency =
+  | 'IMMEDIATE'
+  | 'SOON'
+  | 'NORMAL'
+  | 'LOW'
+  | 'SHORT_TERM'
+  | 'MEDIUM_TERM'
+  | 'LONG_TERM'
+  | 'FUTURE';
 
-export type OutcomePriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'minimal';
-
-export type OutcomeCategory = 
+export type OutcomeCategory =
   | 'career_transition'
   | 'salary_progression'
   | 'skill_acquisition'
@@ -205,376 +358,363 @@ export type OutcomeCategory =
   | 'geographic_mobility'
   | 'industry_impact';
 
+export interface PriorityAdjustment {
+  timestamp?: number;
+  studentId?: StudentId;
+  oldPriority?: PriorityLevel;
+  previousPriority?: PriorityLevel;
+  newPriority: PriorityLevel;
+  reason: string;
+  confidence?: number;
+}
+
 export interface OutcomePriority {
-  category: OutcomeCategory;
-  level: OutcomePriorityLevel;
-  score: number; // 0-1
-  
-  // Why this priority?
-  rationale: string;
-  
-  // Evidence strength
-  evidenceStrength: number; // 0-1
-  
-  // Sample size for this outcome type
-  sampleSize: number;
-  
-  // Uncertainty in this outcome
-  outcomeUncertainty: number;
-  
-  // Business impact of learning this outcome
-  businessImpact: number;
-  
-  // Recommended tracking intensity
-  trackingIntensity: 'continuous' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  priorityId: string;
+  studentId: StudentId;
+  recommendationId?: RecommendationId;
+  careerId?: CareerId;
+  category?: OutcomeCategory;
+  level: PriorityLevel;
+  priority?: PriorityLevel;
+  score?: number;
+  urgency?: OutcomeUrgency;
+  reasons: string[];
+  rationale?: string;
+  evidenceStrength?: number;
+  sampleSize?: number;
+  outcomeUncertainty?: number;
+  businessImpact?: number;
+  trackingFrequency: number;
+  trackingIntensity?: 'continuous' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  nextScheduled?: number;
+  lastTracked?: number;
+  autoFollowUp?: boolean;
+  createdAt?: number;
+  updatedAt?: number;
 }
 
 export interface OutcomePriorityProfile {
   studentId: string;
   timestamp: Date;
-  
-  // Priority for each outcome category
   priorities: OutcomePriority[];
-  
-  // Overall tracking priority
-  overallPriority: OutcomePriorityLevel;
-  
-  // Categories requiring aggressive tracking
+  overallPriority: PriorityLevel;
   criticalCategories: OutcomeCategory[];
   highCategories: OutcomeCategory[];
-  
-  // Recommended check-in frequency
   recommendedCheckInDays: number;
 }
 
-// ============================================================================
-// EVIDENCE GAP TYPES
-// ============================================================================
-
-export type EvidenceGapType = 
-  | 'rare_career'
-  | 'emerging_field'
-  | 'new_industry'
-  | 'geographic_region'
-  | 'demographic_segment'
-  | 'education_pathway'
-  | 'skill_combination'
-  | 'career_transition'
-  | 'outcome_type'
-  | 'recommendation_type';
-
-export type EvidenceGapSeverity = 'critical' | 'severe' | 'moderate' | 'minor' | 'negligible';
+export type EvidenceGapType =
+  | 'RARE_CAREER'
+  | 'EMERGING_CAREER'
+  | 'CREATOR_ECONOMY'
+  | 'AI_CAREER'
+  | 'NEW_INDUSTRY'
+  | 'GEOGRAPHIC_REGION'
+  | 'DEMOGRAPHIC_SEGMENT'
+  | 'EDUCATION_PATHWAY'
+  | 'TRANSITION_TYPE'
+  | 'DECISION_PATTERN';
 
 export interface EvidenceGap {
-  id: string;
+  gapId: EvidenceGapId;
+  id?: string;
   type: EvidenceGapType;
-  severity: EvidenceGapSeverity;
-  
-  // What is missing
+  name: string;
   description: string;
-  
-  // Specific area
-  area: string;
-  
-  // Current evidence count
-  currentEvidence: number;
-  
-  // Minimum evidence needed
-  minimumEvidence: number;
-  
-  // Gap size
-  gapSize: number;
-  
-  // Impact on recommendations
-  impactOnRecommendations: number; // 0-1
-  
-  // Students who could fill this gap
-  relevantStudentCount: number;
-  
-  // Priority for filling this gap
-  fillPriority: number; // 0-1
-  
-  // Suggested data collection strategies
-  strategies: string[];
+  targetSamples: number;
+  currentSamples: number;
+  coverage: number;
+  priority: PriorityLevel;
+  relatedCareers: CareerId[] | string[];
+  relatedBoundaries: DecisionBoundaryId[] | string[];
+  learningStrategy: string;
 }
 
 export interface EvidenceGapProfile {
   studentId: string;
   timestamp: Date;
-  
-  // Gaps relevant to this student
   relevantGaps: EvidenceGap[];
-  
-  // Gaps this student could help fill
   fillableGaps: EvidenceGap[];
-  
-  // Student's contribution potential
   contributionScore: number;
 }
 
-// ============================================================================
-// ACTIVE LEARNING REPORT TYPES
-// ============================================================================
+export interface EvidenceGapAnalysis {
+  analysisId?: string;
+  timestamp?: number;
+  totalGaps?: number;
+  gaps?: EvidenceGap[];
+  criticalGaps: EvidenceGapId[];
+  gapProgress: Array<{
+    gapId: EvidenceGapId;
+    name?: string;
+    coverage?: number;
+    samplesNeeded?: number;
+    previousCoverage?: number;
+    currentCoverage?: number;
+  }>;
+  recommendations?: string[];
+  recommendedFocus?: EvidenceGapId[];
+  estimatedImpact?: number;
+}
+
+export type QueryType =
+  | 'UNCERTAINTY_PROBE'
+  | 'OUTCOME_FOLLOWUP'
+  | 'DECISION_EXPLORATION'
+  | 'CONTRADICTION_INVESTIGATION'
+  | 'BOUNDARY_CLARIFICATION'
+  | 'NOVELTY_DISCOVERY'
+  | 'VALIDATION_REQUEST';
+
+export type QueryStatus = 'PENDING' | 'SENT' | 'RESPONDED' | 'EXPIRED' | 'CANCELLED';
+
+export interface LearningQuery {
+  queryId: LearningQueryId;
+  studentId: StudentId;
+  type: QueryType;
+  status: QueryStatus;
+  priority: PriorityLevel;
+  createdAt: number;
+  expiresAt: number;
+  sentAt?: number;
+  question: string;
+  context: {
+    reason: string;
+    expectedValue: number;
+  };
+  response?: {
+    receivedAt: number;
+    data: unknown;
+    quality: number;
+  };
+}
 
 export interface LearningRecommendation {
-  type: 'track_outcome' | 'validate_recommendation' | 'explore_boundary' | 'fill_evidence_gap' | 'deep_dive';
-  priority: OutcomePriorityLevel;
-  description: string;
-  rationale: string;
-  
-  // Target student(s)
-  targetStudentIds: string[];
-  
-  // Expected learning value
-  expectedLearningValue: number;
-  
-  // Cost to implement
-  estimatedCost: 'low' | 'medium' | 'high';
-  
-  // Timeline
-  timeline: 'immediate' | 'short_term' | 'medium_term' | 'long_term';
-  
-  // Success metrics
-  successMetrics: string[];
+  type: string;
+  target: string;
+  expectedImpact: number;
+  effort: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 export interface ActiveLearningReport {
   reportId: string;
-  generatedAt: Date;
-  
-  // Summary statistics
-  summary: {
-    totalStudentsAnalyzed: number;
-    highLearningValueStudents: number;
-    studentsAtBoundaries: number;
-    criticalEvidenceGaps: number;
-    recommendationsGenerated: number;
+  generatedAt: number;
+  period: {
+    start: number;
+    end: number;
   };
-  
-  // Top learning opportunities
-  topLearningOpportunities: LearningValueScore[];
-  
-  // Critical decision boundaries
-  criticalBoundaries: DecisionBoundary[];
-  
-  // Evidence gaps requiring attention
-  criticalEvidenceGaps: EvidenceGap[];
-  
-  // Prioritized recommendations
+  highValueStudents: Array<{
+    studentId: string;
+    learningValue: number;
+    primaryReason: string;
+    recommendedAction: string;
+  }>;
+  activeBoundaries: Array<{
+    boundaryId: string;
+    studentCount: number;
+    learningIntensity: number;
+  }>;
+  priorityDistribution: Record<PriorityLevel, number>;
+  urgentFollowUps: OutcomePriority[];
+  criticalGaps: number;
+  gapProgress: EvidenceGapAnalysis['gapProgress'];
+  queryStats: {
+    total: number;
+    responded: number;
+    responseRate: number;
+    averageResponseQuality: number;
+  };
   recommendations: LearningRecommendation[];
-  
-  // Learning focus areas
-  focusAreas: {
-    area: string;
-    priority: OutcomePriorityLevel;
-    rationale: string;
-  }[];
-  
-  // Resource allocation suggestions
-  resourceAllocation: {
-    area: string;
-    suggestedEffort: number; // percentage
-    expectedImpact: number;
-  }[];
 }
 
-// ============================================================================
-// ENGINE CONFIGURATION TYPES
-// ============================================================================
+export interface ActiveLearningMetrics {
+  totalStudentsAnalyzed?: number;
+  highValueStudents?: number;
+  activeQueries?: number;
+  responseRate?: number;
+  averageLearningGain?: number;
+  evidenceGapCoverage?: Record<EvidenceGapType, number>;
+  totalStudents?: number;
+  totalStudentsProcessed: number;
+  averageLearningValue: number;
+  highValueStudentPercentage: number;
+  boundaryDetectionRate: number;
+  evidenceGapClosureRate: number;
+  modelImprovementRate: number;
+  informationGainPerStudent: number;
+  criticalCount?: number;
+  highCount?: number;
+  mediumCount?: number;
+  lowCount?: number;
+  deferredCount?: number;
+}
 
 export interface UncertaintyEngineConfig {
-  // Weights for composite uncertainty
-  modelWeight: number;
-  decisionWeight: number;
-  outcomeWeight: number;
-  recommendationWeight: number;
-  
-  // Thresholds for uncertainty levels
-  thresholds: {
-    veryLow: number;
-    low: number;
-    medium: number;
-    high: number;
-    veryHigh: number;
-  };
-  
-  // Minimum confidence for reliable uncertainty
-  minConfidence: number;
+  modelUncertaintyWeight: number;
+  decisionUncertaintyWeight: number;
+  outcomeUncertaintyWeight: number;
+  recommendationUncertaintyWeight: number;
+  temporalDecayFactor: number;
+  minimumSampleSize: number;
 }
 
 export interface LearningValueEngineConfig {
-  // Factor weights
   uncertaintyWeight: number;
   volatilityWeight: number;
   rarityWeight: number;
   contradictionWeight: number;
   noveltyWeight: number;
-  boundaryWeight: number;
-  
-  // Tier thresholds
-  tierThresholds: {
-    minimal: number;
-    low: number;
-    moderate: number;
-    high: number;
-    exceptional: number;
-  };
-  
-  // Minimum sample size for reliable estimates
-  minSampleSize: number;
+  diversityWeight: number;
+  minimumInformationGain: number;
 }
 
 export interface DecisionBoundaryEngineConfig {
-  // Proximity thresholds
-  distantThreshold: number;
-  approachingThreshold: number;
-  nearThreshold: number;
-  boundaryThreshold: number;
-  
-  // Minimum importance for boundary consideration
-  minImportance: number;
-  
-  // Learning multiplier by proximity
-  proximityMultipliers: {
-    distant: number;
-    approaching: number;
-    near: number;
-    at_boundary: number;
-    crossing: number;
-  };
+  boundaryDetectionThreshold: number;
+  minimumHistoricalData: number;
+  ambiguityThreshold: number;
+  maxBoundariesPerStudent: number;
 }
 
 export interface OutcomePriorityEngineConfig {
-  // Priority thresholds
-  criticalThreshold: number;
-  highThreshold: number;
-  mediumThreshold: number;
-  lowThreshold: number;
-  
-  // Minimum evidence for priority assessment
-  minEvidence: number;
-  
-  // Check-in frequency mapping
-  checkInDays: {
-    continuous: number;
-    weekly: number;
-    monthly: number;
-    quarterly: number;
-    yearly: number;
-  };
+  defaultTrackingDays: number;
+  highPriorityDays: number;
+  autoEscalateThreshold: number;
 }
 
 export interface EvidenceGapEngineConfig {
-  // Severity thresholds
-  criticalThreshold: number;
-  severeThreshold: number;
-  moderateThreshold: number;
-  minorThreshold: number;
-  
-  // Minimum sample sizes by gap type
-  minSamplesByType: Record<EvidenceGapType, number>;
-  
-  // Impact weights
-  recommendationImpactWeight: number;
-  studentRelevanceWeight: number;
+  criticalCoverageThreshold: number;
+  targetCoverage: number;
 }
 
-export interface ActiveLearningEngineConfig {
+export interface ActiveLearningConfig extends
+  UncertaintyEngineConfig,
+  LearningValueEngineConfig,
+  DecisionBoundaryEngineConfig {
   uncertainty: UncertaintyEngineConfig;
   learningValue: LearningValueEngineConfig;
   decisionBoundary: DecisionBoundaryEngineConfig;
   outcomePriority: OutcomePriorityEngineConfig;
   evidenceGap: EvidenceGapEngineConfig;
-  
-  // Global settings
+  queries: {
+    maxPendingPerStudent: number;
+    defaultExpiryDays: number;
+    batchSize: number;
+  };
   maxStudentsPerBatch: number;
   minLearningValueThreshold: number;
-  reportGenerationInterval: number; // days
+  reportGenerationInterval: number;
 }
 
-// ============================================================================
-// STUDENT LEARNING PROFILE
-// ============================================================================
+export type ActiveLearningEngineConfig = ActiveLearningConfig;
+
+export const DEFAULT_ACTIVE_LEARNING_CONFIG: ActiveLearningConfig = {
+  modelUncertaintyWeight: 0.3,
+  decisionUncertaintyWeight: 0.25,
+  outcomeUncertaintyWeight: 0.25,
+  recommendationUncertaintyWeight: 0.2,
+  temporalDecayFactor: 0.95,
+  minimumSampleSize: 10,
+  uncertaintyWeight: 0.25,
+  volatilityWeight: 0.2,
+  rarityWeight: 0.15,
+  contradictionWeight: 0.2,
+  noveltyWeight: 0.15,
+  diversityWeight: 0.05,
+  minimumInformationGain: 0.1,
+  boundaryDetectionThreshold: 0.4,
+  minimumHistoricalData: 20,
+  ambiguityThreshold: 0.35,
+  maxBoundariesPerStudent: 3,
+  uncertainty: {
+    modelUncertaintyWeight: 0.3,
+    decisionUncertaintyWeight: 0.25,
+    outcomeUncertaintyWeight: 0.25,
+    recommendationUncertaintyWeight: 0.2,
+    temporalDecayFactor: 0.95,
+    minimumSampleSize: 10,
+  },
+  learningValue: {
+    uncertaintyWeight: 0.25,
+    volatilityWeight: 0.2,
+    rarityWeight: 0.15,
+    contradictionWeight: 0.2,
+    noveltyWeight: 0.15,
+    diversityWeight: 0.05,
+    minimumInformationGain: 0.1,
+  },
+  decisionBoundary: {
+    boundaryDetectionThreshold: 0.4,
+    minimumHistoricalData: 20,
+    ambiguityThreshold: 0.35,
+    maxBoundariesPerStudent: 3,
+  },
+  outcomePriority: {
+    defaultTrackingDays: 30,
+    highPriorityDays: 7,
+    autoEscalateThreshold: 45,
+  },
+  evidenceGap: {
+    criticalCoverageThreshold: 30,
+    targetCoverage: 80,
+  },
+  queries: {
+    maxPendingPerStudent: 3,
+    defaultExpiryDays: 14,
+    batchSize: 25,
+  },
+  maxStudentsPerBatch: 100,
+  minLearningValueThreshold: 0.4,
+  reportGenerationInterval: 30,
+};
 
 export interface StudentLearningProfile {
-  studentId: string;
-  lastUpdated: Date;
-  
-  // All engine outputs
-  uncertainty: UncertaintyProfile;
+  studentId: StudentId;
+  lastAnalyzed?: number;
+  lastUpdated?: Date;
+  uncertaintyProfile: UncertaintyProfile;
   learningValue: LearningValueScore;
-  decisionBoundaries: DecisionBoundaryProfile;
-  outcomePriorities: OutcomePriorityProfile;
-  evidenceGaps: EvidenceGapProfile;
-  
-  // Composite learning priority
-  learningPriority: number; // 0-1
+  boundaryProximities: BoundaryProximity[];
+  outcomePriority: OutcomePriority;
+  evidenceGaps: string[];
+  queryHistory: LearningQueryId[];
+  learningPriority?: number;
   priorityRank?: number;
-  
-  // Recommended actions
-  recommendedActions: string[];
-  
-  // Historical learning value trend
-  learningValueHistory: {
+  recommendedActions?: string[];
+  learningValueHistory?: Array<{
     timestamp: Date;
     score: number;
-  }[];
-}
-
-// ============================================================================
-// ENGINE INTERFACES
-// ============================================================================
-
-export interface IUncertaintyEngine {
-  calculateUncertainty(student: StudentProfile): Promise<UncertaintyProfile>;
-  calculateBatchUncertainty(students: StudentProfile[]): Promise<UncertaintyProfile[]>;
-  getUncertaintyTrend(studentId: string, days: number): Promise<UncertaintyComponent[]>;
-}
-
-export interface ILearningValueEngine {
-  calculateLearningValue(
-    student: StudentProfile,
-    uncertainty: UncertaintyProfile,
-    boundaries: DecisionBoundaryProfile
-  ): Promise<LearningValueScore>;
-  rankStudentsByLearningValue(profiles: StudentLearningProfile[]): StudentLearningProfile[];
-  getLearningValueDistribution(): Promise<{
-    tier: LearningValueTier;
-    count: number;
-    percentage: number;
-  }[]>;
-}
-
-export interface IDecisionBoundaryEngine {
-  detectBoundaries(student: StudentProfile): Promise<DecisionBoundaryProfile>;
-  getAllBoundaries(): DecisionBoundary[];
-  getBoundaryById(id: string): DecisionBoundary | undefined;
-  findStudentsAtBoundary(boundaryId: string): Promise<string[]>;
-}
-
-export interface IOutcomePriorityEngine {
-  calculatePriorities(
-    student: StudentProfile,
-    recommendations: Recommendation[]
-  ): Promise<OutcomePriorityProfile>;
-  getCategoryStats(category: OutcomeCategory): Promise<{
-    sampleSize: number;
-    evidenceStrength: number;
-    priority: OutcomePriorityLevel;
   }>;
 }
 
+export type LearningStrategy = 'targeted_query' | 'outcome_followup' | 'boundary_probe' | 'evidence_gap_fill';
+
+export interface IUncertaintyEngine {
+  calculateUncertainty(input: unknown): UncertaintyProfile;
+}
+
+export interface ILearningValueEngine {
+  calculateLearningValue(input: unknown): LearningValueScore;
+}
+
+export interface IDecisionBoundaryEngine {
+  detectBoundaries(studentId: StudentId, profile?: unknown): BoundaryProximity[];
+}
+
+export interface IOutcomePriorityEngine {
+  calculatePriority(studentId: StudentId, context?: unknown): OutcomePriority;
+}
+
 export interface IEvidenceGapEngine {
-  identifyGaps(student: StudentProfile): Promise<EvidenceGapProfile>;
-  getAllGaps(): EvidenceGap[];
-  getCriticalGaps(): EvidenceGap[];
-  calculateContributionPotential(student: StudentProfile): number;
+  getStudentGaps(studentId: StudentId): EvidenceGap[];
 }
 
 export interface IActiveLearningEngine {
-  generateStudentProfile(student: StudentProfile): Promise<StudentLearningProfile>;
-  generateBatchProfiles(students: StudentProfile[]): Promise<StudentLearningProfile[]>;
-  generateLearningReport(): Promise<ActiveLearningReport>;
-  getTopLearningOpportunities(count: number): Promise<StudentLearningProfile[]>;
-  getRecommendationsForStudent(studentId: string): Promise<LearningRecommendation[]>;
+  analyzeStudent(studentId: StudentId): {
+    uncertainty: UncertaintyProfile;
+    learningValue: LearningValueScore;
+    boundaries: BoundaryProximity[];
+    priority: OutcomePriority;
+  };
+  generateLearningQuery(studentId: StudentId, type: QueryType): LearningQuery | null;
+  generateReport(): ActiveLearningReport;
 }

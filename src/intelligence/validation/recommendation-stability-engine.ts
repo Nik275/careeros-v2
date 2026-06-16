@@ -145,7 +145,7 @@ export class RecommendationStabilityEngine {
     const driftMetrics = this.calculateDriftMetrics(perturbationResults);
 
     // Calculate engine stability
-    const engineStability = this.calculateEngineStability(
+    const engineStability = await this.calculateEngineStability(
       baseRecommendations,
       perturbations,
       recommendationProvider

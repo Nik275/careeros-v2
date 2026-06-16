@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "npm run typecheck:build",
+    "typecheck:build": "tsc -p tsconfig.build.json --noEmit --pretty false",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit --pretty false",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -34,8 +37,14 @@
     "eslint-config-next": "16.2.6",
     "glob": "^13.0.6",
     "jsdom": "^29.1.1",
+    "puppeteer": "^25.1.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.7"
+  },
+  "overrides": {
+    "js-yaml": "4.2.0",
+    "postcss": "8.5.15",
+    "vite": "8.0.16"
   }
 }

@@ -35,6 +35,9 @@ import {
   BatchSimilarityOutput,
   SimilaritySummary,
   ScoreDistribution,
+  SimilarityFactor,
+  Difference,
+  SimilarityDimension,
   DEFAULT_SIMILARITY_WEIGHTS,
   DEFAULT_SIMILARITY_CONFIG,
 } from './journey-similarity-types';
@@ -497,7 +500,9 @@ export class JourneySimilarityEngine {
     // Evict oldest if at capacity
     if (this.resultCache.size >= this.config.maxCacheSize) {
       const firstKey = this.resultCache.keys().next().value;
-      this.resultCache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.resultCache.delete(firstKey);
+      }
     }
 
     this.resultCache.set(key, results);
@@ -547,12 +552,12 @@ export class JourneySimilarityEngine {
 
   private identifySimilarityFactors(
     dimensionScores: Array<{ dimension: string; score: number; details: string }>
-  ): Array<{ factor: string; dimension: string; impact: 'STRONGLY_POSITIVE' | 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | 'STRONGLY_NEGATIVE'; description: string }> {
+  ): SimilarityFactor[] {
     return dimensionScores
       .filter(d => d.score > 0.6)
       .map(d => ({
         factor: `${d.dimension} alignment`,
-        dimension: d.dimension,
+        dimension: d.dimension as SimilarityDimension,
         impact: d.score > 0.85 ? 'STRONGLY_POSITIVE' : 'POSITIVE',
         description: d.details,
       }));
@@ -560,12 +565,12 @@ export class JourneySimilarityEngine {
 
   private identifyDifferences(
     dimensionScores: Array<{ dimension: string; score: number }>
-  ): Array<{ aspect: string; dimension: string; studentValue: string; journeyValue: string; impact: 'MAJOR' | 'MODERATE' | 'MINOR' | 'NEGLIGIBLE'; outcomeImplication: string }> {
+  ): Difference[] {
     return dimensionScores
       .filter(d => d.score < 0.5)
       .map(d => ({
         aspect: d.dimension,
-        dimension: d.dimension,
+        dimension: d.dimension as SimilarityDimension,
         studentValue: 'Current profile',
         journeyValue: 'Journey profile',
         impact: d.score < 0.3 ? 'MAJOR' : 'MODERATE',
@@ -585,7 +590,23 @@ export class JourneySimilarityEngine {
     };
 
     for (const result of results) {
-      distribution[result.similarityLevel]++;
+      switch (result.similarityLevel) {
+        case 'VERY_HIGH':
+          distribution.veryHigh++;
+          break;
+        case 'HIGH':
+          distribution.high++;
+          break;
+        case 'MODERATE':
+          distribution.moderate++;
+          break;
+        case 'LOW':
+          distribution.low++;
+          break;
+        case 'VERY_LOW':
+          distribution.veryLow++;
+          break;
+      }
     }
 
     return distribution;

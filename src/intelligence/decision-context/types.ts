@@ -12,8 +12,8 @@
  * @module intelligence/decision-context
  */
 
-import { StudentProfile } from '@/domains/student/StudentProfile';
-import { AssessmentResponse } from '@/types/assessment';
+import type { StudentProfile } from '@/domains/student/StudentProfile';
+import type { AssessmentResponse } from '@/assessment/assessment-types';
 
 // ============================================================================
 // CONTEXT TYPE ENUMERATIONS

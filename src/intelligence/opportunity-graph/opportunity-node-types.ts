@@ -45,6 +45,7 @@ export type EdgeType =
 
 export type SchoolStream = 
   | 'PCM'
+  | 'PCMB'
   | 'PCB'
   | 'COMMERCE'
   | 'ARTS'
@@ -94,6 +95,7 @@ export type DegreeType =
   | 'BCA'
   | 'BBA'
   | 'BCOM'
+  | 'CA'
   | 'BA'
   | 'BFA'
   | 'BDes'
@@ -242,6 +244,7 @@ export interface DegreeNode extends OpportunityNode {
   type: 'DEGREE';
   degreeType: DegreeType;
   duration: number; // in years
+  awardedBy?: string[];
   streamRequirement?: SchoolStream[];
   entranceExams: string[]; // exam node IDs
   collegeTypes: string[]; // college type node IDs
@@ -260,13 +263,18 @@ export interface ExamNode extends OpportunityNode {
   type: 'EXAM';
   examType: ExamType;
   frequency: 'ANNUAL' | 'SEMESTER' | 'MULTIPLE';
+  eligibility?: string[];
   eligibilityCriteria: string[];
   syllabus: string[];
   difficulty: DifficultyLevel;
   competitionLevel: CompetitionLevel;
   successRate?: number; // percentage
+  attemptsAllowed?: number;
   opensDoorsTo: string[]; // node IDs this exam enables
   alternativeExams: string[]; // similar exam node IDs
+  outcomes?: string[];
+  qualificationAwarded?: string;
+  psuOpportunities?: boolean;
 }
 
 // ============================================================================
@@ -276,12 +284,15 @@ export interface ExamNode extends OpportunityNode {
 export interface CollegeTypeNode extends OpportunityNode {
   type: 'COLLEGE_TYPE';
   tier: CollegeTier;
+  count?: number;
   reputationScore: number; // 0-1
   placementRate?: number; // percentage
   averagePackage?: number; // in LPA
+  avgPackage?: number; // in LPA
   researchOutput?: number; // 0-1
   alumniNetworkStrength: number; // 0-1
   degreesOffered: string[]; // degree node IDs
+  offeredDegrees?: string[]; // degree node IDs
   entranceExamsAccepted: string[]; // exam node IDs
   locationTypes: ('METRO' | 'TIER_2' | 'TIER_3' | 'RURAL')[];
 }

@@ -122,7 +122,7 @@ export class DecisionComparisonEngine {
 
     // Delegate to Constitutional Decision Authority
     const authorityResult = await this.authority.decide({
-      type: 'comparison',
+      type: 'option-comparison',
       context: authorityContext,
       options: authorityOptions,
       config: {
@@ -776,9 +776,7 @@ export class DecisionComparisonEngine {
         data: {
           title: option.title,
           description: option.description,
-          industry: option.industry,
-          educationRequired: option.educationRequired,
-          salaryRange: option.salaryRange,
+          careerId: option.careerId,
         },
         metadata: {
           label: option.title,
@@ -810,10 +808,8 @@ export class DecisionComparisonEngine {
     comparisonId: string,
     analyses: Record<string, DecisionAnalysis>
   ): AuthorityDecisionContext {
-    const firstAnalysis = Object.values(analyses)[0];
-    
     return {
-      studentId: firstAnalysis?.studentId ?? 'unknown',
+      studentId: 'unknown',
       sessionId: comparisonId,
       timestamp: new Date(),
       metadata: {
@@ -836,13 +832,6 @@ export class DecisionComparisonEngine {
     return {
       method: 'pairwise',
       transitive: true,
-      weights: {
-        fitQuality: config.fitQualityWeight ?? 0.25,
-        lifestyleQuality: config.lifestyleQualityWeight ?? 0.2,
-        valueAlignment: config.valueAlignmentWeight ?? 0.2,
-        futurePotential: config.futurePotentialWeight ?? 0.2,
-        flexibility: config.flexibilityWeight ?? 0.15,
-      },
     };
   }
 
@@ -859,15 +848,13 @@ export class DecisionComparisonEngine {
   ): RankingConfig {
     return {
       algorithm: 'multi-criteria',
-      dimensions: criteria?.dimensions ?? [
-        'FIT_QUALITY',
-        'LIFESTYLE_QUALITY',
-        'VALUE_ALIGNMENT',
-        'FUTURE_POTENTIAL',
-        'FLEXIBILITY',
-        'RISK_LEVEL',
-        'OVERALL_QUALITY',
-      ],
+      criteriaWeights: {
+        fitQuality: config.fitQualityWeight ?? 0.25,
+        lifestyleQuality: config.lifestyleQualityWeight ?? 0.2,
+        valueAlignment: config.valueAlignmentWeight ?? 0.2,
+        futurePotential: config.futurePotentialWeight ?? 0.2,
+        flexibility: config.flexibilityWeight ?? 0.15,
+      },
       tieBreaker: 'confidence',
       allowTies: false,
     };
@@ -1025,11 +1012,28 @@ export class DecisionComparisonEngine {
       return {
         rank: index + 1,
         optionId: option.id,
-        score: option.metadata?.scores?.overall ?? option.score ?? 50,
+        score: this.readAuthorityOverallScore(option.metadata) ?? option.score ?? 50,
         relativeStrengths: this.identifyRelativeStrengthsForLegacy(option.id, analyses),
         relativeWeaknesses: this.identifyRelativeWeaknessesForLegacy(option.id, analyses),
       };
     });
+  }
+
+  /**
+   * Reads optional authority score metadata without assuming metadata shape.
+   */
+  private readAuthorityOverallScore(metadata: object | undefined): number | undefined {
+    if (!metadata || !('scores' in metadata)) {
+      return undefined;
+    }
+
+    const scores = metadata.scores;
+    if (typeof scores !== 'object' || scores === null || !('overall' in scores)) {
+      return undefined;
+    }
+
+    const overall = scores.overall;
+    return typeof overall === 'number' ? overall : undefined;
   }
 
   /**
@@ -1042,15 +1046,24 @@ export class DecisionComparisonEngine {
       return [];
     }
 
-    return result.comparisons.map((comp) => ({
-      optionA: comp.optionA?.id ?? '',
-      optionB: comp.optionB?.id ?? '',
-      optionAWins: comp.winner === comp.optionA?.id ? ['OVERALL_QUALITY'] : [],
-      optionBWins: comp.winner === comp.optionB?.id ? ['OVERALL_QUALITY'] : [],
-      equivalent: comp.winner === null ? ['OVERALL_QUALITY'] : [],
-      winner: comp.winner ?? null,
-      winnerRationale: comp.winnerRationale ?? '',
-    }));
+    return result.comparisons.map((comp) => {
+      const optionA = comp.optionA?.id ?? '';
+      const optionB = comp.optionB?.id ?? '';
+      const winner =
+        comp.outcome === 'a-better' ? optionA :
+        comp.outcome === 'b-better' ? optionB :
+        null;
+
+      return {
+        optionA,
+        optionB,
+        optionAWins: comp.outcome === 'a-better' ? ['OVERALL_QUALITY'] : [],
+        optionBWins: comp.outcome === 'b-better' ? ['OVERALL_QUALITY'] : [],
+        equivalent: comp.outcome === 'equivalent' ? ['OVERALL_QUALITY'] : [],
+        winner,
+        winnerRationale: comp.rationale ?? '',
+      };
+    });
   }
 
   /**
@@ -1114,30 +1127,12 @@ export class DecisionComparisonEngine {
       .map((d) => d.description);
   }
 
-  /**
-   * Formats dimension name for display.
-   */
-  private formatDimensionName(dimension: DecisionDimension): string {
-    const names: Record<DecisionDimension, string> = {
-      FIT_QUALITY: 'personal fit',
-      LIFESTYLE_QUALITY: 'lifestyle quality',
-      VALUE_ALIGNMENT: 'value alignment',
-      FUTURE_POTENTIAL: 'future potential',
-      FLEXIBILITY: 'flexibility',
-      CONFIDENCE: 'confidence',
-      RISK_LEVEL: 'risk profile',
-      OPPORTUNITY_LEVEL: 'opportunity level',
-      OVERALL_QUALITY: 'overall quality',
-    };
-
-    return names[dimension] ?? dimension;
-  }
-
   // ============================================================================
   // LEGACY PRIVATE METHODS (preserved for backward compatibility)
   // These methods are kept to support internal calculations during conversion
   // but comparison ownership has been transferred to DecisionAuthority
   // ============================================================================
+}
 
 
 /**

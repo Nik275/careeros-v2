@@ -362,9 +362,9 @@ export class CriticalityEngineV1 {
       try {
         const analysis = this.calculateCriticality(careerId, options);
         analyses.set(careerId, analysis);
-      } catch (error) {
+      } catch {
         // Skip careers not in graph
-        console.warn(`Skipping ${careerId}: ${error}`);
+        console.warn('Skipping a career that is not available in the criticality graph.');
       }
     }
 
@@ -1148,17 +1148,3 @@ export function calculateBatchCriticality(
   const engine = new CriticalityEngineV1(graph);
   return engine.calculateBatch(careerIds, options);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  CriticalityAnalysis,
-  CriticalityMetric,
-  CriticalityCalculationOptions,
-  CriticalityWeights,
-  CriticalityComparison,
-  BatchCriticalityResult,
-  CriticalityId,
-};

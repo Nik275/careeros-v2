@@ -592,8 +592,8 @@ class FeedbackIngestionEngine implements IFeedbackIngestionEngine {
       const batch = feedbacks.slice(i, i + batchSize);
       
       const batchResults = await Promise.all(
-        batch.map(fb => this.ingest(fb).catch(err => {
-          console.warn(`Failed to ingest feedback ${fb.id}:`, err.message);
+        batch.map(fb => this.ingest(fb).catch(() => {
+          console.warn('Failed to ingest feedback safely.');
           return null;
         }))
       );

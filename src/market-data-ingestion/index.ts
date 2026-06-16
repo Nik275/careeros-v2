@@ -183,13 +183,14 @@ export type {
   SignalFreshnessStatus,
   FreshnessPolicy,
 
-  // Aggregation
-  AggregationMethod,
-  AggregationOptions,
-
   // Config
   IngestionPipelineConfig,
 } from './types.js';
+
+export type {
+  AggregationMethod,
+  AggregationOptions,
+} from './SignalAggregationEngine.js';
 
 // ============================================================================
 // CONSTANTS

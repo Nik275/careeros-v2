@@ -32,6 +32,28 @@ export type ForecastStatus =
   | 'superseded';
 
 /**
+ * Direction of a market signal used by forecast engines.
+ */
+export type ForecastSignalDirection = 'positive' | 'negative' | 'neutral';
+
+/**
+ * Market signal evidence used to shape forecast scenarios and confidence.
+ */
+export interface ForecastSignal {
+  /** When the signal was observed */
+  timestamp: Date;
+
+  /** Signal category or source-specific type */
+  type: string;
+
+  /** Signal strength (0-100) */
+  strength: number;
+
+  /** Signal impact direction */
+  direction: ForecastSignalDirection;
+}
+
+/**
  * Core forecast entity.
  */
 export interface Forecast {
@@ -107,10 +129,15 @@ export interface Forecast {
 }
 
 /**
+ * Input required to create a forecast before lifecycle metadata is assigned.
+ */
+export type ForecastInput = Omit<Forecast, 'id' | 'generatedAt' | 'expiresAt' | 'version'>;
+
+/**
  * Create a forecast.
  */
 export function createForecast(
-  params: Omit<Forecast, 'id' | 'generatedAt' | 'expiresAt' | 'version'>
+  params: ForecastInput
 ): Forecast {
   const now = new Date();
   const expiresAt = new Date(now);

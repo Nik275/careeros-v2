@@ -21,6 +21,8 @@ import {
   RegretDecisionOption,
   RegretComparison,
   RegretEngineConfig,
+  RegretStudentProfile,
+  RegretDecisionContext,
 } from './regret-types';
 
 import {
@@ -206,7 +208,7 @@ export class RegretPredictionEngine {
         optionId: option.id,
         optionName: option.name,
         overallRegretRisk: profile.overallRegretRisk,
-        dominantRegretCategory: profile.highestRiskRegret,
+        dominantRegretCategory: profile.highestRiskRegret ?? 'EXPLORATION',
         explorationRegret: profile.explorationAnalysis.severity,
         identityRegret: profile.identityAnalysis.severity,
         keyInsight: this.generateOptionInsight(profile),

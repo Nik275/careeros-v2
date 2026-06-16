@@ -269,15 +269,8 @@ export class JourneyAnalyzer {
       decisionTypes[decision.type] = (decisionTypes[decision.type] || 0) + 1;
     }
 
-    // Calculate average confidence
-    const confidenceScores: Record<string, number> = {
-      'VERY_HIGH': 5,
-      'HIGH': 4,
-      'MODERATE': 3,
-      'LOW': 2,
-      'VERY_LOW': 1,
-    };
-    const averageConfidence = decisions.reduce((acc, d) => acc + confidenceScores[d.confidence], 0) / decisions.length;
+    // Calculate average constitutional confidence (0.0-1.0)
+    const averageConfidence = decisions.reduce((acc, d) => acc + d.confidence, 0) / decisions.length;
 
     // Calculate accuracy (% with positive outcomes)
     const positiveOutcomes = decisions.filter(d => d.actualOutcome.positive).length;
@@ -841,7 +834,7 @@ export class JourneyAnalyzer {
     const strategicDecisions = decisions.filter(d => {
       const goodOutcome = d.actualOutcome.positive;
       const highImpact = d.actualOutcome.impact === 'MAJOR' || d.actualOutcome.impact === 'TRANSFORMATIONAL';
-      const highConfidence = d.confidence === 'HIGH' || d.confidence === 'VERY_HIGH';
+      const highConfidence = d.confidence >= 0.7;
       return goodOutcome && highImpact && highConfidence;
     });
 
@@ -939,8 +932,8 @@ export class JourneyAnalyzer {
       else if (decision.actualOutcome.positive) score += 0.2;
       
       // Confidence calibration (0-0.3)
-      if (decision.confidence === 'HIGH' && decision.actualOutcome.positive) score += 0.3;
-      else if (decision.confidence === 'MODERATE') score += 0.15;
+      if (decision.confidence >= 0.7 && decision.actualOutcome.positive) score += 0.3;
+      else if (decision.confidence >= 0.4) score += 0.15;
       
       // Consideration of alternatives (0-0.3)
       if (decision.alternativesConsidered.length >= 2) score += 0.3;

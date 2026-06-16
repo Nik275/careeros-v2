@@ -132,6 +132,8 @@ export class ForecastEngine {
 
   // Forecast cache
   private forecastCache: Map<string, { forecast: Forecast; expiresAt: Date }> = new Map();
+  private careerResultCache: Map<string, { result: CareerForecastResult; expiresAt: Date }> = new Map();
+  private skillResultCache: Map<string, { result: SkillForecastResult; expiresAt: Date }> = new Map();
 
   constructor(config?: Partial<ForecastEngineConfig>) {
     this.config = { ...DEFAULT_FORECAST_CONFIG, ...config };
@@ -161,9 +163,9 @@ export class ForecastEngine {
 
     // Check cache
     const cacheKey = `career-${inputs.careerId}-${targetHorizon}`;
-    const cached = this.getCachedForecast(cacheKey);
+    const cached = this.getCachedCareerResult(cacheKey);
     if (cached) {
-      return { ...this.careerEngine.getForecast(inputs.careerId, targetHorizon)!, forecast: cached } as CareerForecastResult;
+      return cached;
     }
 
     // Generate forecast
@@ -171,7 +173,7 @@ export class ForecastEngine {
 
     // Cache result
     if (this.config.cacheForecasts) {
-      this.cacheForecast(cacheKey, result.forecast);
+      this.cacheCareerResult(cacheKey, result);
     }
 
     return result;
@@ -192,9 +194,9 @@ export class ForecastEngine {
 
     // Check cache
     const cacheKey = `skill-${inputs.skillId}-${targetHorizon}`;
-    const cached = this.getCachedForecast(cacheKey);
+    const cached = this.getCachedSkillResult(cacheKey);
     if (cached) {
-      return { ...this.skillEngine.getForecast(inputs.skillId, targetHorizon)!, forecast: cached } as SkillForecastResult;
+      return cached;
     }
 
     // Generate forecast
@@ -202,7 +204,7 @@ export class ForecastEngine {
 
     // Cache result
     if (this.config.cacheForecasts) {
-      this.cacheForecast(cacheKey, result.forecast);
+      this.cacheSkillResult(cacheKey, result);
     }
 
     return result;
@@ -504,9 +506,21 @@ export class ForecastEngine {
    * Invalidate cache for entity.
    */
   invalidateCache(entityId: string): void {
-    for (const [key, value] of this.forecastCache) {
-      if (key.startsWith(entityId)) {
+    for (const key of this.forecastCache.keys()) {
+      if (key.startsWith(entityId) || key.includes(`-${entityId}-`)) {
         this.forecastCache.delete(key);
+      }
+    }
+
+    for (const key of this.careerResultCache.keys()) {
+      if (key.startsWith(`career-${entityId}-`)) {
+        this.careerResultCache.delete(key);
+      }
+    }
+
+    for (const key of this.skillResultCache.keys()) {
+      if (key.startsWith(`skill-${entityId}-`)) {
+        this.skillResultCache.delete(key);
       }
     }
   }
@@ -516,6 +530,8 @@ export class ForecastEngine {
    */
   clearCache(): void {
     this.forecastCache.clear();
+    this.careerResultCache.clear();
+    this.skillResultCache.clear();
   }
 
   /**
@@ -527,7 +543,8 @@ export class ForecastEngine {
     validationCount: number;
   } {
     return {
-      totalCachedForecasts: this.forecastCache.size,
+      totalCachedForecasts:
+        this.forecastCache.size + this.careerResultCache.size + this.skillResultCache.size,
       cacheHitRate: 0, // Would need tracking
       validationCount: this.config.enableValidation
         ? this.validationEngine.getAccuracyStats().totalValidations
@@ -537,7 +554,7 @@ export class ForecastEngine {
 
   // Private methods
 
-  private getCachedForecast(key: string): Forecast | null {
+  private getCachedForecastByKey(key: string): Forecast | null {
     const cached = this.forecastCache.get(key);
 
     if (cached && cached.expiresAt > new Date()) {
@@ -556,6 +573,50 @@ export class ForecastEngine {
     expiresAt.setHours(expiresAt.getHours() + this.config.cacheTTL);
 
     this.forecastCache.set(key, { forecast, expiresAt });
+  }
+
+  private getCachedCareerResult(key: string): CareerForecastResult | null {
+    const cached = this.careerResultCache.get(key);
+
+    if (cached && cached.expiresAt > new Date()) {
+      return cached.result;
+    }
+
+    if (cached) {
+      this.careerResultCache.delete(key);
+    }
+
+    return null;
+  }
+
+  private cacheCareerResult(key: string, result: CareerForecastResult): void {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + this.config.cacheTTL);
+
+    this.careerResultCache.set(key, { result, expiresAt });
+    this.cacheForecast(key, result.forecast);
+  }
+
+  private getCachedSkillResult(key: string): SkillForecastResult | null {
+    const cached = this.skillResultCache.get(key);
+
+    if (cached && cached.expiresAt > new Date()) {
+      return cached.result;
+    }
+
+    if (cached) {
+      this.skillResultCache.delete(key);
+    }
+
+    return null;
+  }
+
+  private cacheSkillResult(key: string, result: SkillForecastResult): void {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + this.config.cacheTTL);
+
+    this.skillResultCache.set(key, { result, expiresAt });
+    this.cacheForecast(key, result.forecast);
   }
 }
 

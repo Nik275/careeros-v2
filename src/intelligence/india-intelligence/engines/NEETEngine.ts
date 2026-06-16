@@ -19,6 +19,9 @@ import {
   AlternativeMedicalPath,
   MedicalFinancialAnalysis,
   NEETRecommendation,
+  SpecializationPath,
+  PracticeOption,
+  MedicalEmployment,
   ExamAttempt,
   MedicalEducationPath,
   EconomicStratum,
@@ -73,9 +76,9 @@ export class NEETEngine {
     
     // Generate pathway options
     const governmentMBBS = eligibleSeats.filter(s => s.type === MedicalEducationPath.MBBS_GOV);
-    const privateMBBSIndia = this.generatePrivateMBBSOptions(bestRank, input);
+    const privateMBBSIndia = this.generatePrivateMBBS(input);
     const mbbsAbroad = this.generateAbroadOptions(input);
-    const alternativeMedical = this.generateAlternativePaths(bestRank, input);
+    const alternativeMedical = this.generateAlternativePaths(input);
     
     // Generate long-term outlook
     const specializationPathways = this.generateSpecializationPaths();
@@ -312,7 +315,7 @@ export class NEETEngine {
   /**
    * Generate private MBBS options
    */
-  private generatePrivateMBBS(rank: number, input: IndiaIntelligenceInput): MedicalSeat[] {
+  private generatePrivateMBBS(input: IndiaIntelligenceInput): MedicalSeat[] {
     const seats: MedicalSeat[] = [];
     const budget = input.profile.financialConstraints.maxEducationBudget;
     
@@ -422,10 +425,7 @@ export class NEETEngine {
   /**
    * Generate alternative medical paths
    */
-  private generateAlternativePaths(
-    rank: number,
-    input: IndiaIntelligenceInput
-  ): AlternativeMedicalPath[] {
+  private generateAlternativePaths(input: IndiaIntelligenceInput): AlternativeMedicalPath[] {
     const paths: AlternativeMedicalPath[] = [];
     
     // BDS
@@ -518,7 +518,7 @@ export class NEETEngine {
   /**
    * Generate specialization pathways
    */
-  private generateSpecializationPaths() {
+  private generateSpecializationPaths(): SpecializationPath[] {
     return [
       {
         field: 'Medicine/General Physician',
@@ -574,7 +574,7 @@ export class NEETEngine {
   /**
    * Generate practice options
    */
-  private generatePracticeOptions() {
+  private generatePracticeOptions(): PracticeOption[] {
     return [
       {
         type: 'OWN_CLINIC' as const,
@@ -614,7 +614,7 @@ export class NEETEngine {
   /**
    * Generate employment options
    */
-  private generateEmploymentOptions() {
+  private generateEmploymentOptions(): MedicalEmployment[] {
     return [
       {
         employer: 'Corporate Hospital (Apollo, Fortis, Max)',

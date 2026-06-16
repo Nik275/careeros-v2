@@ -200,6 +200,9 @@ export class MarketSignalEngine {
     return {
       ...signal,
       normalizedStrength: validation.normalizedStrength,
+      careerIdentifier: signal.careerIdentifier ?? signal.careerId,
+      unit: signal.unit ?? 'index',
+      geography: signal.geography ?? signal.metadata.geography,
       direction,
       weight: validation.weight,
       processedAt: new Date(),

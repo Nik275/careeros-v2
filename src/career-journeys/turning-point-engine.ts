@@ -385,7 +385,7 @@ export class TurningPointEngine {
         patterns.push({
           type: type as TurningPointType,
           frequency: count,
-          typicalImpact: avgImpact,
+          typicalImpact: this.toTypicalTrajectoryImpact(avgImpact),
           commonTiming: 'Recurring pattern',
         });
       }
@@ -651,6 +651,14 @@ export class TurningPointEngine {
     if (avg >= 1.5) return 'MODERATE';
     if (avg >= 0.5) return 'MINOR';
     return 'NEGLIGIBLE';
+  }
+
+  private toTypicalTrajectoryImpact(magnitude: ImpactLevel): TrajectoryImpact {
+    return {
+      direction: 'CHANGED_PATH',
+      magnitude,
+      duration: 'LONG_TERM',
+    };
   }
 
   private estimateTypicalTiming(turningPoints: TurningPoint[]): string {

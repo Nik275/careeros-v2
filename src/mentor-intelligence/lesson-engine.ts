@@ -340,14 +340,14 @@ export class LessonEngine {
       importance: lesson.importance,
       evidence: [{
         journeyId: journey.id,
-        situation: lesson.context,
+        situation: lesson.learnedFrom,
         action: lesson.lesson,
         outcome: 'Documented lesson',
         relevance: 1,
       }],
       applicability: {
         careerStages: [this.inferCareerStage(journey)],
-        situations: [lesson.context],
+        situations: [lesson.learnedFrom],
         prerequisites: [],
         minSimilarityScore: 0.5,
       },
@@ -589,7 +589,7 @@ export class LessonEngine {
 
   private categorizeLesson(lesson: LessonLearned): LessonCategory {
     const text = lesson.lesson.toLowerCase();
-    const context = lesson.context.toLowerCase();
+    const context = lesson.learnedFrom.toLowerCase();
 
     if (text.includes('skill') || text.includes('learn') || text.includes('study')) {
       return 'SKILL_DEVELOPMENT';
@@ -645,7 +645,7 @@ export class LessonEngine {
     if (lesson.importance === 'CRITICAL') confidence += 0.1;
 
     // Higher confidence for lessons with context
-    if (lesson.context && lesson.context.length > 10) confidence += 0.1;
+    if (lesson.learnedFrom && lesson.learnedFrom.length > 10) confidence += 0.1;
 
     return Math.min(confidence, 1) as ConfidenceLevel;
   }
@@ -698,7 +698,7 @@ export class LessonEngine {
     const importanceScores: Record<ImportanceLevel, number> = {
       'CRITICAL': 4,
       'HIGH': 3,
-      'MEDIUM': 2,
+      'MODERATE': 2,
       'LOW': 1,
     };
 

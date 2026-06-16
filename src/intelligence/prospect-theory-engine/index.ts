@@ -60,6 +60,11 @@ export {
   createBiasExplanationEngine,
 } from './BiasExplanationEngine';
 
+// Constants
+export {
+  DEFAULT_PROSPECT_THEORY_CONFIG,
+} from './types';
+
 // Types
 export type {
   // Core types
@@ -84,5 +89,4 @@ export type {
 
   // Configuration
   ProspectTheoryConfig,
-  DEFAULT_PROSPECT_THEORY_CONFIG,
 } from './types';

@@ -46,10 +46,6 @@ export type {
   ActionOutput,
   Action,
   PrioritizedAction,
-  ActionPriority,
-  ActionStatus,
-  ActionType,
-  TimeHorizon,
   PriorityScore,
   PriorityRoadmap,
 
@@ -64,7 +60,6 @@ export type {
   // Opportunity types
   Opportunity,
   OpportunityBundle,
-  OpportunityType,
   OpportunityLocation,
 
   // Execution types

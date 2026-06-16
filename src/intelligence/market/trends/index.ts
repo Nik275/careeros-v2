@@ -90,25 +90,33 @@ export {
 } from './models/TrendClassification';
 
 export {
-  TrendSnapshot,
   createTrendSnapshot,
   type SnapshotFrequency,
 } from './models/TrendSnapshot';
 
-export {
+export type {
+  TrendSnapshot,
+} from './models/TrendSnapshot';
+
+export type {
   TrendAnalysis,
-  createTrendAnalysis,
 } from './models/TrendAnalysis';
 
 export {
-  MarketMomentum,
   calculateMomentum,
   calculateMomentumTrend,
   type MomentumTrend,
 } from './models/MarketMomentum';
 
+export type {
+  MarketMomentum,
+} from './models/MarketMomentum';
+
 export {
-  TrendHistory,
   createTrendHistory,
   type TrendPoint,
+} from './models/TrendHistory';
+
+export type {
+  TrendHistory,
 } from './models/TrendHistory';

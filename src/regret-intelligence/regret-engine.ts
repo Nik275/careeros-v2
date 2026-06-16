@@ -22,7 +22,7 @@ import type {
 } from './regret-types';
 import type { CareerIntelligence, CareerId } from '@/career-intelligence/career-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
-import type { StudentLifeProfile } from '@/types/student-profile';
+import type { StudentLifeProfile } from '@/types/student-life-profile';
 import type { OptionalityAnalysis } from '@/optionality-intelligence/optionality-types';
 
 import { RegretCalculator, createRegretCalculator } from './regret-calculator';
@@ -402,7 +402,12 @@ export class RegretIntelligenceEngine {
     const result = await this.analyzeRegret(input);
 
     if (!result.success || !result.data) {
-      return result as RegretIntelligenceResult<RegretFactor[]>;
+      return {
+        success: false,
+        error: result.error,
+        errorMessage: result.errorMessage,
+        timestamp: result.timestamp,
+      };
     }
 
     const primaryFactors = this.factorEngine.getPrimaryFactors(

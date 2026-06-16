@@ -20,14 +20,18 @@
 
 // Models
 export {
-  MarketAwareCareerAnalysis,
-  ScoreWeights,
-  AnalysisConfig,
   DEFAULT_SCORE_WEIGHTS,
   DEFAULT_ANALYSIS_CONFIG,
   createMarketAwareAnalysis,
   compareAnalyses,
   validateConfig,
+} from './models/MarketAwareCareerAnalysis';
+
+export type {
+  MarketAwareCareerAnalysis,
+  MarketAwareCareerAnalysisInput,
+  ScoreWeights,
+  AnalysisConfig,
 } from './models/MarketAwareCareerAnalysis';
 
 // Adjustment Engine

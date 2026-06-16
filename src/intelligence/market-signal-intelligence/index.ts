@@ -225,6 +225,7 @@ export type {
   TimeSeriesPoint,
 
   // Output types
+  AggregatedMarketSignal,
   MarketTrend,
   MarketOpportunity,
   MarketRisk,
@@ -232,6 +233,8 @@ export type {
   EmergingCareer,
   MarketNarrative,
   MarketIntelligenceReport,
+  NormalizedEntityType,
+  NormalizedSignalType,
 
   // Engine configurations
   TrendDetectionConfig,

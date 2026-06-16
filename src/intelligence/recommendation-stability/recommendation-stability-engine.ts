@@ -33,6 +33,7 @@ import {
   StabilityTelemetry,
   MentorStabilityContext,
   RecommendationStabilityContext,
+  type PerturbationId,
   DEFAULT_STABILITY_ANALYSIS_CONFIG,
 } from './recommendation-stability-types';
 
@@ -199,9 +200,9 @@ export class RecommendationStabilityEngine {
    * Generate recommendations for all perturbed profiles
    */
   private async generateAllRecommendations(
-    perturbedProfiles: Array<{ id: string; dimensionScores: DimensionScoreMap }>
-  ): Promise<Map<string, RecommendationSet>> {
-    const recommendations = new Map<string, RecommendationSet>();
+    perturbedProfiles: Array<{ id: PerturbationId; dimensionScores: DimensionScoreMap }>
+  ): Promise<Map<PerturbationId, RecommendationSet>> {
+    const recommendations = new Map<PerturbationId, RecommendationSet>();
     
     // Process in batches to avoid overwhelming the recommendation generator
     const batchSize = 50;
@@ -213,9 +214,9 @@ export class RecommendationStabilityEngine {
         try {
           const recSet = await this.recommendationGenerator(profile.dimensionScores);
           return { id: profile.id, recSet };
-        } catch (error) {
+        } catch {
           // Log error and return empty recommendation set
-          console.error(`Failed to generate recommendations for perturbation ${profile.id}:`, error);
+          console.error('Failed to generate recommendations for a perturbation safely.');
           return { id: profile.id, recSet: this.createEmptyRecommendationSet() };
         }
       });
@@ -533,5 +534,4 @@ export type {
   StabilityTelemetry,
   MentorStabilityContext,
   RecommendationStabilityContext,
-  RecommendationGenerator,
 };

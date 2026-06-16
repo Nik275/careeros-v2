@@ -12,7 +12,7 @@
 // TYPE EXPORTS
 // ============================================================================
 
-export {
+export type {
   // Core Journey Types
   JourneyId,
   CareerJourney,
@@ -118,8 +118,11 @@ export {
 
 export {
   CareerJourneyEngine,
-  CareerJourneyEngineConfig,
   createCareerJourneyEngine,
+} from './career-journey-engine';
+
+export type {
+  CareerJourneyEngineConfig,
   ValidationResult,
   ValidationError,
   ValidationWarning,
@@ -127,6 +130,9 @@ export {
 
 export {
   JourneyAnalyzer,
+} from './journey-analyzer';
+
+export type {
   PatternDetectionResult,
   TrajectoryAnalysis,
   DecisionPatternAnalysis,
@@ -134,6 +140,9 @@ export {
 
 export {
   TurningPointEngine,
+} from './turning-point-engine';
+
+export type {
   CausalFactor,
   EffectAnalysis,
   TimingAnalysis,
@@ -141,6 +150,9 @@ export {
 
 export {
   CareerTransitionEngine,
+} from './career-transition-engine';
+
+export type {
   BridgeAnalysis,
   SuccessFactors,
   AlternativePath,
@@ -148,6 +160,9 @@ export {
 
 export {
   JourneyInsightsEngine,
+} from './journey-insights-engine';
+
+export type {
   InsightCategory,
   ComparativeInsight,
   ActionableRecommendation,

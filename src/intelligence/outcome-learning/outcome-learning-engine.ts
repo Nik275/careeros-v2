@@ -386,12 +386,12 @@ class OutcomeLearningEngine implements IOutcomeLearningEngine {
     // Register handlers for different target engines
     this.signalEngine.registerHandler('RECOMMENDATION', (signal) => {
       // Handle recommendation signals
-      console.debug(`Recommendation signal received: ${signal.signalId}`);
+      void signal;
     });
 
     this.signalEngine.registerHandler('DECISION', (signal) => {
       // Handle decision signals
-      console.debug(`Decision signal received: ${signal.signalId}`);
+      void signal;
     });
 
     this.signalEngine.registerHandler('CALIBRATION', (signal) => {

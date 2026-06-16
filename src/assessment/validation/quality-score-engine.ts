@@ -15,8 +15,8 @@ import type {
   QualityMetrics,
   ResponseTiming,
   ValidationConfig,
-  DEFAULT_VALIDATION_CONFIG,
 } from './validation-types';
+import { DEFAULT_VALIDATION_CONFIG } from './validation-types';
 
 /**
  * Calculates comprehensive quality scores for assessments.

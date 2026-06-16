@@ -22,6 +22,8 @@
 import type {
   IDecisionAuthority,
   DecisionConfig,
+  DecisionType,
+  DecisionStatus,
   DecisionInput,
   DecisionOutput,
   DecisionId,
@@ -42,7 +44,6 @@ import type {
   DecisionOption,
   DecisionContext,
   Conflict,
-  DecisionError,
   DecisionErrorType,
 } from './IDecisionAuthority';
 
@@ -56,6 +57,7 @@ import type { IDecisionEvents } from './DecisionEvents';
 import type { IDecisionAudit } from './DecisionAudit';
 
 import {
+  DecisionError,
   DEFAULT_DECISION_CONFIG,
   isValidDecisionInput,
 } from './DecisionTypes';
@@ -94,6 +96,46 @@ import {
   type CoalitionEvaluationInput,
   type PathInput,
 } from './coalition/CoalitionModule';
+
+function createDecisionTypeCounters(): Record<DecisionType, number> {
+  return {
+    'career-selection': 0,
+    'path-selection': 0,
+    'recommendation-ranking': 0,
+    'stakeholder-arbitration': 0,
+    'option-comparison': 0,
+    'conflict-resolution': 0,
+    'tradeoff-resolution': 0,
+    'reversibility-assessment': 0,
+    'timing-optimization': 0,
+    'quality-validation': 0,
+  };
+}
+
+function createDecisionStatusCounters(): Record<DecisionStatus, number> {
+  return {
+    pending: 0,
+    ranking: 0,
+    comparing: 0,
+    arbitrating: 0,
+    selecting: 0,
+    completed: 0,
+    rejected: 0,
+    appealed: 0,
+  };
+}
+
+function createInitialDecisionMetrics(): DecisionMetrics {
+  return {
+    totalDecisions: 0,
+    decisionsByType: createDecisionTypeCounters(),
+    decisionsByStatus: createDecisionStatusCounters(),
+    avgProcessingTime: 0,
+    avgConfidence: 0.5,
+    errorRate: 0,
+    appealsRate: 0,
+  };
+}
 
 /**
  * Decision Authority implementation.
@@ -150,15 +192,7 @@ export class DecisionAuthority implements IDecisionAuthority {
     this.coalitionModule = modules?.coalitionModule ?? createCoalitionModule();
 
     // Initialize metrics
-    this.metrics = {
-      totalDecisions: 0,
-      decisionsByType: {} as Record<string, number>,
-      decisionsByStatus: {} as Record<string, number>,
-      avgProcessingTime: 0,
-      avgConfidence: 0.5,
-      errorRate: 0,
-      appealsRate: 0,
-    };
+    this.metrics = createInitialDecisionMetrics();
   }
 
   /**
@@ -194,7 +228,10 @@ export class DecisionAuthority implements IDecisionAuthority {
       audit = this.auditor.addStep(audit, {
         step: 'ranking',
         duration: 0,
-        inputs: { options: input.options.map(o => o.id) },
+        inputs: {
+          context: input.context,
+          options: input.options.map(o => o.id),
+        },
         outputs: {},
         moduleVersion: this.ranker.getVersion(),
       });
@@ -603,15 +640,7 @@ export class DecisionAuthority implements IDecisionAuthority {
    * Reset metrics.
    */
   resetMetrics(): void {
-    this.metrics = {
-      totalDecisions: 0,
-      decisionsByType: {},
-      decisionsByStatus: {},
-      avgProcessingTime: 0,
-      avgConfidence: 0.5,
-      errorRate: 0,
-      appealsRate: 0,
-    };
+    this.metrics = createInitialDecisionMetrics();
   }
 
   /**
@@ -791,12 +820,15 @@ export class DecisionAuthority implements IDecisionAuthority {
     rank: number;
   }> {
     // Convert to decision options for ranking
-    const options: DecisionOption[] = pathAnalyses.map(analysis => ({
+    const options: Array<DecisionOption<PathInput> & { score: number; confidence: number }> = pathAnalyses.map(analysis => ({
       id: analysis.path.id,
       type: analysis.path.type === 'primary' ? 'career' : 'pathway',
       data: analysis.path,
       source: 'coalition-analysis',
       createdAt: new Date(),
+      metadata: {
+        sourceConfidence: analysis.aggregate.stabilityScore / 100,
+      },
       confidence: analysis.aggregate.stabilityScore / 100,
       score: analysis.aggregate.stabilityScore,
     }));
@@ -806,7 +838,7 @@ export class DecisionAuthority implements IDecisionAuthority {
 
     // Map back to coalition analyses with ranks
     return ranked.map((result, index) => {
-      const analysis = pathAnalyses.find(a => a.path.id === result.option.id)!;
+      const analysis = pathAnalyses.find(a => a.path.id === result.id)!;
       return {
         ...analysis,
         rank: index + 1,
@@ -829,13 +861,17 @@ export class DecisionAuthority implements IDecisionAuthority {
     comparisonText: string;
   } {
     // Use comparator for structured comparison
-    const options: DecisionOption[] = [
+    const options: Array<DecisionOption<PathInput> & { score: number }> = [
       {
         id: pathA.path.id,
         type: 'career',
         data: pathA.path,
         source: 'coalition',
         createdAt: new Date(),
+        metadata: {
+          sourceConfidence: pathA.aggregate.stabilityScore / 100,
+          score: pathA.aggregate.stabilityScore,
+        },
         score: pathA.aggregate.stabilityScore,
       },
       {
@@ -844,6 +880,10 @@ export class DecisionAuthority implements IDecisionAuthority {
         data: pathB.path,
         source: 'coalition',
         createdAt: new Date(),
+        metadata: {
+          sourceConfidence: pathB.aggregate.stabilityScore / 100,
+          score: pathB.aggregate.stabilityScore,
+        },
         score: pathB.aggregate.stabilityScore,
       },
     ];
@@ -906,12 +946,16 @@ export class DecisionAuthority implements IDecisionAuthority {
     }
 
     // Use selector to pick top path
-    const options: DecisionOption[] = rankedPaths.map(r => ({
+    const options: Array<DecisionOption<PathInput> & { score: number; confidence: number }> = rankedPaths.map(r => ({
       id: r.path.id,
       type: 'career',
       data: r.path,
       source: 'coalition',
       createdAt: new Date(),
+      metadata: {
+        sourceConfidence: r.aggregate.stabilityScore / 100,
+        score: r.aggregate.stabilityScore,
+      },
       score: r.aggregate.stabilityScore,
       confidence: r.aggregate.stabilityScore / 100,
     }));
@@ -963,58 +1007,71 @@ export class DecisionAuthority implements IDecisionAuthority {
    *
    * Generates explanation using the Explanation Authority.
    */
-  explainCoalitionDecision(context: {
+  async explainCoalitionDecision(context: {
     selectedPath: PathInput;
     rankedPaths: Array<{ path: PathInput; aggregate: CoalitionAggregateScores }>;
     dynamics: CoalitionDynamics;
     conflicts: MemberConflict[];
-  }): {
+  }): Promise<{
     summary: string;
     details: string;
     factors: string[];
     concerns: string[];
-  } {
-    const explanation = this.explainer.explain({
-      type: 'coalition-recommendation',
-      context: {
-        description: `Coalition analysis for ${context.selectedPath.name}`,
-      },
-      options: context.rankedPaths.map(r => ({
-        id: r.path.id,
+  }> {
+    const rankedOptions: Array<RankedDecisionOption<PathInput>> = context.rankedPaths.map((rankedPath, index) => {
+      const score = rankedPath.aggregate.stabilityScore;
+      return {
+        id: rankedPath.path.id,
         type: 'career',
-        data: r.path,
+        data: rankedPath.path,
         source: 'coalition',
         createdAt: new Date(),
-        score: r.aggregate.stabilityScore,
-      })),
-      selection: {
-        winner: {
-          id: context.selectedPath.id,
-          type: 'career',
-          data: context.selectedPath,
-          source: 'coalition',
-          createdAt: new Date(),
+        metadata: {
+          sourceConfidence: score / 100,
+          score,
         },
-        ranking: context.rankedPaths.map((r, i) => ({
-          optionId: r.path.id,
-          rank: i + 1,
-          score: r.aggregate.stabilityScore,
-        })),
-        method: 'coalition-stability',
+        rank: index + 1,
+        score,
+        normalizedScore: score / 100,
+      };
+    });
+
+    const winner = rankedOptions.find((option) => option.id === context.selectedPath.id) ?? rankedOptions[0];
+    if (!winner) {
+      throw new Error('No ranked paths available for coalition explanation');
+    }
+
+    const explanation = await this.explainer.explain(
+      rankedOptions,
+      winner,
+      {
+        studentId: 'coalition-analysis',
+        sessionId: 'coalition-analysis',
+        timestamp: new Date(),
+        description: `Coalition analysis for ${context.selectedPath.name}`,
       },
+      [],
+      undefined,
+      {
+        level: 'standard',
+        includeScores: true,
+        includeComparisons: false,
+        includeArbitration: false,
+        includeAlternatives: true,
+      }
+    );
+
+    return {
+      summary: explanation.summary,
+      details: explanation.details,
       factors: [
+        ...explanation.keyFactors,
         `Coalition stability: ${context.rankedPaths[0]?.aggregate.stabilityScore || 0}/100`,
         `Consensus level: ${context.dynamics.consensusLevel}`,
         `Strong support: ${context.dynamics.strongSupport.length} members`,
         `Opposition: ${context.dynamics.opposition.length} members`,
         `Conflicts: ${context.conflicts.length} identified`,
       ],
-    }, 'standard');
-
-    return {
-      summary: explanation.summary,
-      details: explanation.details,
-      factors: explanation.factors,
       concerns: context.dynamics.opposition.map(m => `${m} has reservations`),
     };
   }
@@ -1034,27 +1091,40 @@ export class DecisionAuthority implements IDecisionAuthority {
    * Update metrics.
    */
   private updateMetrics(
-    type: string,
+    type: DecisionType,
     success: boolean,
     duration: number,
     confidence: number
   ): void {
-    this.metrics.totalDecisions++;
+    const totalDecisions = this.metrics.totalDecisions + 1;
     
     // Update by type
-    this.metrics.decisionsByType[type] = (this.metrics.decisionsByType[type] ?? 0) + 1;
+    const decisionsByType = {
+      ...this.metrics.decisionsByType,
+      [type]: (this.metrics.decisionsByType[type] ?? 0) + 1,
+    };
     
     // Update by status
-    const status = success ? 'completed' : 'rejected';
-    this.metrics.decisionsByStatus[status] = (this.metrics.decisionsByStatus[status] ?? 0) + 1;
+    const status: DecisionStatus = success ? 'completed' : 'rejected';
+    const decisionsByStatus = {
+      ...this.metrics.decisionsByStatus,
+      [status]: (this.metrics.decisionsByStatus[status] ?? 0) + 1,
+    };
     
     // Update average processing time
-    const totalTime = this.metrics.avgProcessingTime * (this.metrics.totalDecisions - 1) + duration;
-    this.metrics.avgProcessingTime = totalTime / this.metrics.totalDecisions;
+    const totalTime = this.metrics.avgProcessingTime * (totalDecisions - 1) + duration;
     
     // Update average confidence
-    const totalConfidence = this.metrics.avgConfidence * (this.metrics.totalDecisions - 1) + confidence;
-    this.metrics.avgConfidence = totalConfidence / this.metrics.totalDecisions;
+    const totalConfidence = this.metrics.avgConfidence * (totalDecisions - 1) + confidence;
+
+    this.metrics = {
+      ...this.metrics,
+      totalDecisions,
+      decisionsByType,
+      decisionsByStatus,
+      avgProcessingTime: totalTime / totalDecisions,
+      avgConfidence: totalConfidence / totalDecisions,
+    };
   }
 }
 

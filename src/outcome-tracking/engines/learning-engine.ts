@@ -159,7 +159,7 @@ export class LearningEngineImpl implements LearningEngine {
    * Validate existing patterns against new data.
    */
   async validatePatterns(patternIds: string[]): Promise<PatternValidationResult> {
-    const results = [];
+    const results: PatternValidationResult['results'] = [];
 
     for (const patternId of patternIds) {
       const pattern = this.patterns.get(patternId);

@@ -7,13 +7,13 @@
  * @version 1.0.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import type {
   Confidence,
   ConfidenceValue,
   AggregationMethod,
   ConfidenceFactor,
 } from './ConfidenceTypes';
+import { uuidv4 } from './ConfidenceId';
 import { validateConfidence, getReliabilityBand, createDefaultBounds } from './ConfidenceTypes';
 
 // ============================================================================

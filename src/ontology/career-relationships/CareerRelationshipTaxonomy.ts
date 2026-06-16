@@ -401,6 +401,10 @@ export type CareerRelationship =
   | CareerToCertificationRelationshipEntity
   | CareerToRoleRelationshipEntity;
 
+export type RelationshipValidationInput = Omit<CareerRelationship, 'metadata'> & {
+  metadata: RelationshipMetadata;
+};
+
 // ============================================================================
 // RELATIONSHIP TYPE GUARDS
 // ============================================================================
@@ -493,7 +497,9 @@ export class RelationshipBuilder {
     return this;
   }
 
-  withMetadata(metadata: Partial<RelationshipMetadata>): this {
+  withMetadata<TMetadata extends RelationshipMetadata>(
+    metadata: Partial<TMetadata>
+  ): this {
     this.metadata = { ...this.metadata, ...metadata };
     return this;
   }
@@ -652,7 +658,7 @@ export interface RelationshipValidationResult {
  * Validate a career relationship
  */
 export function validateRelationship(
-  relationship: CareerRelationship
+  relationship: RelationshipValidationInput
 ): RelationshipValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];

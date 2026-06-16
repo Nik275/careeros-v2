@@ -352,13 +352,13 @@ describe('StudentProfile Domain', () => {
       it('should set academic performance', () => {
         const profile = builder
           .withAcademicPerformance({
-            stage: EducationStage.HIGH_SCHOOL_12,
+            stage: EducationStage.HIGH_SCHOOL_11_12,
             stream: AcademicStream.SCIENCE,
             overallScore: 0.85,
           })
           .build();
 
-        expect(profile.academic.performance.stage).toBe(EducationStage.HIGH_SCHOOL_12);
+        expect(profile.academic.performance.stage).toBe(EducationStage.HIGH_SCHOOL_11_12);
         expect(profile.academic.performance.stream).toBe(AcademicStream.SCIENCE);
         expect(profile.academic.performance.overallScore).toBe(0.85);
       });
@@ -691,7 +691,7 @@ describe('StudentProfile Domain', () => {
           localInstitutionQuality: 'good',
         })
         .withAcademicPerformance({
-          stage: EducationStage.HIGH_SCHOOL_12,
+          stage: EducationStage.HIGH_SCHOOL_11_12,
           stream: AcademicStream.SCIENCE,
           board: EducationBoard.CBSE,
           gradeScale: GradeScale.PERCENTAGE,

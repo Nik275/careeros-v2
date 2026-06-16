@@ -281,7 +281,7 @@ export class OptionClosureEngine {
           name: opp,
           category: 'CAREER',
           reason: `Requires ${domain} background`,
-          reversibility: this.getReversibility(decisionType),
+          reversibility: this.getReversibility(decisionType, option),
         });
       });
     }
@@ -337,14 +337,25 @@ export class OptionClosureEngine {
   /**
    * Get reversibility for an opportunity
    */
-  private getReversibility(decisionType: CriticalityDecisionType): 
+  private getReversibility(decisionType: CriticalityDecisionType, option: CriticalityOption): 
     'REVERSIBLE' | 'PARTIALLY_REVERSIBLE' | 'IRREVERSIBLE' {
     const reversible: CriticalityDecisionType[] = ['COLLEGE_SELECTION', 'LOCATION_DECISION', 'JOB_ACCEPTANCE'];
-    const irreversible: CriticalityDecisionType[] = ['CAREER_SWITCHING', 'MEDICAL_PRACTICE'];
+    const irreversible: CriticalityDecisionType[] = ['CAREER_SWITCHING'];
     
     if (reversible.includes(decisionType)) return 'REVERSIBLE';
+    if (this.isMedicalPracticeOption(option)) return 'IRREVERSIBLE';
     if (irreversible.includes(decisionType)) return 'IRREVERSIBLE';
     return 'PARTIALLY_REVERSIBLE';
+  }
+
+  private isMedicalPracticeOption(option: CriticalityOption): boolean {
+    const normalizedName = option.name.toLowerCase();
+    const normalizedDescription = option.description.toLowerCase();
+    const medicalTerms = ['medical practice', 'medicine', 'mbbs', 'doctor', 'surgeon', 'clinical'];
+
+    return medicalTerms.some(term =>
+      normalizedName.includes(term) || normalizedDescription.includes(term)
+    );
   }
 
   /**

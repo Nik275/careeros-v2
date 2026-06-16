@@ -211,9 +211,7 @@ export class CommitmentCostEngine {
     const breadth = 100 - score;
 
     // Transferability from optionality
-    const transferableSkillsDim = optionalityAnalysis.dimensions?.find(
-      (d) => d.name === 'Transferable Skills'
-    );
+    const transferableSkillsDim = optionalityAnalysis.dimensions?.transferableSkills;
     const transferability = transferableSkillsDim
       ? transferableSkillsDim.score * 100
       : 50;
@@ -304,7 +302,7 @@ export class CommitmentCostEngine {
     }
 
     // Financial lock-in
-    if (criticalityAnalysis.metrics.reachableCareers?.value || 10 < 10) {
+    if (criticalityAnalysis.metrics.reachableCareerCount.value < 10) {
       effects.push({
         type: 'financial',
         severity: 'moderate',

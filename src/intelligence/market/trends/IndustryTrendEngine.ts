@@ -162,7 +162,20 @@ export class IndustryTrendEngine {
     for (const metricType of this.config.trackedMetrics) {
       const metricSnapshots = industrySnapshots.filter((s) => s.metricType === metricType);
       if (metricSnapshots.length >= 3) {
-        metrics[metricType] = this.analyzeMetric(metricSnapshots);
+        switch (metricType) {
+          case 'expansion':
+            metrics.expansion = this.analyzeMetric(metricSnapshots);
+            break;
+          case 'hiring':
+            metrics.hiring = this.analyzeMetric(metricSnapshots);
+            break;
+          case 'investment':
+            metrics.investment = this.analyzeMetric(metricSnapshots);
+            break;
+          case 'confidence':
+            metrics.confidence = this.analyzeConfidenceMetric(metricSnapshots);
+            break;
+        }
       }
     }
 
@@ -240,8 +253,9 @@ export class IndustryTrendEngine {
       const comparisonMetric = comparisonAnalysis.metrics[metric];
 
       if (baseMetric && comparisonMetric) {
-        const baseScore = baseMetric.momentum;
-        const comparisonScore = comparisonMetric.momentum;
+        const baseScore = 'momentum' in baseMetric ? baseMetric.momentum : baseMetric.level;
+        const comparisonScore =
+          'momentum' in comparisonMetric ? comparisonMetric.momentum : comparisonMetric.level;
         const diff = comparisonScore - baseScore;
 
         let winner: 'base' | 'comparison' | 'tie';
@@ -395,14 +409,34 @@ export class IndustryTrendEngine {
   }
 
   /**
+   * Analyze a confidence metric.
+   */
+  private analyzeConfidenceMetric(snapshots: TrendSnapshot[]): {
+    classification: TrendClassification;
+    level: number;
+    trend: TrendClassification;
+  } {
+    const metric = this.analyzeMetric(snapshots);
+    const sorted = [...snapshots].sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    );
+
+    return {
+      classification: metric.classification,
+      level: Math.round(sorted[sorted.length - 1].value),
+      trend: metric.classification,
+    };
+  }
+
+  /**
    * Calculate composite scores.
    */
   private calculateScores(metrics: IndustryTrendAnalysis['metrics']): IndustryTrendAnalysis['scores'] {
-    const metricValues = Object.values(metrics).filter(Boolean) as Array<{
-      momentum: number;
-    }>;
+    const momentumValues = Object.values(metrics)
+      .filter((metric): metric is NonNullable<typeof metric> => metric !== undefined)
+      .map((metric) => ('momentum' in metric ? metric.momentum : metric.level));
 
-    if (metricValues.length === 0) {
+    if (momentumValues.length === 0) {
       return {
         overall: 50,
         momentum: 50,
@@ -412,7 +446,7 @@ export class IndustryTrendEngine {
     }
 
     const momentum = Math.round(
-      metricValues.reduce((sum, m) => sum + m.momentum, 0) / metricValues.length
+      momentumValues.reduce((sum, value) => sum + value, 0) / momentumValues.length
     );
 
     // Overall score weighted toward expansion and hiring

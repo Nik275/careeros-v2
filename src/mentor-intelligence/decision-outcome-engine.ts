@@ -471,7 +471,7 @@ export class DecisionOutcomeEngine {
     const careerStage = this.inferCareerStage(journey);
 
     // Extract constraints
-    const constraints = journey.constraints.map(c => c.description);
+    const constraints = journey.startingPoint.initialConstraints.map(c => c.description);
 
     // Infer information availability
     const informationAvailability: DecisionContext['informationAvailability'] =
@@ -480,14 +480,14 @@ export class DecisionOutcomeEngine {
 
     // Infer time pressure
     const timePressure: DecisionContext['timePressure'] =
-      decision.confidence === 'LOW' ? 'URGENT' :
-      decision.confidence === 'MEDIUM' ? 'MODERATE' : 'RELAXED';
+      decision.confidence < 0.4 ? 'URGENT' :
+      decision.confidence < 0.7 ? 'MODERATE' : 'RELAXED';
 
     // Infer stakes
     const stakes: DecisionContext['stakes'] =
-      decision.importance === 'CRITICAL' ? 'LIFE_CHANGING' :
-      decision.importance === 'HIGH' ? 'HIGH' :
-      decision.importance === 'MEDIUM' ? 'MODERATE' : 'LOW';
+      decision.actualOutcome.impact === 'TRANSFORMATIONAL' ? 'LIFE_CHANGING' :
+      decision.actualOutcome.impact === 'MAJOR' ? 'HIGH' :
+      decision.actualOutcome.impact === 'MODERATE' ? 'MODERATE' : 'LOW';
 
     return {
       careerStage,
@@ -597,7 +597,13 @@ export class DecisionOutcomeEngine {
         consequence: tp.event,
         timeframe: this.inferTimeframe(tp.timestamp, decision.timestamp),
         impact: tp.positiveEffects.length > tp.negativeEffects.length ? 'POSITIVE' : 'NEGATIVE',
-        magnitude: tp.importance,
+        magnitude: tp.importance === 'CRITICAL'
+          ? 'TRANSFORMATIONAL'
+          : tp.importance === 'HIGH'
+          ? 'MAJOR'
+          : tp.importance === 'MODERATE'
+          ? 'MODERATE'
+          : 'MINOR',
         foreseeable: false,
       });
     }

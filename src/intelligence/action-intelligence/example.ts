@@ -19,9 +19,8 @@ import type {
   StudentBelief,
   CareerPath,
   CareerRecommendation,
-  DecisionAnalysis,
-  MarketInsight,
 } from '../types';
+import { EvidenceSource, StrengthCategory } from '../types';
 
 /**
  * Example 1: Basic Usage - Software Engineer Career Path
@@ -105,6 +104,11 @@ export function example4_SkillGapAnalysis(): void {
   const input = createSampleInput();
   const output = engine.generate(input);
 
+  if (!output.skillGapAnalysis) {
+    console.log('No skill gap analysis available.');
+    return;
+  }
+
   console.log(`Target: ${output.skillGapAnalysis.targetId}\n`);
 
   console.log('Critical Skill Gaps:');
@@ -130,20 +134,24 @@ export function example5_WeeklyPlan(): void {
   const output = engine.generate(input);
 
   const weeklyPlan = output.weeklyPlan;
+  if (!weeklyPlan) {
+    console.log('No weekly plan available.');
+    return;
+  }
 
   console.log(`Week ${weeklyPlan.weekNumber}: ${weeklyPlan.focus}\n`);
 
   console.log('Goals:');
-  weeklyPlan.goals.forEach(goal => console.log(`- ${goal}`));
+  weeklyPlan.goals?.forEach(goal => console.log(`- ${goal}`));
 
   console.log('\nTime Budget:');
-  console.log(`- Total: ${weeklyPlan.timeBudget.totalHours} hours`);
-  console.log(`- Study: ${weeklyPlan.timeBudget.studyHours} hours`);
-  console.log(`- Practice: ${weeklyPlan.timeBudget.practiceHours} hours`);
-  console.log(`- Networking: ${weeklyPlan.timeBudget.networkingHours} hours`);
+  console.log(`- Total: ${weeklyPlan.timeBudget?.totalHours ?? 0} hours`);
+  console.log(`- Study: ${weeklyPlan.timeBudget?.studyHours ?? 0} hours`);
+  console.log(`- Practice: ${weeklyPlan.timeBudget?.practiceHours ?? 0} hours`);
+  console.log(`- Networking: ${weeklyPlan.timeBudget?.networkingHours ?? 0} hours`);
 
   console.log('\nActions:');
-  weeklyPlan.actions.forEach(action => {
+  weeklyPlan.actions?.forEach(action => {
     console.log(`\n[${action.priority}] ${action.title}`);
     console.log(`  ${action.description.slice(0, 100)}...`);
     console.log(`  Duration: ${action.estimatedDuration} hours`);
@@ -190,12 +198,12 @@ export function example7_Explanations(): void {
 
   console.log('Why These Actions Matter:\n');
 
-  output.explanations.slice(0, 3).forEach((explanation, index) => {
+  output.explanations?.slice(0, 3).forEach((explanation, index) => {
     const action = output.allActions.find(a => a.id === explanation.actionId);
     if (!action) return;
 
     console.log(`${index + 1}. ${action.title}\n`);
-    console.log(`   Why this matters: ${explanation.whyThisMatter}`);
+    console.log(`   Why this matters: ${explanation.whyThisMatters}`);
     console.log(`   How it fits: ${explanation.howItFits}`);
     console.log(`   Expected outcome: ${explanation.expectedOutcome}`);
 
@@ -294,109 +302,86 @@ export function example10_Configuration(): void {
 function createSampleInput(): ActionIntelligenceInput {
   const studentBelief: StudentBelief = {
     id: 'student_001',
-    type: 'STUDENT',
+    studentId: 'student_001',
+    version: 1,
     timestamp: Date.now(),
-    confidence: 0.9,
-
-    // Personal info
-    personal: {
-      name: 'Rahul Sharma',
-      email: 'rahul.sharma@example.com',
-      age: 22,
-    },
-
-    // Academic info
-    academic: {
-      institution: 'Delhi Technological University',
-      program: 'B.Tech Computer Science',
-      yearOfStudy: 'Final Year',
-      graduationYear: 2025,
-      gpa: 8.2,
-      courses: [
-        'Data Structures',
-        'Algorithms',
-        'Database Systems',
-        'Web Development',
-        'Machine Learning',
-      ],
-    },
-
-    // Skills
+    motivations: [],
     strengths: [
       {
         id: 'strength_001',
         name: 'Programming',
-        type: 'SKILL',
-        category: 'TECHNICAL',
+        category: StrengthCategory.TECHNICAL,
+        description: 'Can build software projects using modern programming tools',
         level: 0.7,
-        evidence: [{ explanation: 'Built multiple projects' }],
+        evidence: [{
+          id: 'evidence_001',
+          source: EvidenceSource.VALIDATED,
+          rawData: 'portfolio_projects',
+          timestamp: Date.now(),
+          confidence: 0.8,
+          explanation: 'Built multiple projects',
+        }],
+        isSelfReported: true,
       },
       {
         id: 'strength_002',
         name: 'Problem Solving',
-        type: 'SKILL',
-        category: 'COGNITIVE',
+        category: StrengthCategory.COGNITIVE,
+        description: 'Can solve algorithmic and analytical problems',
         level: 0.75,
-        evidence: [{ explanation: 'Good at competitive programming' }],
+        evidence: [{
+          id: 'evidence_002',
+          source: EvidenceSource.VALIDATED,
+          rawData: 'competitive_programming',
+          timestamp: Date.now(),
+          confidence: 0.8,
+          explanation: 'Good at competitive programming',
+        }],
+        isSelfReported: true,
       },
     ],
-
-    // Interests
-    interests: [
-      {
-        id: 'interest_001',
-        domain: 'Software Development',
-        strength: 0.9,
-      },
-      {
-        id: 'interest_002',
-        domain: 'AI/ML',
-        strength: 0.7,
-      },
-    ],
-
-    // Current state
-    currentContext: {
-      currentRole: 'Final Year Student',
-      currentSkills: ['JavaScript', 'Python', 'React', 'Node.js'],
-      availableHoursPerWeek: 15,
-      constraints: {
-        canRelocate: true,
-        preferredLocations: ['Bangalore', 'Hyderabad', 'Remote'],
-      },
+    values: [],
+    personalityTraits: [],
+    lifestylePreferences: [],
+    constraints: [],
+    overallConfidence: 0.9,
+    isValidated: true,
+    metadata: {
+      assessmentQuestionCount: 0,
+      inferenceStepCount: 0,
+      contributingEngines: ['action-intelligence-example'],
+      assessmentDuration: 0,
     },
   };
 
   return {
     studentBelief,
     targetCareer: 'Software Engineer',
+    timestamp: Date.now(),
 
     // Constraints
     constraints: {
       financial: {
         budget: 50000,
+        canTakeLoan: false,
         monthlyLimit: 5000,
-        currency: 'INR',
       },
       temporal: {
         maxHoursPerWeek: 15,
-        preferredStudyTimes: ['evening', 'weekend'],
       },
       location: {
         canRelocate: true,
-        preferredLocations: ['Bangalore', 'Hyderabad', 'Remote'],
+        preferredCities: ['Bangalore', 'Hyderabad', 'Remote'],
       },
     },
 
     // Current context
     currentContext: {
+      currentEducationLevel: 'Final Year B.Tech Computer Science',
       currentRole: 'Final Year Student',
       currentSkills: ['JavaScript', 'Python', 'React', 'Node.js'],
+      currentCommitments: ['Coursework', 'Placement preparation'],
       availableHoursPerWeek: 15,
-      constraints: {
-        canRelocate: true,
-        preferredLocations: ['Bangalore', 'Hyderabad', 'Remote'],
-      },
     },
   };
 }
@@ -440,8 +425,8 @@ function displayResults(output: ActionOutput): void {
   console.log('--- THIS WEEK ---');
   if (output.weeklyPlan) {
     console.log(`Focus: ${output.weeklyPlan.focus}`);
-    console.log(`Actions: ${output.weeklyPlan.actions.length}`);
-    console.log(`Time Budget: ${output.weeklyPlan.timeBudget.totalHours} hours\n`);
+    console.log(`Actions: ${output.weeklyPlan.actions?.length ?? 0}`);
+    console.log(`Time Budget: ${output.weeklyPlan.timeBudget?.totalHours ?? 0} hours\n`);
   }
 
   console.log('--- NEXT REVIEW ---');

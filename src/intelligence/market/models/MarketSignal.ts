@@ -17,7 +17,9 @@ export type MarketSignalType =
   | 'job_postings'
   | 'salary_growth'
   | 'skill_growth'
+  | 'hiring_rate'
   | 'layoffs'
+  | 'automation_risk'
   | 'government_push'
   | 'startup_activity'
   | 'investment_flow';
@@ -42,6 +44,11 @@ export type MarketSignalSource =
   | 'research_report';
 
 /**
+ * Direction of normalized market impact.
+ */
+export type MarketSignalDirection = 'positive' | 'negative' | 'neutral';
+
+/**
  * Raw market signal captured from external sources.
  * 
  * This is the raw input to the market intelligence system.
@@ -53,6 +60,12 @@ export interface MarketSignal {
 
   /** Career this signal relates to */
   readonly careerId: string;
+
+  /** Human-readable career title if supplied by a provider */
+  readonly careerTitle?: string;
+
+  /** Provider-specific career identifier if different from careerId */
+  readonly careerIdentifier?: string;
 
   /** Source of the signal */
   readonly source: MarketSignalSource;
@@ -71,6 +84,12 @@ export interface MarketSignal {
 
   /** Raw data payload (source-specific) */
   readonly rawData: Record<string, unknown>;
+
+  /** Signal unit if supplied by a provider */
+  readonly unit?: string;
+
+  /** Flattened geography if supplied by a provider */
+  readonly geography?: string;
 
   /** Processing metadata */
   readonly metadata: {
@@ -92,6 +111,11 @@ export interface MarketSignal {
 }
 
 /**
+ * Processing metadata attached to a market signal.
+ */
+export type MarketSignalMetadata = MarketSignal['metadata'];
+
+/**
  * Validated and normalized market signal.
  * 
  * Output from MarketSignalEngine after processing.
@@ -100,8 +124,17 @@ export interface NormalizedMarketSignal extends MarketSignal {
   /** Normalized strength (0-100, always positive) */
   readonly normalizedStrength: number;
 
+  /** Provider/source career identifier used by profile scoring */
+  readonly careerIdentifier: string;
+
+  /** Signal unit used by profile scoring */
+  readonly unit: string;
+
+  /** Flattened geography used by profile scoring */
+  readonly geography: string;
+
   /** Direction of signal (positive/negative impact) */
-  readonly direction: 'positive' | 'negative' | 'neutral';
+  readonly direction: MarketSignalDirection;
 
   /** Weight based on source reliability and confidence */
   readonly weight: number;

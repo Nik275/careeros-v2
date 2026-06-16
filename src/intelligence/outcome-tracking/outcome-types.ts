@@ -507,6 +507,7 @@ export interface LearningSignal {
     studentId: StudentId;
     recommendationId?: RecommendationId;
     predictionId?: PredictionId;
+    outcomeType?: string;
     expectedOutcome: unknown;
     actualOutcome: unknown;
     errorMagnitude: number;

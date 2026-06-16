@@ -36,6 +36,14 @@ import type {
 
 import { DEFAULT_MARKET_ADJUSTMENT_CALCULATOR_CONFIG } from './types.js';
 
+type SalaryAdjustmentCapable = {
+  calculateSalaryAdjustment?: (salaryGrowth: number) => number;
+};
+
+type DemandSignalTrend = MarketIntelligenceReport['trend'] & {
+  signalType?: string;
+};
+
 // ============================================================================
 // MARKET ADJUSTMENT CALCULATOR
 // ============================================================================
@@ -60,7 +68,8 @@ export class MarketAdjustmentCalculator {
 
     // Calculate component adjustments
     const demandAdjustment = this.calculateDemandAdjustment(factors.demand);
-    const salaryAdjustment = this.calculateSalaryAdjustment(factors.salaryGrowth);
+    const salaryAdjustment =
+      (this as unknown as SalaryAdjustmentCapable).calculateSalaryAdjustment?.(factors.salaryGrowth) ?? 0;
     const competitionAdjustment = this.calculateCompetitionAdjustment(factors.competition);
     const automationAdjustment = this.calculateAutomationAdjustment(factors.automationRisk);
     const outlookAdjustment = this.calculateOutlookAdjustment(factors.industryOutlook);
@@ -140,7 +149,7 @@ export class MarketAdjustmentCalculator {
     // From opportunity score component or trend
     const opportunityDemand = report.opportunity.scoreComponents.demand / 100;
 
-    if (report.trend.signalType === 'demand') {
+    if ((report.trend as DemandSignalTrend).signalType === 'demand') {
       return (opportunityDemand + report.trend.strength) / 2;
     }
 

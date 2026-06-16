@@ -48,7 +48,7 @@ export {
   ConstraintType,
   
   // Legacy Career graph types (kept for compatibility)
-  type PathScores,
+
   CareerCategory,
   WorkEnvironmentType,
   EntryRequirementType,
@@ -68,10 +68,10 @@ export {
   
   // Regret types
   type RegretPrediction,
-  RegretType,
+
   
   // Mentor types
-  type MentorContext,
+
   type MentorInteraction,
   type MentorResponse,
   ResponseType,
@@ -274,20 +274,20 @@ export {
 
   // Graph Types (GraphNode/GraphEdge/GraphPath - note: different from types/index.ts CareerNode/CareerPath)
   type CareerNodeType,
-  type TransitionType,
+  type TransitionType as PathCascadeTransitionType,
   type Prerequisite,
-  type PathMetrics,
+  type PathMetrics as PathCascadeMetrics,
 
   // Analysis Types
-  type CriticalityAnalysis,
+  type CriticalityAnalysis as PathCascadeCriticalityAnalysis,
   type ClosedOption,
-  type OptionalityAnalysis,
-  type ReachableCareer,
+  type OptionalityAnalysis as PathCascadeOptionalityAnalysis,
+  type ReachableCareer as PathCascadeReachableCareer,
   
   // Result Types
   type PathCascadeResult,
   type PathExplanations,
-  type PathComparison,
+  type PathComparison as PathCascadeComparison,
   type PathCascadeStatistics,
 } from './path-cascade/PathCascadeEngine';
 
@@ -425,10 +425,10 @@ export {
   compareCareerOptionality,
 
   // Types
-  type OptionalityAnalysis,
+  type OptionalityAnalysis as OptionalityEngineAnalysis,
   type OptionalityDimensionScore,
-  type AdjacentCareer,
-  type SkillCategory,
+  type AdjacentCareer as OptionalityAdjacentCareer,
+  type SkillCategory as OptionalitySkillCategory,
   type OptionalityWeights,
   type OptionalityCalculationOptions,
 } from './optionality-engine';
@@ -448,14 +448,14 @@ export {
   type CareerNode,
   type CareerEdge,
   type CareerTransitionPath,
-  type AdjacentCareer,
-  type ReachableCareer,
+  type AdjacentCareer as CareerTransitionAdjacentCareer,
+  type ReachableCareer as CareerTransitionReachableCareer,
   type GraphStatistics,
   type GraphTraversalOptions,
   type ShortestPathOptions,
-  type TransitionType,
+  type TransitionType as CareerTransitionType,
   type TransitionPrerequisite,
-  type SkillCategory,
+  type SkillCategory as CareerTransitionSkillCategory,
   type NodeId,
   type EdgeId,
 } from './career-transition-graph';
@@ -472,7 +472,7 @@ export {
   calculateBatchCriticality,
 
   // Types
-  type CriticalityAnalysis,
+  type CriticalityAnalysis as CriticalityEngineAnalysis,
   type CriticalityMetric,
   type CriticalityCalculationOptions,
   type CriticalityWeights,
@@ -494,10 +494,10 @@ export {
   // Types
   type CareerPathExplorerResult,
   type ExploredCareerPath,
-  type PathMetrics,
+  type PathMetrics as PathExplorerMetrics,
   type PathScores,
   type PathExplanation,
-  type PathComparison,
+  type PathComparison as PathExplorerComparison,
   type PathRecommendation,
   type PathExplorerOptions,
   type PathFilters,
@@ -567,14 +567,14 @@ export {
   type DecisionConfidence,
   type DecisionReasoning,
   type DecisionTradeoffs,
-  type RecommendationStrength,
+  type RecommendationStrength as DecisionRecommendationStrength,
   type RecommendationCaveat,
   type DecisionFactors,
   type PathDecisionScore,
   type DecisionIntelligenceOptions,
   type DecisionIntelligenceId,
   type DecisionTier,
-  type DecisionUrgency,
+  type DecisionUrgency as DecisionIntelligenceUrgency,
 } from './decision-intelligence';
 
 // ============================================================================
@@ -825,7 +825,7 @@ export {
   detectConflicts,
   detectTransitions,
   determineEvolutionPattern,
-  generateInsights,
+  generateInsights as generateIdentityInsights,
 
   // Constants
   IDENTITY_ARCHETYPES,
@@ -847,14 +847,14 @@ export {
   type IdentityEvolution,
   type IdentitySnapshot,
   type IdentityTransition,
-  type TransitionType,
-  type EvolutionPattern,
+  type TransitionType as IdentityTransitionType,
+  type EvolutionPattern as IdentityEvolutionPattern,
   type PrimaryIdentityRecord,
   type IdentityAnalysisInput,
   type IdentityAnalysisOptions,
   type IdentityAnalysisOutput,
   type IdentityInsight,
-  type InsightType,
+  type InsightType as IdentityInsightType,
   type IdentityRecommendation,
   type IdentityDevelopmentConfig,
 } from './identity-development-engine';
@@ -876,8 +876,8 @@ export {
   assessPotential,
   analyzeGaps,
   generateTrajectory,
-  generateInsights,
-  generateRecommendations,
+  generateInsights as generatePersonalGrowthInsights,
+  generateRecommendations as generatePersonalGrowthRecommendations,
 
   // Constants
   GROWTH_DIMENSIONS,
@@ -920,10 +920,10 @@ export {
 
   // Analysis algorithms
   generateTimeline,
-  detectTransitions,
+  detectTransitions as detectLongitudinalTransitions,
   identifyMilestones,
   analyzeDecisionPatterns,
-  generateInsights,
+  generateInsights as generateLongitudinalInsights,
   generatePredictions,
 
   // Constants
@@ -946,7 +946,7 @@ export {
   type StudentTimeline,
   type TimelineSummary,
   type MajorTransition,
-  type TransitionType,
+  type TransitionType as LongitudinalTransitionType,
   type GrowthMilestone,
   type MilestoneType,
   type DecisionPattern,
@@ -957,7 +957,7 @@ export {
   type LongitudinalPrediction,
   type AssessmentSnapshot,
   type DecisionRecord,
-  type OutcomeRecord,
+  type OutcomeRecord as LongitudinalOutcomeRecord,
   type LongitudinalAnalysisInput,
   type LongitudinalOptions,
   type LongitudinalConfig,
@@ -976,7 +976,7 @@ export {
 
   // Analysis algorithms
   buildMentorContext,
-  generateInsights,
+  generateInsights as generateMentorFoundationInsights,
   generateGrowthObservations,
   generateDecisionWarnings,
 
@@ -1060,7 +1060,7 @@ export {
   type LifestyleDifference,
   type ComparisonScore,
   type OpportunitiesAnalysis,
-  type Opportunity,
+  type Opportunity as CareerComparisonOpportunity,
   type OpportunityCategory,
   type OpportunityCostSummary,
   type OptionalityComparison,
@@ -1123,7 +1123,7 @@ export type {
   PathComparisonAcrossFutures,
   PathComparisonMetric,
   PathSimilarity,
-  PathDifference,
+  PathDifference as FuturePathDifference,
   ConvergencePoint,
   DivergencePoint,
   ScenarioComparisonAcrossFutures,
@@ -1152,7 +1152,7 @@ export {
   createCareerGraphV2,
   calculateTransitionQuality,
   calculateTransitionDifficulty,
-  calculateSkillTransferability,
+  calculateSkillTransferability as calculateCareerGraphSkillTransferability,
   calculateOptionalityGain,
   calculateFutureStrength,
   calculateTransitionProbability,
@@ -1171,7 +1171,7 @@ export {
   filterTransitions,
   findBestTransitions,
   findViablePaths,
-  compareTransitions,
+  compareTransitions as compareCareerGraphTransitions,
   calculateTransitionMetrics,
   DEFAULT_CAREER_GRAPH_V2_CONFIG,
 } from './career-graph-v2';
@@ -1183,7 +1183,7 @@ export type {
   CareerTransitionEdge,
   TransitionOpportunityScore,
   TransitionMetrics,
-  CareerTransitionPath,
+  CareerTransitionPath as CareerGraphV2TransitionPath,
   TransitionFilter,
   CareerGraphV2Config,
 } from './career-graph-v2';
@@ -1199,7 +1199,7 @@ export {
   getCareerSkillProfile,
   calculateSkillOverlap,
   calculateSkillGap,
-  calculateSkillTransferability,
+  calculateSkillTransferability as calculateSkillTaxonomyTransferability,
   calculateSkillSimilarity,
   findAdjacentSkills,
   findEmergingSkills,
@@ -1212,13 +1212,13 @@ export {
 
 export type {
   SkillId,
-  SkillCategory,
+  SkillCategory as SkillTaxonomyCategory,
   ProficiencyLevel,
   SkillNode,
   CareerSkillRequirement,
   CareerSkillProfile,
   StudentSkillInventory,
-  SkillGap,
+  SkillGap as SkillTaxonomyGap,
   SkillGapReport,
   SkillSimilarity,
   TransferabilityAnalysis,
@@ -1231,7 +1231,7 @@ export {
   SkillTransitionEngineV1,
   createSkillTransitionEngine,
   analyzeCareerTransition,
-  compareTransitions,
+  compareTransitions as compareSkillTransitions,
   generateCareerGraphEdgeData,
   generateOptionalityData,
   generatePathExplorerData,
@@ -1268,7 +1268,7 @@ export {
 export type {
   ExpansionAnalysisId,
   CareerSimilarity,
-  AdjacentCareer,
+  AdjacentCareer as CareerExpansionAdjacentCareer,
   TransitionCandidate,
   ExpansionConfidence,
   CareerCoverageAnalysis,
@@ -1408,7 +1408,7 @@ export {
 } from './uncertainty-engine';
 
 export type {
-  ConfidenceLevel,
+  ConfidenceLevel as UncertaintyConfidenceLevel,
   UncertaintyProfile,
   ComponentConfidence,
   StudentProfileConfidence,
@@ -1463,7 +1463,7 @@ export {
 
 export type {
   RecommendationId,
-  RecommendationStrength,
+  RecommendationStrength as ConfidenceAwareRecommendationStrength,
   DecisionRiskLevel,
   UtilityBounds,
   ConfidenceAwareRecommendation,
@@ -1481,19 +1481,19 @@ export {
   identifyWeakAssumptions,
   generateRecommendedActions,
   generateStrategy,
-  generateExplanation,
+  generateExplanation as generateInformationValueExplanation,
   DEFAULT_INFORMATION_VALUE_CONFIG,
 } from './information-value-engine';
 
 export type {
   InformationType,
-  InformationMethod,
+  InformationMethod as InformationValueMethod,
   UncertaintyFactor,
   MissingEvidence,
   WeakAssumption,
   RecommendedAction,
   AssessmentRecommendation,
-  ExperimentRecommendation,
+  ExperimentRecommendation as InformationValueExperimentRecommendation,
   ExplorationActivity,
   InformationValueAnalysis,
   InformationValueConfig,
@@ -1513,8 +1513,8 @@ export {
 export type {
   OutcomeRecordId,
   StudentId,
-  RecommendationId,
-  PathId,
+  RecommendationId as OutcomeRecommendationId,
+  PathId as OutcomePathId,
   SnapshotId,
   OutcomeTimepoint,
   EducationProgress,
@@ -1526,7 +1526,7 @@ export type {
   ConfidenceMetrics,
   OutcomeSnapshot,
   ActionTaken,
-  OutcomeRecord,
+  OutcomeRecord as TrackedOutcomeRecord,
   OutcomeQuery,
   OutcomeAggregation,
   OutcomeRepository,
@@ -1564,13 +1564,13 @@ export type {
   // Core types
   VoIAnalysisId,
   InformationGapCategory,
-  InformationMethod,
+  InformationMethod as VoIInformationMethod,
   ExperimentType,
 
   // Main interfaces
   InformationGap,
   InformationOpportunity,
-  ExperimentRecommendation,
+  ExperimentRecommendation as VoIExperimentRecommendation,
   ValueOfInformationCalculation,
   VoIExplanation,
   ValueOfInformationReport,
@@ -1657,7 +1657,7 @@ export {
   detectDirectionalConflict,
   normalizeScore,
   weightedAverage,
-  calculateStdDev,
+  calculateStdDev as calculateConsistencyStdDev,
   inRange,
   clamp,
   formatConfidence,
@@ -1806,7 +1806,7 @@ export type {
   EvidenceId,
   BeliefType,
   EvidenceType,
-  ConfidenceLevel,
+  ConfidenceLevel as BayesianConfidenceLevel,
   StabilityLevel,
 
   // Main interfaces
@@ -1927,7 +1927,7 @@ export {
 export type {
   // Core types
   MetaDecisionId,
-  DecisionState,
+  DecisionState as MetaDecisionState,
   DecisionTiming,
   DecisionQualityLevel,
   UncertaintyLevel,
@@ -1998,7 +1998,7 @@ export type {
   PriorityRoadmap,
 
   // Skill gap types
-  SkillGap,
+  SkillGap as ActionSkillGap,
   SkillGapAnalysis,
   SkillAssessment,
   SkillRequirement,
@@ -2006,7 +2006,7 @@ export type {
   SkillDevelopmentPlan,
 
   // Opportunity types
-  Opportunity,
+  Opportunity as ActionOpportunity,
   OpportunityBundle,
   OpportunityLocation,
 
@@ -2026,7 +2026,7 @@ export type {
 
   // Resource types
   ResourceRequirement,
-  ResourceAvailability,
+  ResourceAvailability as ActionResourceAvailability,
   ConstraintAnalysis,
 
   // Sub-engine configs

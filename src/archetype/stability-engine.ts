@@ -10,6 +10,7 @@
  */
 
 import type { ArchetypeType, ArchetypeScore } from '@/types/archetype-profile';
+import type { ArchetypeSignal } from './archetype-types';
 import type {
   StabilityAnalysis,
   RobustnessIndicator,
@@ -17,7 +18,6 @@ import type {
   ChangeScenario,
   SeparationAnalysis,
   ConsistencyAnalysis,
-  ArchetypeSignal,
 } from './confidence-types';
 import { SEPARATION_THRESHOLDS } from './confidence-types';
 

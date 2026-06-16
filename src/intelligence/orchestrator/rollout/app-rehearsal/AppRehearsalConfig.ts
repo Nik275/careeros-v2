@@ -1,0 +1,70 @@
+/**
+ * @fileoverview Safe defaults for Phase 5.9 app-route rehearsals.
+ */
+
+import type { AppRehearsalConfig } from './AppRehearsalTypes';
+
+export const DEFAULT_APP_REHEARSAL_CONFIG: AppRehearsalConfig = Object.freeze({
+  runId: 'app-rehearsal-disabled',
+  enabled: false,
+  environment: 'unknown',
+  allowedEnvironments: Object.freeze([]),
+  allowedFlows: Object.freeze([]),
+  allowedEntrypoints: Object.freeze([]),
+  allowServiceFallback: false,
+  requireAppLevelCoverage: true,
+  sampleRate: 0,
+  maxExecutionsPerFlow: 0,
+  maxTotalExecutions: 0,
+  requireManualApproval: true,
+  requireParityGate: true,
+  requirePrivacyGate: true,
+  requireTelemetryHealth: true,
+  requireKillSwitchInactive: true,
+  requireEnvironmentGuard: true,
+  rollbackOnAnyDrift: true,
+  rollbackOnAnyFailure: true,
+  rollbackOnLatencyRegression: true,
+  maxLatencyMs: 250,
+  capturePayloadSummaries: false,
+  captureRawPayloads: false,
+});
+
+export function createAppRehearsalConfig(
+  overrides: Partial<AppRehearsalConfig> = {}
+): AppRehearsalConfig {
+  const config = {
+    ...DEFAULT_APP_REHEARSAL_CONFIG,
+    ...overrides,
+    allowedEnvironments:
+      overrides.allowedEnvironments ?? DEFAULT_APP_REHEARSAL_CONFIG.allowedEnvironments,
+    allowedFlows: overrides.allowedFlows ?? DEFAULT_APP_REHEARSAL_CONFIG.allowedFlows,
+    allowedEntrypoints:
+      overrides.allowedEntrypoints ?? DEFAULT_APP_REHEARSAL_CONFIG.allowedEntrypoints,
+  };
+
+  return Object.freeze({
+    ...config,
+    environment: normalizeEnvironment(config.environment),
+    allowedEnvironments: Object.freeze(
+      [...new Set(config.allowedEnvironments.map(normalizeEnvironment))].filter(Boolean)
+    ),
+    allowedFlows: Object.freeze([...new Set(config.allowedFlows)]),
+    allowedEntrypoints: Object.freeze([...new Set(config.allowedEntrypoints)]),
+    sampleRate: clamp(config.sampleRate, 0, 1),
+    maxExecutionsPerFlow: Math.max(0, Math.floor(config.maxExecutionsPerFlow)),
+    maxTotalExecutions: Math.max(0, Math.floor(config.maxTotalExecutions)),
+    maxLatencyMs: Math.max(0, Math.floor(config.maxLatencyMs)),
+    captureRawPayloads: false,
+  });
+}
+
+function normalizeEnvironment(environment: string | undefined): string {
+  const normalized = (environment ?? 'unknown').trim().toLowerCase();
+  return normalized.length > 0 ? normalized : 'unknown';
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  if (Number.isNaN(value)) return minimum;
+  return Math.min(maximum, Math.max(minimum, value));
+}

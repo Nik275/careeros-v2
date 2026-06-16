@@ -300,12 +300,12 @@ export function createCareerRepository(
 
 export function createCareerRepository(
   type: RepositoryType,
-  options?: CareerRepositoryOptions & Record<string, unknown>
+  options?: CareerRepositoryOptions
 ): CareerRepository;
 
 export function createCareerRepository(
   type: RepositoryType,
-  options?: CareerRepositoryOptions & Record<string, unknown>
+  options?: CareerRepositoryOptions
 ): CareerRepository {
   switch (type) {
     case RepositoryType.IN_MEMORY:

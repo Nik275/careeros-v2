@@ -15,35 +15,35 @@ const analysisStages = [
     icon: Brain,
     label: 'Processing your responses',
     description: 'Understanding your unique profile',
-    color: 'rgba(125, 156, 116, 0.8)',
+    color: '#8052ff',
   },
   {
     id: 'patterns',
     icon: Sparkles,
     label: 'Identifying patterns',
     description: 'Finding what makes you unique',
-    color: 'rgba(130, 165, 200, 0.8)',
+    color: '#6c42db',
   },
   {
     id: 'matching',
     icon: Target,
     label: 'Matching career paths',
     description: 'Aligning with your psychology',
-    color: 'rgba(195, 170, 125, 0.8)',
+    color: '#502db3',
   },
   {
     id: 'insights',
     icon: Lightbulb,
     label: 'Generating insights',
     description: 'Creating personalized guidance',
-    color: 'rgba(175, 155, 185, 0.8)',
+    color: '#402099',
   },
   {
     id: 'direction',
     icon: Compass,
     label: 'Building your direction',
     description: 'Finalizing your career clarity',
-    color: 'rgba(125, 156, 116, 0.8)',
+    color: '#8052ff',
   },
 ];
 
@@ -117,7 +117,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               position: 'absolute',
               inset: 0,
               borderRadius: '50%',
-              border: '1px dashed rgba(125, 156, 116, 0.25)',
+              border: '1px dashed rgba(128, 82, 255, 0.25)',
             }}
           />
 
@@ -133,7 +133,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               position: 'absolute',
               inset: '20px',
               borderRadius: '50%',
-              border: '1px dashed rgba(130, 165, 200, 0.2)',
+              border: '1px dashed rgba(100, 50, 200, 0.2)',
             }}
           />
 
@@ -149,7 +149,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               position: 'absolute',
               inset: '40px',
               borderRadius: '50%',
-              border: '1px dashed rgba(195, 170, 125, 0.15)',
+              border: '1px dashed rgba(80, 45, 180, 0.15)',
             }}
           />
 
@@ -162,12 +162,12 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               position: 'absolute',
               inset: '55px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, rgba(125, 156, 116, 0.15) 0%, rgba(130, 165, 200, 0.12) 100%)',
+              background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.15) 0%, rgba(100, 50, 200, 0.12) 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid rgba(125, 156, 116, 0.2)',
-              boxShadow: '0 8px 32px rgba(125, 156, 116, 0.15)',
+              border: '1px solid rgba(128, 82, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(128, 82, 255, 0.15)',
             }}
           >
             <motion.div
@@ -184,7 +184,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               <Brain
                 size={40}
                 strokeWidth={1.5}
-                style={{ color: 'rgba(125, 156, 116, 0.9)' }}
+                style={{ color: 'rgba(128, 82, 255, 0.9)' }}
               />
             </motion.div>
           </motion.div>
@@ -217,11 +217,11 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
                   height: `${6 - i}px`,
                   borderRadius: '50%',
                   background: i % 2 === 0 
-                    ? 'rgba(125, 156, 116, 0.5)' 
-                    : 'rgba(130, 165, 200, 0.4)',
+                    ? 'rgba(128, 82, 255, 0.5)' 
+                    : 'rgba(100, 50, 200, 0.4)',
                   boxShadow: `0 0 ${8 - i}px ${i % 2 === 0 
-                    ? 'rgba(125, 156, 116, 0.4)' 
-                    : 'rgba(130, 165, 200, 0.3)'}`,
+                    ? 'rgba(128, 82, 255, 0.4)' 
+                    : 'rgba(100, 50, 200, 0.3)'}`,
                 }}
               />
             </motion.div>
@@ -243,10 +243,10 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               alignItems: 'center',
               gap: '10px',
               padding: '10px 18px',
-              background: 'rgba(255, 255, 255, 0.6)',
+              background: 'rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(12px)',
               borderRadius: '999px',
-              border: '1px solid rgba(0,0,0,0.04)',
+              border: '1px solid rgba(255,255,255,0.06)',
               marginBottom: '16px',
             }}
           >
@@ -277,7 +277,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: '15px',
               fontWeight: 400,
-              color: 'rgba(26, 24, 22, 0.55)',
+              color: 'rgba(255, 255, 255, 0.55)',
               margin: 0,
             }}
           >
@@ -291,18 +291,21 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
             width: '100%',
             maxWidth: '280px',
             height: '4px',
-            background: 'rgba(0,0,0,0.04)',
+            background: 'rgba(255,255,255,0.06)',
             borderRadius: '2px',
             overflow: 'hidden',
             marginBottom: '48px',
           }}
         >
           <motion.div
-            animate={{ width: `${progress}%` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: progress / 100 }}
             transition={{ duration: duration.normal, ease: ease.luxury }}
             style={{
               height: '100%',
-              background: 'linear-gradient(90deg, rgba(125,156,116,0.8) 0%, rgba(130,165,200,0.8) 50%, rgba(195,170,125,0.8) 100%)',
+              width: '100%',
+              transformOrigin: 'left',
+              background: 'linear-gradient(90deg, #8052ff 0%, #6c42db 50%, #502db3 100%)',
               borderRadius: '2px',
             }}
           />
@@ -346,16 +349,16 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
                     height: '36px',
                     borderRadius: '10px',
                     background: isComplete
-                      ? 'rgba(125, 156, 116, 0.15)'
+                      ? 'rgba(128, 82, 255, 0.15)'
                       : isActive
-                      ? 'rgba(125, 156, 116, 0.12)'
-                      : 'rgba(0,0,0,0.03)',
+                      ? 'rgba(128, 82, 255, 0.12)'
+                      : 'rgba(255,255,255,0.03)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: isActive || isComplete
-                      ? '1px solid rgba(125, 156, 116, 0.3)'
-                      : '1px solid rgba(0,0,0,0.04)',
+                      ? '1px solid rgba(128, 82, 255, 0.3)'
+                      : '1px solid rgba(255,255,255,0.06)',
                     transition: 'all 0.3s ease',
                   }}
                 >
@@ -363,7 +366,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M5 12L10 17L20 7"
-                        stroke="#7D9C74"
+                        stroke="#8052ff"
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -375,8 +378,8 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
                       strokeWidth={2}
                       style={{
                         color: isActive
-                          ? 'rgba(125, 156, 116, 0.9)'
-                          : 'rgba(26, 24, 22, 0.3)',
+                          ? 'rgba(128, 82, 255, 0.9)'
+                          : 'rgba(255, 255, 255, 0.3)',
                       }}
                     />
                   )}
@@ -395,7 +398,7 @@ export function AnalysisScreen({ onComplete }: AnalysisScreenProps) {
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: '13px',
             fontWeight: 400,
-            color: 'rgba(26, 24, 22, 0.35)',
+            color: 'rgba(255, 255, 255, 0.4)',
             marginTop: '40px',
             fontStyle: 'italic',
           }}

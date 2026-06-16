@@ -136,6 +136,11 @@ export interface CareerMarketProfile {
 }
 
 /**
+ * Component breakdown for a career market profile.
+ */
+export type CareerMarketProfileComponents = CareerMarketProfile['components'];
+
+/**
  * Historical snapshot of a career market profile.
  */
 export interface CareerMarketProfileSnapshot {

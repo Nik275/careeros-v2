@@ -473,7 +473,7 @@ export class ConfidenceCalibrationEngine {
     const correlation = actualAccuracy > 0 ? 1 - Math.abs(avgConfidence - actualAccuracy) / 100 : 0;
 
     // Determine status and score
-    let status: typeof report.overallCalibration.status = 'well-calibrated';
+    let status: ReturnType<ConfidenceCalibrationEngine['analyzeCalibration']>['overallCalibration']['status'] = 'well-calibrated';
     let score = Math.max(0, 100 - ece * 2);
 
     if (ece > 30) {
@@ -504,7 +504,7 @@ export class ConfidenceCalibrationEngine {
       recommendations.push('Calibration is good - maintain current practices');
     }
 
-    const report = {
+    const report: ReturnType<ConfidenceCalibrationEngine['analyzeCalibration']> = {
       overallCalibration: {
         score,
         status,
@@ -550,7 +550,7 @@ export class ConfidenceCalibrationEngine {
   private analyzeConfidenceBins(data: CalibrationInput[]): ConfidenceCalibrationReport['confidenceBins'] {
     const bins: ConfidenceCalibrationReport['confidenceBins'] = [];
 
-    for (let bin = 0; bin < this.config.binCount; bin++) {
+    for (let bin = 0; bin < this.config.numBins; bin++) {
       const binStart = bin * this.config.binSize;
       const binEnd = Math.min(binStart + this.config.binSize, 100);
 

@@ -840,7 +840,7 @@ export class StudentProfileBuilder {
   private decision: {
     explorationStage?: ExplorationStage;
     timeline?: Partial<DecisionTimeline>;
-    confidence?: Partial<DecisionConfidence>;
+    confidence?: Partial<DecisionConfidenceAssessment>;
     informationNeeds?: Partial<InformationNeeds>;
     previousAssessments?: string[];
     hasMentor?: boolean;
@@ -1092,7 +1092,7 @@ export class StudentProfileBuilder {
         confidentAreas: [],
         uncertainAreas: [],
         ...this.decision.confidence,
-      } as DecisionConfidence,
+      } as DecisionConfidenceAssessment,
       informationNeeds: {
         gaps: [],
         careersToResearch: [],

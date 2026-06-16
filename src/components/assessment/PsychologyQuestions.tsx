@@ -204,13 +204,13 @@ export function PsychologyQuestions({
             gap: '6px',
             padding: '10px 16px',
             borderRadius: '12px',
-            background: 'rgba(255,255,255,0.6)',
-            border: '1px solid rgba(0,0,0,0.06)',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.06)',
             cursor: 'pointer',
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: '14px',
             fontWeight: 450,
-            color: 'rgba(26, 24, 22, 0.7)',
+            color: 'rgba(255, 255, 255, 0.8)',
             transition: 'all 0.2s ease',
           }}
         >
@@ -230,7 +230,7 @@ export function PsychologyQuestions({
             height="12"
             viewBox="0 0 24 24"
             fill="none"
-            style={{ color: '#7D9C74' }}
+            style={{ color: '#8052ff' }}
           >
             <path
               d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
@@ -239,7 +239,7 @@ export function PsychologyQuestions({
           </svg>
           <span
             style={{
-              color: '#171312',
+              color: '#ffffff',
               fontWeight: 600,
               fontSize: '14px',
               letterSpacing: '-0.02em',
@@ -260,9 +260,9 @@ export function PsychologyQuestions({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           overflowY: 'auto',
-          padding: '0 0 100px 0',
+          padding: '0 0 160px 0',
         }}
       >
         <AnimatePresence mode="wait" custom={direction}>
@@ -282,6 +282,7 @@ export function PsychologyQuestions({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              margin: 'auto 0',
             }}
           >
             <QuestionCard
@@ -306,7 +307,7 @@ export function PsychologyQuestions({
           left: 0,
           right: 0,
           padding: '20px',
-          background: 'linear-gradient(to top, rgba(248,245,238,0.98) 0%, rgba(248,245,238,0.9) 70%, transparent 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.8) 70%, transparent 100%)',
           display: 'flex',
           justifyContent: 'center',
           zIndex: 10,
@@ -328,14 +329,14 @@ export function PsychologyQuestions({
             fontSize: '16px',
             fontWeight: 600,
             fontFamily: 'Inter, system-ui, sans-serif',
-            color: 'white',
+            color: hasSelection ? 'white' : 'rgba(255,255,255,0.4)',
             background: hasSelection
-              ? 'linear-gradient(180deg, #6d9165 0%, #4d7548 100%)'
-              : 'linear-gradient(180deg, rgba(109,145,101,0.4) 0%, rgba(77,117,72,0.4) 100%)',
-            border: 'none',
+              ? 'linear-gradient(180deg, #8052ff 0%, #6c42db 100%)'
+              : 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+            border: hasSelection ? 'none' : '1px solid rgba(255,255,255,0.05)',
             cursor: hasSelection ? 'pointer' : 'not-allowed',
             boxShadow: hasSelection
-              ? '0 12px 32px rgba(109,145,101,0.3), 0 4px 12px rgba(0,0,0,0.08)'
+              ? '0 12px 32px rgba(128,82,255,0.3), 0 4px 12px rgba(0,0,0,0.2)'
               : 'none',
             transition: 'all 0.3s ease',
           }}

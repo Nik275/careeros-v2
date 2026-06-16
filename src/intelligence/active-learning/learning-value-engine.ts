@@ -26,6 +26,7 @@ import {
   ActiveLearningMetrics,
   BoundaryProximity,
   EvidenceGap,
+  StudentId,
 } from './active-learning-types';
 
 // ============================================================================
@@ -292,9 +293,9 @@ function detectExpectationRealityContradiction(
   outcomeHistory: { outcome: string; timestamp: Date; success: boolean }[]
 ): number {
   // High expectations but poor outcomes = contradiction
-  const expectations = studentProfile.careerExpectations || {};
+  const expectations: Record<string, unknown> = studentProfile.careerExpectations || {};
   const expectationLevel = Object.values(expectations).reduce(
-    (sum, val) => sum + (typeof val === 'number' ? val : 0),
+    (sum: number, val: unknown) => sum + (typeof val === 'number' ? val : 0),
     0
   ) / Math.max(Object.keys(expectations).length, 1);
   
@@ -885,9 +886,14 @@ export class LearningValueEngine {
    * Get students with highest learning value
    */
   getHighValueStudents(
-    minTier: LearningValueTier = LearningValueTier.HIGH,
+    minTier: LearningValueTier | number = LearningValueTier.HIGH,
     limit: number = 100
   ): LearningValueScore[] {
+    if (typeof minTier === 'number') {
+      limit = minTier;
+      minTier = LearningValueTier.HIGH;
+    }
+
     const tierOrder = [
       LearningValueTier.TRIVIAL,
       LearningValueTier.LOW,
@@ -919,7 +925,7 @@ export class LearningValueEngine {
   getTopOpportunities(limit: number = 50): Array<{
     studentId: string;
     score: LearningValueScore;
-    topAction: LearningAction;
+    topAction: LearningAction | string;
   }> {
     const highValueStudents = this.getHighValueStudents(LearningValueTier.MODERATE, limit * 2);
     
@@ -939,12 +945,77 @@ export class LearningValueEngine {
   getLearningValueHistory(studentId: string): LearningValueScore[] {
     return this.learningValueHistory.get(studentId) || [];
   }
+
+  recordQuery(_studentId: string): void {
+    // Query generation is tracked by the orchestrating ActiveLearningEngine.
+  }
+
+  recordResponseQuality(_studentId: string, _quality: number): void {
+    // Response quality is tracked by the orchestrating ActiveLearningEngine.
+  }
+
+  recordLearningGain(_studentId: string, gain: number): void {
+    this.metrics.informationGainPerStudent =
+      (this.metrics.informationGainPerStudent + gain) / 2;
+  }
+
+  getPrioritizedStudents(): StudentId[] {
+    return this.getHighValueStudents().map((score) => score.studentId as StudentId);
+  }
+
+  isPriorityStudent(studentId: string): boolean {
+    return this.getPrioritizedStudents().includes(studentId as StudentId);
+  }
   
   /**
    * Get engine metrics
    */
   getMetrics(): ActiveLearningMetrics {
     return { ...this.metrics };
+  }
+
+  getStats(): ActiveLearningMetrics {
+    let criticalCount = 0;
+    let highCount = 0;
+    let mediumCount = 0;
+    let lowCount = 0;
+    let deferredCount = 0;
+
+    for (const scores of this.learningValueHistory.values()) {
+      const latest = scores[scores.length - 1];
+      if (!latest) {
+        continue;
+      }
+
+      switch (latest.tier) {
+        case LearningValueTier.EXCEPTIONAL:
+        case LearningValueTier.CRITICAL:
+          criticalCount++;
+          break;
+        case LearningValueTier.HIGH:
+          highCount++;
+          break;
+        case LearningValueTier.MODERATE:
+          mediumCount++;
+          break;
+        case LearningValueTier.LOW:
+          lowCount++;
+          break;
+        case LearningValueTier.TRIVIAL:
+        default:
+          deferredCount++;
+          break;
+      }
+    }
+
+    return {
+      ...this.getMetrics(),
+      criticalCount,
+      highCount,
+      mediumCount,
+      lowCount,
+      deferredCount,
+    };
   }
   
   /**
@@ -966,6 +1037,10 @@ export class LearningValueEngine {
    */
   clearHistory(): void {
     this.learningValueHistory.clear();
+  }
+
+  clear(): void {
+    this.clearHistory();
   }
   
   /**

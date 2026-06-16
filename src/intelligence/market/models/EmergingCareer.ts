@@ -20,6 +20,8 @@ export enum GrowthTrajectory {
   EARLY = 'EARLY',            // <5% but accelerating
 }
 
+export type EmergingCareerStage = 'embryonic' | 'emerging' | 'growing' | 'approaching_mainstream';
+
 /**
  * Evidence source for emerging career detection.
  */
@@ -134,7 +136,7 @@ export interface EmergingCareer {
   };
 
   /** Maturity stage */
-  readonly maturityStage: 'embryonic' | 'emerging' | 'growing' | 'approaching_mainstream';
+  readonly maturityStage: EmergingCareerStage;
 
   /** Adoption timeline estimate */
   readonly adoptionTimeline: {

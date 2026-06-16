@@ -289,7 +289,7 @@ describe('Utility Functions', () => {
       );
 
       expect(career.identity.slug).toBe('data-scientist');
-      expect(career.identity.metadata.schemaVersion).toBe(ONTOLOGY_SCHEMA_VERSION);
+      expect(career.identity.metadata?.schemaVersion).toBe(ONTOLOGY_SCHEMA_VERSION);
     });
 
     it('should use custom slug when provided', () => {

@@ -48,6 +48,8 @@ export const DEFAULT_UPSC_CONFIG: UPSCEngineConfig = {
   minSuccessProbability: 0.15,
 };
 
+type UPSCReservationCategory = 'GENERAL' | 'OBC' | 'SC' | 'ST' | 'EWS';
+
 /**
  * UPSC Engine
  * 
@@ -56,7 +58,7 @@ export const DEFAULT_UPSC_CONFIG: UPSCEngineConfig = {
 export class UPSCEngine {
   private config: UPSCEngineConfig;
   
-  constructor(config: Partial<UPSCConfig> = {}) {
+  constructor(config: Partial<UPSCEngineConfig> = {}) {
     this.config = { ...DEFAULT_UPSC_CONFIG, ...config };
   }
   
@@ -65,7 +67,7 @@ export class UPSCEngine {
    */
   analyze(input: IndiaIntelligenceInput): UPSCAnalysis {
     const birthYear = this.estimateBirthYear(input);
-    const category = 'GENERAL'; // Should come from profile
+    const category: UPSCReservationCategory = 'GENERAL'; // Should come from profile
     
     // Check eligibility
     const eligibility = this.checkEligibility(birthYear, category, input);
@@ -135,10 +137,10 @@ export class UPSCEngine {
    */
   private checkEligibility(
     birthYear: number,
-    category: string,
+    category: UPSCReservationCategory,
     input: IndiaIntelligenceInput
   ): UPSCAnalysis['eligibility'] {
-    const ageCheck = isUPSCAgeEligible(birthYear, category as any);
+    const ageCheck = isUPSCAgeEligible(birthYear, category);
     const attempts = this.extractUPSCAttempts(input.profile.examAttempts);
     const attemptsRemaining = this.config.maxAttemptsGeneral - attempts.length;
     
@@ -155,7 +157,7 @@ export class UPSCEngine {
    */
   private extractUPSCAttempts(attempts: ExamAttempt[]): ExamAttempt[] {
     return attempts.filter(a => 
-      a.examType === 'UPSC' || a.examType === 'UPSC_CSE' || a.examType === 'UPSC_PRELIMS'
+      a.examType === 'UPSC'
     );
   }
   
@@ -512,7 +514,7 @@ export class UPSCEngine {
   /**
    * Update configuration
    */
-  updateConfig(config: Partial<UPSCConfig>): void {
+  updateConfig(config: Partial<UPSCEngineConfig>): void {
     this.config = { ...this.config, ...config };
   }
 }
@@ -520,6 +522,6 @@ export class UPSCEngine {
 /**
  * Factory function for UPSC Engine
  */
-export function createUPSCConfig(config?: Partial<UPSCConfig>): UPSCEngine {
+export function createUPSCConfig(config?: Partial<UPSCEngineConfig>): UPSCEngine {
   return new UPSCEngine(config);
 }

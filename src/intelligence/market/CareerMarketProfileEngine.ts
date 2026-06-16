@@ -9,8 +9,8 @@ import type {
   CareerMarketProfile,
   CareerMarketProfileSnapshot,
   CareerMarketProfileUpdate,
-  MarketOutlook,
 } from './models/CareerMarketProfile';
+import { MarketOutlook } from './models/CareerMarketProfile';
 import type { MarketTrend, MarketTrendType } from './models/MarketTrend';
 import type { AggregateMarketSignal } from './models/MarketSignal';
 import type { MarketSnapshot } from './models/MarketSnapshot';
@@ -114,6 +114,7 @@ export class CareerMarketProfileEngine {
     // Calculate confidence
     const confidenceBreakdown = this.confidenceEngine.calculateProfileConfidence(
       {
+        id: careerId,
         careerId,
         demandScore,
         salaryScore,

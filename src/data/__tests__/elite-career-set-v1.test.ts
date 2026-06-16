@@ -60,8 +60,6 @@ import {
   getEliteCareerStats,
 } from '../index';
 
-import type { CareerV2 } from '../../ontology/career-ontology';
-
 // ============================================================================
 // TEST DATA
 // ============================================================================
@@ -689,7 +687,7 @@ describe('Comparative Analysis', () => {
   it('Entrepreneur should have highest risk tolerance', () => {
     const riskScores = ALL_CAREERS.map(c => ({
       name: c.name,
-      riskTolerance: c.psychology.riskTolerance,
+      riskTolerance: c.psychology.riskTolerance ?? 0,
     }));
     const sorted = riskScores.sort((a, b) => b.riskTolerance - a.riskTolerance);
     expect(sorted[0].name).toBe('Entrepreneur');

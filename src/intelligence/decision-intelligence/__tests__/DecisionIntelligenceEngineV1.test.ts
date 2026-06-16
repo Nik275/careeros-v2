@@ -17,8 +17,13 @@ import type {
   PathMetrics,
   PathScores,
 } from '../../path-explorer';
-import type { RegretAnalysis, PathRegretAnalysis } from '../../regret-functional';
-import type { DecisionCoalitionAnalysis, PathCoalitionAnalysis } from '../../decision-coalition-v3';
+import type { RegretAnalysis, PathRegretAnalysis, RegretFactor, RegretType } from '../../regret-functional';
+import type {
+  CoalitionMember,
+  CoalitionMemberEvaluation,
+  DecisionCoalitionAnalysis,
+  PathCoalitionAnalysis,
+} from '../../decision-coalition-v3';
 import { CareerTransitionGraphV1, type CareerNode } from '../../career-transition-graph';
 
 // ============================================================================
@@ -116,11 +121,11 @@ const createMockCareerPathExplorerResult = (
   ],
   pathsByType: new Map(),
   comparison: {
-    bestForGrowth: 'path-2',
-    bestForOptionality: 'path-1',
-    bestForStability: 'path-1',
-    safestPath: 'path-1',
-    riskiestPath: 'path-2',
+    bestForGrowth: 'high-growth',
+    bestForOptionality: 'high-optionality',
+    bestForStability: 'balanced',
+    safestPath: 'low-risk',
+    riskiestPath: 'high-growth',
     comparisonText: 'Comparison text',
     keyDifferences: [],
   },
@@ -129,18 +134,49 @@ const createMockCareerPathExplorerResult = (
   ...overrides,
 });
 
-const createMockStudentBeliefV3 = (overrides: Partial<StudentBeliefV3> = {}): StudentBeliefV3 => ({
+type StudentBeliefV3FixtureOverrides = Partial<StudentBeliefV3> & {
+  interests?: {
+    coreInterests: string[];
+    interestStrengths: Map<string, number>;
+    topInterestCategories: string[];
+  };
+};
+
+const createMockStudentBeliefV3 = (
+  overrides: StudentBeliefV3FixtureOverrides = {}
+): StudentBeliefV3 => ({
   studentId: 'student-1',
   interests: {
     coreInterests: ['technology', 'engineering'],
     interestStrengths: new Map([['technology', 0.8], ['engineering', 0.7]]),
     topInterestCategories: ['technical'],
   },
-  values: {
-    coreValues: ['growth', 'impact', 'stability'],
-    valuePriorities: new Map([['growth', 0.9], ['impact', 0.7], ['stability', 0.8]]),
-    topValueCategories: ['development'],
-  },
+  values: [
+    {
+      id: 'value_growth',
+      name: 'Growth',
+      description: 'Continuous learning and development',
+      importance: 0.9,
+      evidence: [],
+      isNonNegotiable: false,
+    },
+    {
+      id: 'value_impact',
+      name: 'Impact',
+      description: 'Meaningful contribution',
+      importance: 0.7,
+      evidence: [],
+      isNonNegotiable: false,
+    },
+    {
+      id: 'value_stability',
+      name: 'Stability',
+      description: 'Predictable and stable career foundation',
+      importance: 0.8,
+      evidence: [],
+      isNonNegotiable: false,
+    },
+  ],
   profile: {
     analyticalThinking: 0.8,
     creativity: 0.6,
@@ -160,7 +196,10 @@ const createMockStudentBeliefV3 = (overrides: Partial<StudentBeliefV3> = {}): St
 } as StudentBeliefV3);
 
 // Helper to create mock factors
-const createMockFactors = (regretScore = 35, strongestType = 'economic') => new Map([
+const createMockFactors = (
+  regretScore = 35,
+  strongestType: RegretType = 'economic'
+): Map<RegretType, RegretFactor> => new Map<RegretType, RegretFactor>([
   ['action', { type: 'action' as const, score: 30, confidence: 0.8, riskLevel: 'low' as const, components: [], drivers: [], mitigations: [], isStrongest: false }],
   ['inaction', { type: 'inaction' as const, score: 40, confidence: 0.7, riskLevel: 'low' as const, components: [], drivers: [], mitigations: [], isStrongest: false }],
   ['optionality-loss', { type: 'optionality-loss' as const, score: 35, confidence: 0.75, riskLevel: 'low' as const, components: [], drivers: [], mitigations: [], isStrongest: false }],
@@ -173,16 +212,13 @@ const createMockPathRegretAnalysis = (
   overrides: Partial<PathRegretAnalysis> & { pathId?: string } = {}
 ): PathRegretAnalysis => ({
   pathId: overrides.pathId || 'test-path',
-  path: createMockExploredCareerPath({ id: overrides.pathId || 'test-path' }),
+  pathName: overrides.pathName || 'Test Path',
   factors: overrides.factors || createMockFactors(),
   aggregate: {
     overallRegretScore: 35,
     weightedRegretScore: 32,
     maxRegretScore: 45,
     overallConfidence: 0.75,
-    factorCount: 6,
-    strongestFactor: 'economic',
-    weakestFactor: 'identity',
   },
   strongestRisk: { type: 'economic', score: 45, description: 'Economic concerns' },
   riskDistribution: { minimal: 0, low: 6, moderate: 0, high: 0, severe: 0 },
@@ -210,9 +246,6 @@ const createMockRegretAnalysis = (
       weightedRegretScore: 48,
       maxRegretScore: 60,
       overallConfidence: 0.7,
-      factorCount: 6,
-      strongestFactor: 'action',
-      weakestFactor: 'identity',
     },
     strongestRisk: { type: 'action', score: 60, description: 'High risk' },
   });
@@ -231,16 +264,14 @@ const createMockRegretAnalysis = (
       regretVariance: 56,
       dominantRegretType: 'economic',
       overallRisk: 'low',
-      pathCount: 2,
-      lowestRegretPathId: 'path-1',
-      highestRegretPathId: 'path-2',
     },
     pathComparison: {
-      lowestRegretPathId: 'path-1',
-      highestRegretPathId: 'path-2',
+      lowestRegretPath: path1Analysis,
+      highestRegretPath: path2Analysis,
       regretDifference: 15,
+      regretByType: new Map(),
       comparisonText: 'Path 1 has lower regret',
-      keyDifferences: [],
+      tradeoffs: [],
     },
     generatedAt: Date.now(),
     ...overrides,
@@ -251,29 +282,42 @@ const createMockPathCoalitionAnalysis = (
   overrides: Partial<PathCoalitionAnalysis> & { pathId?: string } = {}
 ): PathCoalitionAnalysis => ({
   pathId: overrides.pathId || 'test-path',
-  path: createMockExploredCareerPath({ id: overrides.pathId || 'test-path' }),
-  members: new Map([
-    ['student', { member: { id: 'student', name: 'Student', type: 'self', priority: 1, influenceWeight: 1 }, score: 0.8, agreement: 0.9, conflict: null }],
+  pathType: overrides.pathType || 'primary',
+  pathName: overrides.pathName || 'Test Path',
+  memberEvaluations: new Map<CoalitionMember, CoalitionMemberEvaluation>([
+    ['student-interests', {
+      member: 'student-interests',
+      supportScore: 85,
+      conflictScore: 10,
+      alignmentScore: 90,
+      concerns: [],
+      endorsements: ['Strong alignment'],
+      weight: 1,
+      confidence: 0.8,
+    }],
   ]),
   aggregate: {
-    averageAgreement: 0.85,
-    weightedAgreement: 0.87,
-    minAgreement: 0.8,
-    maxAgreement: 0.9,
-    conflictCount: 0,
-    criticalConflictCount: 0,
-    overallStability: 'stable',
-    overallConfidence: 0.8,
+    coalitionSupport: 87,
+    coalitionConflict: 10,
+    alignmentScore: 85,
+    tensionScore: 5,
+    stabilityScore: 87,
   },
-  strongestSupport: { memberId: 'student', memberName: 'Student', agreement: 0.9, description: 'Strong alignment' },
-  strongestOpposition: null,
+  dynamics: {
+    strongSupport: ['student-interests'],
+    reservations: [],
+    opposition: [],
+    memberConflicts: [],
+    consensusLevel: 'strong',
+  },
   explanation: {
     summary: 'Stable coalition',
     details: 'Good support',
     reasoning: 'Aligned interests',
-    supportBreakdown: [],
-    concernAreas: [],
-    resolutionStrategies: [],
+    coalitionStrengths: ['student interests strongly supports this path'],
+    coalitionConflicts: [],
+    recommendedNegotiations: [],
+    alternativeConsiderations: [],
   },
   ...overrides,
 });
@@ -284,46 +328,49 @@ const createMockDecisionCoalitionAnalysis = (
   const path1Coalition = createMockPathCoalitionAnalysis({ pathId: 'path-1' });
   const path2Coalition = createMockPathCoalitionAnalysis({
     pathId: 'path-2',
+    pathName: 'High Growth Path',
     aggregate: {
-      averageAgreement: 0.6,
-      weightedAgreement: 0.62,
-      minAgreement: 0.5,
-      maxAgreement: 0.7,
-      conflictCount: 1,
-      criticalConflictCount: 0,
-      overallStability: 'tense',
-      overallConfidence: 0.6,
+      coalitionSupport: 62,
+      coalitionConflict: 35,
+      alignmentScore: 60,
+      tensionScore: 40,
+      stabilityScore: 62,
     },
-    strongestSupport: { memberId: 'student', memberName: 'Student', agreement: 0.7, description: 'Moderate alignment' },
-    strongestOpposition: { memberId: 'parent', memberName: 'Parent', agreement: 0.5, description: 'Concerned' },
+    dynamics: {
+      strongSupport: [],
+      reservations: ['student-interests'],
+      opposition: [],
+      memberConflicts: [],
+      consensusLevel: 'moderate',
+    },
   });
 
   return {
     id: 'coalition-test',
     studentBelief: createMockStudentBeliefV3(),
+    pathExplorerResult: createMockCareerPathExplorerResult(),
     pathAnalyses: new Map([
       ['path-1', path1Coalition],
       ['path-2', path2Coalition],
     ]),
     rankedPaths: [path1Coalition, path2Coalition],
-    overallProfile: {
-      averageAgreement: 0.72,
-      agreementVariance: 0.03,
-      dominantStability: 'stable',
-      overallStability: 'stable',
-      pathCount: 2,
-      highestAgreementPathId: 'path-1',
-      lowestAgreementPathId: 'path-2',
-      criticalConflictCount: 0,
+    coalitionHealth: {
+      cohesion: 72,
+      conflictLevel: 22,
+      clarity: 75,
+      confidence: 0.8,
     },
-    pathComparison: {
-      highestAgreementPathId: 'path-1',
-      lowestAgreementPathId: 'path-2',
-      agreementDifference: 0.25,
-      comparisonText: 'Path 1 has better coalition support',
-      keyDifferences: [],
+    pathComparison: null,
+    recommendation: {
+      recommendedPathId: 'path-1',
+      recommendedPathType: 'primary',
+      confidence: 0.8,
+      reasoning: 'Path 1 has better coalition support',
+      supportingMembers: ['student-interests'],
+      opposingMembers: [],
+      successConditions: [],
+      riskMitigation: [],
     },
-    recommendations: [],
     generatedAt: Date.now(),
     ...overrides,
   };
@@ -643,8 +690,8 @@ describe('Realistic Scenarios', () => {
 
     const regretAnalysis = createMockRegretAnalysis({
       pathAnalyses: new Map([
-        ['tech-path', createMockPathRegretAnalysis({ pathId: 'tech-path', aggregate: { overallRegretScore: 20, weightedRegretScore: 18, maxRegretScore: 30, overallConfidence: 0.9, factorCount: 6, strongestFactor: 'economic', weakestFactor: 'identity' }, strongestRisk: { type: 'economic', score: 30, description: 'Low' } })],
-        ['art-path', createMockPathRegretAnalysis({ pathId: 'art-path', aggregate: { overallRegretScore: 60, weightedRegretScore: 58, maxRegretScore: 70, overallConfidence: 0.6, factorCount: 6, strongestFactor: 'identity', weakestFactor: 'economic' }, strongestRisk: { type: 'identity', score: 70, description: 'High' } })],
+        ['tech-path', createMockPathRegretAnalysis({ pathId: 'tech-path', aggregate: { overallRegretScore: 20, weightedRegretScore: 18, maxRegretScore: 30, overallConfidence: 0.9 }, strongestRisk: { type: 'economic', score: 30, description: 'Low' } })],
+        ['art-path', createMockPathRegretAnalysis({ pathId: 'art-path', aggregate: { overallRegretScore: 60, weightedRegretScore: 58, maxRegretScore: 70, overallConfidence: 0.6 }, strongestRisk: { type: 'identity', score: 70, description: 'High' } })],
       ]),
     });
 
@@ -682,8 +729,8 @@ describe('Realistic Scenarios', () => {
 
     const regretAnalysis = createMockRegretAnalysis({
       pathAnalyses: new Map([
-        ['safe-path', createMockPathRegretAnalysis({ pathId: 'safe-path', aggregate: { overallRegretScore: 20, weightedRegretScore: 18, maxRegretScore: 30, overallConfidence: 0.9, factorCount: 6, strongestFactor: 'economic', weakestFactor: 'identity' }, strongestRisk: { type: 'economic', score: 30, description: 'Low' } })],
-        ['risky-path', createMockPathRegretAnalysis({ pathId: 'risky-path', aggregate: { overallRegretScore: 80, weightedRegretScore: 78, maxRegretScore: 90, overallConfidence: 0.5, factorCount: 6, strongestFactor: 'action', weakestFactor: 'economic' }, strongestRisk: { type: 'action', score: 90, description: 'Very High' } })],
+        ['safe-path', createMockPathRegretAnalysis({ pathId: 'safe-path', aggregate: { overallRegretScore: 20, weightedRegretScore: 18, maxRegretScore: 30, overallConfidence: 0.9 }, strongestRisk: { type: 'economic', score: 30, description: 'Low' } })],
+        ['risky-path', createMockPathRegretAnalysis({ pathId: 'risky-path', aggregate: { overallRegretScore: 80, weightedRegretScore: 78, maxRegretScore: 90, overallConfidence: 0.5 }, strongestRisk: { type: 'action', score: 90, description: 'Very High' } })],
       ]),
     });
 

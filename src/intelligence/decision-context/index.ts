@@ -84,39 +84,47 @@ export {
   // Evidence Types
   EvidenceType,
   EvidenceStrength,
-  ContextEvidence,
   
   // Uncertainty Types
   UncertaintySource,
-  ContextUncertainty,
   
   // Result Types
-  DetectedContext,
-  ContextAnalysis,
-  ContextConflict,
   ContextPriority,
-  ContextNarrative,
-  ContextRecommendation,
-  
-  // Input Types
-  ContextDetectionInput,
-  RawContextSignals,
-  SignalExtractor,
-  
-  // Configuration Types
-  ContextEngineConfig,
-  EvidenceWeights,
-  
-  // Engine Interfaces
-  IDecisionContextEngine,
-  IContextExplanationEngine,
-  IContextScoringEngine,
   
   // Utility Functions
   isDecisionContextType,
   isContextCategory,
   getContextTypeLabel,
   getContextTypeDescription,
+} from './types';
+
+export type {
+  // Evidence Types
+  ContextEvidence,
+
+  // Uncertainty Types
+  ContextUncertainty,
+
+  // Result Types
+  DetectedContext,
+  ContextAnalysis,
+  ContextConflict,
+  ContextNarrative,
+  ContextRecommendation,
+
+  // Input Types
+  ContextDetectionInput,
+  RawContextSignals,
+  SignalExtractor,
+
+  // Configuration Types
+  ContextEngineConfig,
+  EvidenceWeights,
+
+  // Engine Interfaces
+  IDecisionContextEngine,
+  IContextExplanationEngine,
+  IContextScoringEngine,
 } from './types';
 
 // ============================================================================
@@ -135,6 +143,9 @@ export {
   ContextScoringEngine,
   createContextScoringEngine,
   DEFAULT_SCORING_CONFIG,
+} from './scoring/ContextScoringEngine';
+
+export type {
   ScoringConfig,
   ConfidenceResult,
 } from './scoring/ContextScoringEngine';
@@ -143,6 +154,9 @@ export {
   ContextExplanationEngine,
   createContextExplanationEngine,
   DEFAULT_EXPLANATION_CONFIG,
+} from './explanation/ContextExplanationEngine';
+
+export type {
   ExplanationConfig,
 } from './explanation/ContextExplanationEngine';
 

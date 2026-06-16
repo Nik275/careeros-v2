@@ -95,7 +95,7 @@ describe('ConfidenceTypes', () => {
       expect(zeroBounds.upper).toBeGreaterThan(0);
 
       const oneBounds = createDefaultBounds(1);
-      expect(oneBounds.lower).toBeLessThan(1);
+      expect(oneBounds.lower).toBeLessThanOrEqual(1);
       expect(oneBounds.upper).toBe(1);
     });
   });

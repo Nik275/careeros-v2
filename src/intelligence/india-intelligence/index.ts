@@ -126,69 +126,102 @@
 export {
   IndiaIntelligenceEngine,
   createIndiaIntelligenceEngine,
-  IndiaIntelligenceEngineConfig,
 } from './IndiaIntelligenceEngine';
 
 // Exam pathway engines
 export {
   JEEEngine,
   createJEEEngine,
-  JEEEngineConfig,
 } from './engines/JEEEngine';
 
 export {
   NEETEngine,
   createNEETEngine,
-  NEETEngineConfig,
 } from './engines/NEETEngine';
 
 export {
   UPSCEngine,
   createUPSCConfig,
-  UPSCEngineConfig,
 } from './engines/UPSCEngine';
 
 export {
   CAEngine,
   createCAEngine,
-  CAEngineConfig,
 } from './engines/CAEngine';
 
 // Constraint engines
 export {
   FamilyBusinessEngine,
   createFamilyBusinessEngine,
-  FamilyBusinessEngineConfig,
 } from './engines/FamilyBusinessEngine';
 
 export {
   RegionalConstraintEngine,
   createRegionalConstraintEngine,
-  RegionalConstraintEngineConfig,
 } from './engines/RegionalConstraintEngine';
 
 export {
   EconomicConstraintEngine,
   createEconomicConstraintEngine,
-  EconomicConstraintEngineConfig,
 } from './engines/EconomicConstraintEngine';
 
 // Analysis engines
 export {
   IndiaMotivationModel,
   createIndiaMotivationModel,
-  IndiaMotivationModelConfig,
 } from './IndiaMotivationModel';
 
 export {
   IndiaExplanationEngine,
   createIndiaExplanationEngine,
-  IndiaExplanationEngineConfig,
 } from './IndiaExplanationEngine';
 
 export {
   IndiaTradeoffEngine,
   createIndiaTradeoffEngine,
+} from './IndiaTradeoffEngine';
+
+export type {
+  IndiaIntelligenceEngineConfig,
+} from './IndiaIntelligenceEngine';
+
+export type {
+  JEEEngineConfig,
+} from './engines/JEEEngine';
+
+export type {
+  NEETEngineConfig,
+} from './engines/NEETEngine';
+
+export type {
+  UPSCEngineConfig,
+} from './engines/UPSCEngine';
+
+export type {
+  CAEngineConfig,
+} from './engines/CAEngine';
+
+export type {
+  FamilyBusinessEngineConfig,
+} from './engines/FamilyBusinessEngine';
+
+export type {
+  RegionalConstraintEngineConfig,
+} from './engines/RegionalConstraintEngine';
+
+export type {
+  EconomicConstraintEngineConfig,
+} from './engines/EconomicConstraintEngine';
+
+export type {
+  IndiaMotivationModelConfig,
+} from './IndiaMotivationModel';
+
+export type {
+  IndiaExplanationEngineConfig,
+} from './IndiaExplanationEngine';
+
+export type {
   IndiaTradeoffEngineConfig,
 } from './IndiaTradeoffEngine';
 

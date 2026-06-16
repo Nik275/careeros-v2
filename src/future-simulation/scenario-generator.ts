@@ -20,6 +20,7 @@ import type {
   LikelihoodEstimate,
   FutureSimulationConfig,
 } from './future-simulation-types';
+import { DEFAULT_FUTURE_SIMULATION_CONFIG } from './future-simulation-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { CareerTrajectory } from './future-simulation-types';
 import type { ScenarioOutcomes } from './future-simulation-types';
@@ -156,11 +157,11 @@ export class ScenarioGenerator {
   ): ScenarioDimensions {
     // Base values from career intelligence
     const baseCareerGrowth = career.careerAdvantages.careerMobility?.score ?? 50;
-    const baseIncomeGrowth = career.careerAdvantages.salaryGrowth?.score ?? 50;
-    const baseSkillDevelopment = career.careerAdvantages.skillDevelopment?.score ?? 50;
+    const baseIncomeGrowth = career.careerAdvantages.futureRelevance?.score ?? 50;
+    const baseSkillDevelopment = career.careerAdvantages.transferability?.score ?? 50;
     const baseCareerMobility = career.careerAdvantages.optionality?.score ?? 50;
-    const baseWorkLife = career.careerAdvantages.workLifeIntegration?.score ?? 50;
-    const baseRecognition = career.careerAdvantages.recognitionPotential?.score ?? 50;
+    const baseWorkLife = career.careerAdvantages.optionality?.score ?? 50;
+    const baseRecognition = career.careerAdvantages.futureRelevance?.score ?? 50;
 
     // Calculate time decay (less certainty further out)
     const timeDecay = 1 - (timeHorizon / 40);
@@ -447,7 +448,7 @@ export function createScenarioGenerator(
   config?: Partial<FutureSimulationConfig>
 ): ScenarioGenerator {
   const fullConfig: FutureSimulationConfig = {
-    ...import('./future-simulation-types').DEFAULT_FUTURE_SIMULATION_CONFIG,
+    ...DEFAULT_FUTURE_SIMULATION_CONFIG,
     ...config,
   };
 

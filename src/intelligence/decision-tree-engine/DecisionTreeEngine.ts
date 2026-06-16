@@ -17,11 +17,11 @@
  * - Compatible with Path Explorer, Future Simulation, Utility Engine, Decision Intelligence
  */
 
+import { DEFAULT_DECISION_TREE_CONFIG } from './types';
 import type {
   DecisionTreeInput,
   DecisionTreeAnalysis,
   DecisionTreeEngineConfig,
-  DEFAULT_DECISION_TREE_CONFIG,
 } from './types';
 
 import { DecisionTreeGenerator, createDecisionTreeGenerator } from './DecisionTreeGenerator';

@@ -251,7 +251,6 @@ export class FounderRiskProfileEngineV2 {
     
     // Multiple skill gaps = need co-founder
     const criticalGaps = [
-      FounderDimensionV2.TECHNICAL_FOUNDER,
       FounderDimensionV2.SALES_CAPABILITY,
       FounderDimensionV2.RESOURCEFULNESS,
     ].filter(d => (dimensionMap.get(d as FounderDimensionV2) ?? 0.5) < 0.4).length;
@@ -611,9 +610,7 @@ export class FounderRiskProfileEngineV2 {
         case FounderDimensionV2.SALES_CAPABILITY:
           mitigations.push('Practice selling through side projects or fundraising for nonprofits');
           break;
-        case FounderDimensionV2.TECHNICAL_FOUNDER:
-          mitigations.push('Learn to code through intensive bootcamp or self-study');
-          break;
+
         case FounderDimensionV2.TALENT_MAGNETISM:
           mitigations.push('Lead volunteer projects or community initiatives');
           break;

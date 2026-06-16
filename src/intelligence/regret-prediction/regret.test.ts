@@ -26,6 +26,11 @@ import {
   RegretDecisionOption,
   RegretStudentProfile,
   RegretDecisionContext,
+  ExplorationRegretAnalysis,
+  IdentityRegretAnalysis,
+  OpportunityRegretAnalysis,
+  FearDrivenRegretAnalysis,
+  ApprovalDrivenRegretAnalysis,
   RegretCategory,
   RegretRisk,
   RegretSeverity,
@@ -118,6 +123,89 @@ function createTestContext(
     timePressure: false,
     informationLevel: 'ADEQUATE',
     externalPressures,
+  };
+}
+
+function createMockExplorationAnalysis(
+  overrides: Partial<ExplorationRegretAnalysis> = {}
+): ExplorationRegretAnalysis {
+  return {
+    hasExplorationRisk: false,
+    unexploredPaths: [],
+    strongestInterestSuppressed: null,
+    explorationGap: 0.3,
+    severity: 'MILD',
+    evidence: [],
+    explanation: 'Test exploration analysis',
+    preventionPossible: true,
+    preventionStrategies: [],
+    ...overrides,
+  };
+}
+
+function createMockIdentityAnalysis(
+  overrides: Partial<IdentityRegretAnalysis> = {}
+): IdentityRegretAnalysis {
+  return {
+    hasIdentityRisk: false,
+    suppressedIdentities: [],
+    identityExpressions: [],
+    identityAlignment: 0.8,
+    severity: 'MILD',
+    evidence: [],
+    explanation: 'Test identity analysis',
+    preventionPossible: true,
+    identityRecoveryPath: [],
+    ...overrides,
+  };
+}
+
+function createMockOpportunityAnalysis(
+  overrides: Partial<OpportunityRegretAnalysis> = {}
+): OpportunityRegretAnalysis {
+  return {
+    hasOpportunityRisk: false,
+    opportunitiesForegone: [],
+    opportunityCostScore: 0.2,
+    severity: 'MILD',
+    evidence: [],
+    explanation: 'Test opportunity analysis',
+    preventionPossible: true,
+    alternativePaths: [],
+    ...overrides,
+  };
+}
+
+function createMockFearAnalysis(
+  overrides: Partial<FearDrivenRegretAnalysis> = {}
+): FearDrivenRegretAnalysis {
+  return {
+    hasFearRisk: false,
+    dominantFears: [],
+    fearInfluenceScore: 0.1,
+    severity: 'MILD',
+    evidence: [],
+    explanation: 'Test fear analysis',
+    preventionPossible: true,
+    fearMitigationStrategies: [],
+    ...overrides,
+  };
+}
+
+function createMockApprovalAnalysis(
+  overrides: Partial<ApprovalDrivenRegretAnalysis> = {}
+): ApprovalDrivenRegretAnalysis {
+  return {
+    hasApprovalRisk: false,
+    approvalSources: [],
+    externalInfluenceScore: 0.1,
+    authenticityGap: 0.2,
+    severity: 'MILD',
+    evidence: [],
+    explanation: 'Test approval analysis',
+    preventionPossible: true,
+    authenticityRecoverySteps: [],
+    ...overrides,
   };
 }
 
@@ -1213,8 +1301,8 @@ describe('Integration Tests', () => {
     
     const report = generateRegretReport(input);
     
-    expect(report.profile.hasApprovalRisk || report.profile.approvalAnalysis.hasApprovalRisk).toBeTruthy();
-    expect(report.profile.hasExplorationRisk || report.profile.explorationAnalysis.hasExplorationRisk).toBeTruthy();
+    expect(report.profile.approvalAnalysis.hasApprovalRisk).toBeTruthy();
+    expect(report.profile.explorationAnalysis.hasExplorationRisk).toBeTruthy();
   });
 
   it('should work end-to-end for fear-driven decision', () => {
@@ -1421,7 +1509,7 @@ describe('Additional Regret Categories', () => {
 
     it('should flag windows closing for exploration', () => {
       const input = createTestInput();
-      input.studentProfile.previousChoices = [{ path: 'corporate', age: 18, type: 'career' }];
+      input.studentProfile.previousChoices = ['corporate career at age 18'];
       input.studentProfile.interests = ['art', 'design'];
       const option = createTestOption('Corporate Accounting');
       const result = predictRegret(createTestInput([option], option));
@@ -1432,7 +1520,7 @@ describe('Additional Regret Categories', () => {
   describe('Money Regret', () => {
     it('should identify financial security vs passion tradeoff', () => {
       const option = createTestOption('High Paying Finance Job');
-      option.motivations = ['FINANCIAL_SECURITY'];
+      option.motivations = ['EXTRINSIC'];
       option.alignmentWithInterests = 0.3;
       const input = createTestInput([option], option);
       input.studentProfile.interests = ['art', 'music'];
@@ -1442,7 +1530,7 @@ describe('Additional Regret Categories', () => {
 
     it('should flag financial pressure as risk factor', () => {
       const option = createTestOption();
-      option.motivations = ['FINANCIAL_PRESSURE'];
+      option.motivations = ['OBLIGATION'];
       const input = createTestInput([option], option);
       const result = predictRegret(input);
       expect(result.overallRegretRisk).toBeDefined();
@@ -1459,7 +1547,7 @@ describe('Additional Regret Categories', () => {
 
     it('should consider mentorship opportunities', () => {
       const option = createTestOption('Good Mentorship');
-      option.mentorshipAccess = 'HIGH';
+      option.explorationValue = 0.8;
       const input = createTestInput([option], option);
       const result = predictRegret(input);
       expect(result).toBeDefined();
@@ -1498,7 +1586,7 @@ describe('Additional Regret Categories', () => {
 
     it('should acknowledge missing information', () => {
       const input = createTestInput();
-      input.context.knownUnknowns = ['job market in 10 years', 'technology changes'];
+      input.context.informationLevel = 'LIMITED';
       const result = predictRegret(input);
       expect(result).toBeDefined();
     });
@@ -1507,7 +1595,7 @@ describe('Additional Regret Categories', () => {
   describe('Sacrifice Regret', () => {
     it('should identify health tradeoffs', () => {
       const option = createTestOption('High Stress Job');
-      option.workLifeBalance = 'POOR';
+      option.opportunityCost = 0.8;
       const input = createTestInput([option], option);
       const result = predictRegret(input);
       expect(result).toBeDefined();
@@ -1526,8 +1614,7 @@ describe('Additional Regret Categories', () => {
     it('should detect insufficient challenge for high achievers', () => {
       const option = createTestOption('Easy Entry Level');
       const profile = createTestProfile();
-      profile.achievementLevel = 'HIGH';
-      profile.needsChallenge = true;
+      profile.personalityTraits = [...(profile.personalityTraits ?? []), 'high achiever', 'challenge-seeking'];
       const input = createTestInput([option], option);
       input.studentProfile = profile;
       const result = predictRegret(input);
@@ -1537,7 +1624,7 @@ describe('Additional Regret Categories', () => {
     it('should detect excessive challenge for anxious students', () => {
       const option = createTestOption('Extremely Competitive');
       const profile = createTestProfile();
-      profile.anxietyLevel = 'HIGH';
+      profile.fearFactors = ['anxiety about intense competition'];
       const input = createTestInput([option], option);
       input.studentProfile = profile;
       const result = predictRegret(input);
@@ -1558,7 +1645,7 @@ describe('Additional Regret Categories', () => {
 
     it('should consider contribution opportunities', () => {
       const option = createTestOption('High Impact Role');
-      option.impactPotential = 'HIGH';
+      option.alignmentWithValues = 0.9;
       const input = createTestInput([option], option);
       const result = predictRegret(input);
       expect(result).toBeDefined();
@@ -1628,7 +1715,7 @@ describe('Real-World Scenarios', () => {
     it('should not penalize gap year for exploration', () => {
       const gapYear = createTestOption('Gap Year');
       gapYear.explorationValue = 0.9;
-      gapYear.motivations = ['EXPLORATION', 'GROWTH'];
+      gapYear.motivations = ['INTRINSIC'];
       gapYear.alignmentWithInterests = 0.8;
       gapYear.alignmentWithValues = 0.8;
       const direct = createTestOption('Direct Entry');
@@ -1652,8 +1739,8 @@ describe('Real-World Scenarios', () => {
     it('should assess recovery path for career changers', () => {
       const input = createTestInput();
       input.studentProfile.previousChoices = [
-        { path: 'engineering', age: 22, type: 'career' },
-        { path: 'design switch', age: 28, type: 'career' }
+        'engineering career at age 22',
+        'design switch at age 28',
       ];
       const result = predictRegret(input);
       expect(result).toBeDefined();
@@ -1787,41 +1874,28 @@ describe('Non-Deterministic Language Verification', () => {
 describe('Integration with Other CareerOS Engines', () => {
   it('should accept Decision Intelligence input format', () => {
     const input = createTestInput();
-    input.decisionIntelligenceData = {
-      decisionType: 'CAREER_PATH',
-      options: ['Option A', 'Option B'],
-      analysis: {}
-    };
+    input.description = 'Decision Intelligence input format: CAREER_PATH with Option A and Option B';
     const result = predictRegret(input);
     expect(result).toBeDefined();
   });
 
   it('should accept Career Criticality data', () => {
     const input = createTestInput();
-    input.careerCriticality = {
-      pathCriticality: 0.8,
-      reversibility: 'LOW'
-    };
+    input.context.reversibility = 'DIFFICULT';
     const result = predictRegret(input);
     expect(result).toBeDefined();
   });
 
   it('should accept Optionality Engine data', () => {
     const input = createTestInput();
-    input.optionalityAnalysis = {
-      futureOptions: ['Option A', 'Option B'],
-      optionalityScore: 0.7
-    };
+    input.options.push(createTestOption('Option B'));
     const result = predictRegret(input);
     expect(result).toBeDefined();
   });
 
   it('should accept Recommendation Stability data', () => {
     const input = createTestInput();
-    input.recommendationStability = {
-      stabilityScore: 0.6,
-      confidenceInterval: [0.4, 0.8]
-    };
+    input.context.informationLevel = 'COMPREHENSIVE';
     const result = predictRegret(input);
     expect(result).toBeDefined();
   });
@@ -1960,7 +2034,7 @@ describe('Exploration Regret Engine - Extended Tests', () => {
   it('should handle extensive exploration history', () => {
     const option = createTestOption();
     const profile = createTestProfile();
-    profile.previousChoices = Array(20).fill(null).map((_, i) => ({ path: `path${i}`, age: 15 + i, type: 'exploration' }));
+    profile.previousChoices = Array.from({ length: 20 }, (_, i) => `exploration path${i} at age ${15 + i}`);
     const context = createTestContext();
     const result = engine.analyzeExplorationRegret(option, profile, context);
     expect(result.explorationGap).toBeLessThanOrEqual(1);
@@ -2164,7 +2238,7 @@ describe('Fear-Driven Regret Engine - Extended Tests', () => {
     const profile = createTestProfile();
     const context = createTestContext();
     const result = engine.analyzeFearDrivenRegret(option, profile, context);
-    expect(result.courageAlternative || result.fearMitigationStrategies.length > 0).toBeTruthy();
+    expect(result.fearMitigationStrategies.length > 0).toBeTruthy();
   });
 });
 
@@ -2246,75 +2320,75 @@ describe('Regret Forecast Engine - Extended Tests', () => {
   });
 
   it('should show increasing regret for exploration gaps over time', () => {
-    const mockExploration = { hasExplorationRisk: true, explorationGap: 0.8, severity: 'SIGNIFICANT' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: true, explorationGap: 0.8, severity: 'SIGNIFICANT' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     // Exploration regret typically compounds
     expect(result.twentyYear.regretProbability).toBeDefined();
   });
 
   it('should show trajectory as worsening for multiple risk factors', () => {
-    const mockExploration = { hasExplorationRisk: true, explorationGap: 0.7, severity: 'MODERATE' };
-    const mockIdentity = { hasIdentityRisk: true, identityAlignment: 0.4, severity: 'MODERATE' };
-    const mockOpportunity = { hasOpportunityRisk: true, opportunityCostScore: 0.6, severity: 'MODERATE' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.2, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.3, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: true, explorationGap: 0.7, severity: 'MODERATE' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: true, identityAlignment: 0.4, severity: 'MODERATE' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: true, opportunityCostScore: 0.6, severity: 'MODERATE' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.2, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.3, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.trajectory).toBeDefined();
   });
 
   it('should provide different descriptions for different time horizons', () => {
-    const mockExploration = { hasExplorationRisk: true, explorationGap: 0.6, severity: 'MODERATE' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.3, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.2, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: true, explorationGap: 0.6, severity: 'MODERATE' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.3, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.2, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.fiveYear.description).not.toBe(result.fortyYear.description);
   });
 
   it('should show five year horizon', () => {
-    const mockExploration = { hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.fiveYear).toBeDefined();
     expect(result.fiveYear.timeHorizon).toBe(5);
   });
 
   it('should show ten year horizon', () => {
-    const mockExploration = { hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.tenYear).toBeDefined();
     expect(result.tenYear.timeHorizon).toBe(10);
   });
 
   it('should show twenty year horizon', () => {
-    const mockExploration = { hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.twentyYear).toBeDefined();
     expect(result.twentyYear.timeHorizon).toBe(20);
   });
 
   it('should show forty year horizon', () => {
-    const mockExploration = { hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' };
-    const mockIdentity = { hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' };
-    const mockOpportunity = { hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' };
-    const mockFear = { hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' };
-    const mockApproval = { hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' };
+    const mockExploration = createMockExplorationAnalysis({ hasExplorationRisk: false, explorationGap: 0.3, severity: 'MILD' });
+    const mockIdentity = createMockIdentityAnalysis({ hasIdentityRisk: false, identityAlignment: 0.8, severity: 'MILD' });
+    const mockOpportunity = createMockOpportunityAnalysis({ hasOpportunityRisk: false, opportunityCostScore: 0.2, severity: 'MILD' });
+    const mockFear = createMockFearAnalysis({ hasFearRisk: false, fearInfluenceScore: 0.1, severity: 'MILD' });
+    const mockApproval = createMockApprovalAnalysis({ hasApprovalRisk: false, authenticityGap: 0.2, severity: 'MILD' });
     const result = engine.generateForecast(mockExploration, mockIdentity, mockOpportunity, mockFear, mockApproval, createTestOption());
     expect(result.fortyYear).toBeDefined();
     expect(result.fortyYear.timeHorizon).toBe(40);
@@ -2421,3 +2495,4 @@ describe('Test Suite Verification', () => {
     expect(generateQuickRegretReport).toBeDefined();
   });
 });
+

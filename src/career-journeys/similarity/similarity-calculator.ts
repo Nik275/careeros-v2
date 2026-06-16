@@ -187,7 +187,6 @@ export class SimilarityCalculator {
       'TIER_1': 1.0,
       'TIER_2': 0.8,
       'TIER_3': 0.6,
-      'TIER_4': 0.4,
       'RURAL': 0.2,
     };
 
@@ -212,7 +211,7 @@ export class SimilarityCalculator {
     const bestFieldScore = Math.max(...fieldScores);
 
     // Check level match
-    const levels = journeyEducation.map(e => e.level);
+    const levels = journeyEducation.map(e => e.type);
     const levelScore = levels.some(l => 
       this.normalizeEducationLevel(l) === this.normalizeEducationLevel(studentEducation.currentLevel)
     ) ? 1 : 0.5;
@@ -236,7 +235,7 @@ export class SimilarityCalculator {
       return 0.5; // Neutral when no constraints specified
     }
 
-    const journeyConstraints = journey.constraints || [];
+    const journeyConstraints = journey.startingPoint.initialConstraints;
     
     if (journeyConstraints.length === 0) {
       // Journey had no constraints but student has some
@@ -351,7 +350,7 @@ export class SimilarityCalculator {
 
     // Check if stakes align
     const highStakesDecisions = similarDecisions.filter(d => 
-      d.importance === 'CRITICAL' || d.importance === 'HIGH'
+      d.actualOutcome.impact === 'TRANSFORMATIONAL' || d.actualOutcome.impact === 'MAJOR'
     );
     const stakesMatch = studentContext.stakes === 'HIGH' && highStakesDecisions.length > 0 ? 1 : 0.7;
 
@@ -375,7 +374,7 @@ export class SimilarityCalculator {
     // Family background (if available)
     if (student.constraints) {
       const economicMatch = this.inferEconomicBackground(student) === 
-        journey.startingPoint.familyBackground.economicStatus;
+        journey.startingPoint.economicContext.familyIncomeLevel;
       score += economicMatch ? 1 : 0.5;
       factors++;
     }
@@ -406,10 +405,11 @@ export class SimilarityCalculator {
     factors.push(this.cityTierSimilarity(student.location.cityTier, journey.startingPoint.location.tier));
 
     // Initial constraints
-    if (journey.constraints.length > 0) {
+    const journeyConstraints = journey.startingPoint.initialConstraints;
+    if (journeyConstraints.length > 0) {
       // Check if student has similar constraints
       const hasSimilarConstraints = student.constraints?.some(sc =>
-        journey.constraints.some(jc => jc.type === this.mapConstraintType(sc))
+        journeyConstraints.some(jc => jc.type === this.mapConstraintType(sc))
       );
       factors.push(hasSimilarConstraints ? 0.8 : 0.4);
     }
@@ -430,7 +430,7 @@ export class SimilarityCalculator {
     const dimensions: Record<SimilarityDimension, number[]> = {
       ARCHETYPE: archetype ? this.archetypeToVector(archetype) : [0.5, 0.5, 0.5, 0.5],
       MOTIVATION: motivation ? this.motivationToVector(motivation) : [0.5, 0.5, 0.5],
-      CONSTRAINT: this.constraintsToVector(student.constraints),
+      CONSTRAINT: this.constraintsToVector(this.constraintStringsToSnapshot(student.constraints)),
       EDUCATION: this.educationToVector(student.education),
       LOCATION: this.locationToVector(student.location),
       CAREER_GOAL: this.goalsToVector(student.careerGoals),
@@ -624,9 +624,9 @@ export class SimilarityCalculator {
   private inferJourneyArchetype(journey: CareerJourney): string {
     // Simple heuristic based on career progression
     const industries = [...new Set(journey.careerHistory.map(p => p.industry))];
-    const companies = journey.careerHistory.map(p => p.companyType);
+    const companyStages = journey.careerHistory.map(p => p.companyStage);
 
-    if (companies.includes('STARTUP') || companies.includes('OWN_BUSINESS')) {
+    if (companyStages.some(stage => stage.startsWith('STARTUP_')) || companyStages.includes('SELF_EMPLOYED')) {
       return 'FOUNDER';
     }
 
@@ -696,13 +696,17 @@ export class SimilarityCalculator {
     return this.stringSimilarity(a, b) > 0.7;
   }
 
-  private inferEconomicBackground(student: StudentProfileSnapshot): string {
+  private inferEconomicBackground(student: StudentProfileSnapshot): 'LOW' | 'MIDDLE' | 'UNKNOWN' {
     // Infer from constraints
-    if (student.constraints?.some(c => c.type === 'FINANCIAL' && c.severity === 'CRITICAL')) {
-      return 'LOW_INCOME';
+    if (student.constraints?.some(
+      (constraint) =>
+        this.mapConstraintType(constraint) === 'FINANCIAL' &&
+        constraint.toLowerCase().includes('critical')
+    )) {
+      return 'LOW';
     }
-    if (student.constraints?.some(c => c.type === 'FINANCIAL')) {
-      return 'MIDDLE_INCOME';
+    if (student.constraints?.some((constraint) => this.mapConstraintType(constraint) === 'FINANCIAL')) {
+      return 'MIDDLE';
     }
     return 'UNKNOWN';
   }
@@ -713,9 +717,9 @@ export class SimilarityCalculator {
       'money': 'FINANCIAL',
       'location': 'GEOGRAPHIC',
       'family': 'FAMILY',
-      'time': 'TIME',
+      'time': 'TIMING',
       'health': 'HEALTH',
-      'education': 'EDUCATIONAL',
+      'education': 'EDUCATION',
     };
 
     const lower = constraintString.toLowerCase();
@@ -760,6 +764,23 @@ export class SimilarityCalculator {
     return [avgSeverity, flexibility, constraints.constraints.length / 5];
   }
 
+  private constraintStringsToSnapshot(
+    constraints: string[] | undefined
+  ): ConstraintProfileSnapshot | undefined {
+    if (!constraints || constraints.length === 0) {
+      return undefined;
+    }
+
+    return {
+      constraints: constraints.map((constraint) => ({
+        type: this.mapConstraintType(constraint),
+        description: constraint,
+        severity: 'MODERATE',
+      })),
+      flexibilityLevel: 'MEDIUM',
+    };
+  }
+
   private educationToVector(education: StudentProfileSnapshot['education']): number[] {
     const levelMap: Record<string, number> = {
       'high_school': 0.2,
@@ -786,7 +807,6 @@ export class SimilarityCalculator {
       'TIER_1': 1,
       'TIER_2': 0.8,
       'TIER_3': 0.6,
-      'TIER_4': 0.4,
       'RURAL': 0.2,
     };
 

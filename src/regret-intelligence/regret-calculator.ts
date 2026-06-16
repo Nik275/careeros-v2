@@ -35,9 +35,10 @@ import type {
   OpportunityAtRisk,
   OptionalityReference,
 } from './regret-types';
+import { DEFAULT_REGRET_INTELLIGENCE_CONFIG } from './regret-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
-import type { StudentLifeProfile } from '@/types/student-profile';
+import type { StudentLifeProfile } from '@/types/student-life-profile';
 import type { OptionalityAnalysis } from '@/optionality-intelligence/optionality-types';
 
 /**
@@ -136,8 +137,8 @@ export class RegretCalculator {
     const analyticalDemand = career.cognitiveDemands.analyticalDemand?.score ?? 50;
 
     // Check for creative mismatch
-    if (profile.workStyle?.preferenceForCreative !== undefined) {
-      const creativePreference = profile.workStyle.preferenceForCreative;
+    if (profile.cognitive.creative !== undefined) {
+      const creativePreference = profile.cognitive.creative;
       if (creativePreference >= 70 && creativeDemand <= 40) {
         const impact = Math.round((creativePreference - creativeDemand) * 0.8);
         factors.push({
@@ -155,8 +156,8 @@ export class RegretCalculator {
     }
 
     // Check for analytical mismatch
-    if (profile.workStyle?.preferenceForAnalytical !== undefined) {
-      const analyticalPreference = profile.workStyle.preferenceForAnalytical;
+    if (profile.cognitive.analytical !== undefined) {
+      const analyticalPreference = profile.cognitive.analytical;
       if (analyticalPreference >= 70 && analyticalDemand <= 40) {
         const impact = Math.round((analyticalPreference - analyticalDemand) * 0.7);
         factors.push({
@@ -175,8 +176,8 @@ export class RegretCalculator {
 
     // Check social interaction alignment
     const socialDemand = career.workEnvironment.peopleIntensity?.score ?? 50;
-    if (profile.socialProfile?.socialPreference !== undefined) {
-      const socialPreference = profile.socialProfile.socialPreference;
+    if (profile.workEnvironment.peopleOriented !== undefined) {
+      const socialPreference = profile.workEnvironment.peopleOriented;
       const gap = Math.abs(socialPreference - socialDemand);
       if (gap >= 30) {
         const impact = Math.round(gap * 0.6);
@@ -197,7 +198,7 @@ export class RegretCalculator {
     }
 
     // Check fit result for identity signals
-    const overallFit = fitResult.overallFit?.compatibility ?? 50;
+    const overallFit = fitResult.overallFitScore ?? 50;
     if (overallFit < 50) {
       factors.push({
         name: 'Low Overall Fit',
@@ -258,40 +259,38 @@ export class RegretCalculator {
     }> = [
       {
         name: 'WORK_LIFE_BALANCE',
-        desiredGetter: () => profile.personalPreferences?.workLifeBalancePriority,
-        actualGetter: () => 100 - (career.workEnvironment.schedulePredictability?.score ?? 50),
+        desiredGetter: () => profile.lifestyle.workLifeBalance,
+        actualGetter: () => career.lifestyleCharacteristics.workLifeBalance?.score ?? 50,
         description: 'Balance between work and personal life',
       },
       {
         name: 'SCHEDULE_FLEXIBILITY',
-        desiredGetter: () => profile.workStyle?.preferenceForFlexibility,
-        actualGetter: () => career.workEnvironment.scheduleFlexibility?.score ?? 50,
+        desiredGetter: () => profile.lifestyle.workLifeBalance,
+        actualGetter: () => career.lifestyleCharacteristics.workLifeBalance?.score ?? 50,
         description: 'Flexibility in work schedule',
       },
       {
         name: 'REMOTE_WORK',
-        desiredGetter: () => profile.workStyle?.preferenceForRemote,
-        actualGetter: () => career.workEnvironment.remoteCompatibility?.score ?? 50,
+        desiredGetter: () => profile.lifestyle.locationFreedom,
+        actualGetter: () => career.lifestyleCharacteristics.locationFlexibility?.score ?? 50,
         description: 'Ability to work remotely',
       },
       {
         name: 'AUTONOMY',
-        desiredGetter: () => profile.workStyle?.preferenceForAutonomy,
-        actualGetter: () => career.workEnvironment.autonomyLevel?.score ?? 50,
+        desiredGetter: () => profile.motivation.autonomy,
+        actualGetter: () => career.workEnvironment.independenceLevel?.score ?? 50,
         description: 'Level of independence in work',
       },
       {
         name: 'SOCIAL_INTERACTION',
-        desiredGetter: () => profile.socialProfile?.socialPreference,
+        desiredGetter: () => profile.workEnvironment.peopleOriented,
         actualGetter: () => career.workEnvironment.peopleIntensity?.score ?? 50,
         description: 'Amount of social interaction',
       },
       {
         name: 'STRESS_LEVEL',
-        desiredGetter: () => profile.personalPreferences?.stressTolerance
-          ? 100 - profile.personalPreferences.stressTolerance
-          : undefined,
-        actualGetter: () => career.cognitiveDemands.stressTolerance?.score ?? 50,
+        desiredGetter: () => 100 - profile.risk.uncertaintyComfort,
+        actualGetter: () => career.careerRisks.burnoutRisk?.score ?? 50,
         description: 'Level of stress in the role',
       },
     ];
@@ -343,11 +342,15 @@ export class RegretCalculator {
     const factors: FinancialFactor[] = [];
 
     // Get salary information
-    const salaryRange = career.metadata.averageSalary;
+    const incomePotential = career.lifestyleCharacteristics.incomePotential?.score ?? 50;
+    const salaryRange = {
+      min: incomePotential * 1200,
+      max: incomePotential * 2800,
+    };
     const medianSalary = (salaryRange.min + salaryRange.max) / 2;
 
     // Income adequacy assessment
-    const minimumAcceptable = profile.personalPreferences?.minimumSalaryRequirement ?? salaryRange.min * 0.8;
+    const minimumAcceptable = salaryRange.min * 0.8;
     const buffer = ((medianSalary - minimumAcceptable) / minimumAcceptable) * 100;
     const shortfallRisk = buffer < 0 ? Math.min(100, Math.round(Math.abs(buffer) * 2)) : 0;
 
@@ -367,7 +370,7 @@ export class RegretCalculator {
     }
 
     // Growth potential assessment
-    const currentPotential = career.careerAdvantages.salaryGrowth?.score ?? 50;
+    const currentPotential = career.careerAdvantages.futureRelevance?.score ?? 50;
     const growthTrajectory = career.careerAdvantages.careerMobility?.score ?? 50;
     const ceilingRisk = 100 - currentPotential;
 
@@ -386,8 +389,8 @@ export class RegretCalculator {
     }
 
     // Financial priority alignment
-    if (profile.personalPreferences?.financialStabilityPriority !== undefined) {
-      const financialPriority = profile.personalPreferences.financialStabilityPriority;
+    if (profile.motivation.security !== undefined) {
+      const financialPriority = profile.motivation.security;
       const stabilityScore = 100 - (career.careerRisks.automationRisk?.score ?? 50);
 
       if (financialPriority >= 70 && stabilityScore <= 50) {
@@ -509,7 +512,7 @@ export class RegretCalculator {
     const factors: GrowthFactor[] = [];
 
     // Learning opportunity assessment
-    const skillBreadth = career.cognitiveDemands.learningRequirement?.score ?? 50;
+    const skillBreadth = career.motivationalDemands.masteryDemand?.score ?? 50;
     const skillAcquisitionRate: import('./regret-types').LearningAssessment['skillAcquisitionRate'] =
       skillBreadth >= 70 ? 'HIGH' : skillBreadth >= 45 ? 'MODERATE' : 'LOW';
 
@@ -528,7 +531,17 @@ export class RegretCalculator {
     }
 
     // Challenge assessment
-    const complexityDemand = career.cognitiveDemands.complexityLevel?.score ?? 50;
+    const cognitiveDemandScores = [
+      career.cognitiveDemands.analyticalDemand.score,
+      career.cognitiveDemands.creativeDemand.score,
+      career.cognitiveDemands.systematicDemand.score,
+      career.cognitiveDemands.verbalDemand.score,
+      career.cognitiveDemands.spatialDemand.score,
+      career.cognitiveDemands.quantitativeDemand.score,
+    ];
+    const complexityDemand = Math.round(
+      cognitiveDemandScores.reduce((sum, score) => sum + score, 0) / cognitiveDemandScores.length
+    );
     const underChallengeRisk = complexityDemand < 40 ? Math.round(50 - complexityDemand) : 0;
     const overChallengeRisk = complexityDemand > 80 ? Math.round(complexityDemand - 70) : 0;
 
@@ -553,7 +566,7 @@ export class RegretCalculator {
     const masteryPotential: MasteryAssessment = {
       score: skillBreadth,
       expertiseCeiling,
-      recognitionPotential: career.careerAdvantages.recognitionPotential?.score ?? 50,
+      recognitionPotential: career.careerAdvantages.futureRelevance?.score ?? 50,
     };
 
     if (expertiseCeiling === 'LOW') {
@@ -565,8 +578,8 @@ export class RegretCalculator {
     }
 
     // Check student growth orientation
-    if (profile.workStyle?.preferenceForGrowth !== undefined) {
-      const growthPreference = profile.workStyle.preferenceForGrowth;
+    if (profile.motivation.mastery !== undefined) {
+      const growthPreference = profile.motivation.mastery;
       if (growthPreference >= 70 && skillBreadth <= 50) {
         factors.push({
           name: 'Growth Mismatch',
@@ -611,22 +624,22 @@ export class RegretCalculator {
     // Get student values (from various profile sections)
     const studentValues: Array<{ name: string; strength: number }> = [];
 
-    if (profile.personalPreferences?.impactPriority !== undefined) {
-      studentValues.push({ name: 'Impact', strength: profile.personalPreferences.impactPriority });
+    if (profile.motivation.impact !== undefined) {
+      studentValues.push({ name: 'Impact', strength: profile.motivation.impact });
     }
 
-    if (profile.personalPreferences?.financialStabilityPriority !== undefined) {
+    if (profile.motivation.security !== undefined) {
       studentValues.push({
         name: 'Financial Stability',
-        strength: profile.personalPreferences.financialStabilityPriority,
+        strength: profile.motivation.security,
       });
     }
 
     // Work-life balance as value
-    if (profile.personalPreferences?.workLifeBalancePriority !== undefined) {
+    if (profile.lifestyle.workLifeBalance !== undefined) {
       studentValues.push({
         name: 'Work-Life Balance',
-        strength: profile.personalPreferences.workLifeBalancePriority,
+        strength: profile.lifestyle.workLifeBalance,
       });
     }
 
@@ -637,7 +650,7 @@ export class RegretCalculator {
 
     studentValues.forEach((value) => {
       if (value.name === 'Impact') {
-        const impactScore = career.careerAdvantages.socialImpact?.score ?? 50;
+        const impactScore = career.motivationalDemands.impactDemand.score;
         if (value.strength >= 70 && impactScore < 50) {
           const severity = Math.round((value.strength - impactScore) * 0.8);
           conflicts.push({
@@ -671,7 +684,7 @@ export class RegretCalculator {
       }
 
       if (value.name === 'Work-Life Balance') {
-        const schedulePredictability = career.workEnvironment.schedulePredictability?.score ?? 50;
+        const schedulePredictability = career.lifestyleCharacteristics.workLifeBalance?.score ?? 50;
         if (value.strength >= 70 && schedulePredictability < 50) {
           const severity = Math.round((value.strength - (100 - schedulePredictability)) * 0.8);
           conflicts.push({
@@ -739,7 +752,7 @@ export function createRegretCalculator(
   config?: Partial<RegretIntelligenceConfig>
 ): RegretCalculator {
   const fullConfig: RegretIntelligenceConfig = {
-    ...import('./regret-types').DEFAULT_REGRET_INTELLIGENCE_CONFIG,
+    ...DEFAULT_REGRET_INTELLIGENCE_CONFIG,
     ...config,
   };
 

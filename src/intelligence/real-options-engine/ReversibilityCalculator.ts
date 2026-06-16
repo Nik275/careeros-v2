@@ -290,10 +290,10 @@ export class ReversibilityCalculator {
 
     return {
       overall,
-      financial: Math.round(financialBarrier),
-      temporal: Math.round(timeBarrier),
-      skill: Math.round(skillBarrier),
-      network: networkBarrier,
+      financialBarrier: Math.round(financialBarrier),
+      timeBarrier: Math.round(timeBarrier),
+      skillBarrier: Math.round(skillBarrier),
+      networkBarrier: networkBarrier,
     };
   }
 

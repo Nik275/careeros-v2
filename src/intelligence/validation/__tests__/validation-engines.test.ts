@@ -22,7 +22,6 @@ import {
   IntelligenceValidationEngine,
 } from '../index';
 import type {
-  CalibrationBin,
   RecommendationSnapshot,
   PathwayResult,
   UncertaintyInput,
@@ -33,6 +32,16 @@ import type {
 // ============================================================================
 // TEST UTILITIES
 // ============================================================================
+
+type RawCalibrationBin = ReturnType<ConfidenceCalibrationEngine['binPredictions']>[number];
+type CalibrationBinFixture = Omit<RawCalibrationBin, 'sampleSizeAdequate'> &
+  Partial<Pick<RawCalibrationBin, 'sampleSizeAdequate'>>;
+
+const createCalibrationBins = (bins: CalibrationBinFixture[]): RawCalibrationBin[] =>
+  bins.map(bin => ({
+    ...bin,
+    sampleSizeAdequate: bin.sampleSizeAdequate ?? bin.count >= 30,
+  }));
 
 const createMockTimestamp = () => Date.now();
 
@@ -207,27 +216,27 @@ describe('ConfidenceCalibrationEngine', () => {
     });
 
     it('should calculate expected calibration for perfect calibration', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 10, averageConfidence: 55, actualFrequency: 55, error: 0, sampleSize: 10 },
-        { binStart: 60, binEnd: 70, predictions: [], count: 10, averageConfidence: 65, actualFrequency: 65, error: 0, sampleSize: 10 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 10, averageConfidence: 55, actualFrequency: 55, error: 0 },
+        { binStart: 60, binEnd: 70, predictions: [], count: 10, averageConfidence: 65, actualFrequency: 65, error: 0 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.score).toBeGreaterThan(90);
       expect(report.overallCalibration.status).toBe('well-calibrated');
     });
 
     it('should detect overconfidence', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 80, binEnd: 90, predictions: [], count: 10, averageConfidence: 85, actualFrequency: 60, error: 25, sampleSize: 10 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 80, binEnd: 90, predictions: [], count: 10, averageConfidence: 85, actualFrequency: 60, error: 25 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.overconfidence).toBeGreaterThan(0);
     });
 
     it('should detect underconfidence', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 10, averageConfidence: 55, actualFrequency: 80, error: 25, sampleSize: 10 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 10, averageConfidence: 55, actualFrequency: 80, error: 25 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.underconfidence).toBeGreaterThan(0);
     });
@@ -326,47 +335,47 @@ describe('ConfidenceCalibrationEngine', () => {
 
   describe('Extreme Values', () => {
     it('should handle extreme overconfidence (99% conf, 1% actual)', () => {
-      const bins: CalibrationBin[] = [{
+      const bins = createCalibrationBins([{
         binStart: 95, binEnd: 100, predictions: [], count: 100,
-        averageConfidence: 99, actualFrequency: 1, error: 98, sampleSize: 100
-      }];
+        averageConfidence: 99, actualFrequency: 1, error: 98
+      }]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.score).toBeLessThan(10);
       expect(report.overallCalibration.status).toBe('severely-miscalibrated');
     });
 
     it('should handle perfect calibration at multiple levels', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 55, error: 0, sampleSize: 100 },
-        { binStart: 60, binEnd: 70, predictions: [], count: 100, averageConfidence: 65, actualFrequency: 65, error: 0, sampleSize: 100 },
-        { binStart: 70, binEnd: 80, predictions: [], count: 100, averageConfidence: 75, actualFrequency: 75, error: 0, sampleSize: 100 },
-        { binStart: 80, binEnd: 90, predictions: [], count: 100, averageConfidence: 85, actualFrequency: 85, error: 0, sampleSize: 100 },
-        { binStart: 90, binEnd: 100, predictions: [], count: 100, averageConfidence: 95, actualFrequency: 95, error: 0, sampleSize: 100 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 55, error: 0 },
+        { binStart: 60, binEnd: 70, predictions: [], count: 100, averageConfidence: 65, actualFrequency: 65, error: 0 },
+        { binStart: 70, binEnd: 80, predictions: [], count: 100, averageConfidence: 75, actualFrequency: 75, error: 0 },
+        { binStart: 80, binEnd: 90, predictions: [], count: 100, averageConfidence: 85, actualFrequency: 85, error: 0 },
+        { binStart: 90, binEnd: 100, predictions: [], count: 100, averageConfidence: 95, actualFrequency: 95, error: 0 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.score).toBe(100);
     });
 
     it('should handle inverse calibration (low conf = high accuracy)', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 90, error: 35, sampleSize: 100 },
-        { binStart: 90, binEnd: 100, predictions: [], count: 100, averageConfidence: 95, actualFrequency: 50, error: 45, sampleSize: 100 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 90, error: 35 },
+        { binStart: 90, binEnd: 100, predictions: [], count: 100, averageConfidence: 95, actualFrequency: 50, error: 45 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.score).toBeLessThan(50);
     });
 
     it('should calculate ECE correctly with uniform error', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 45, error: 10, sampleSize: 100 },
-        { binStart: 60, binEnd: 70, predictions: [], count: 100, averageConfidence: 65, actualFrequency: 55, error: 10, sampleSize: 100 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 45, error: 10 },
+        { binStart: 60, binEnd: 70, predictions: [], count: 100, averageConfidence: 65, actualFrequency: 55, error: 10 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.overallCalibration.ece).toBe(10);
     });
 
     it('should handle single prediction per bin', () => {
-      const bins: CalibrationBin[] = Array(10).fill(null).map((_, i) => ({
+      const bins = createCalibrationBins(Array(10).fill(null).map((_, i) => ({
         binStart: i * 10,
         binEnd: (i + 1) * 10,
         predictions: [],
@@ -374,18 +383,17 @@ describe('ConfidenceCalibrationEngine', () => {
         averageConfidence: i * 10 + 5,
         actualFrequency: i * 10 + 5,
         error: 0,
-        sampleSize: 1,
-      }));
+      })));
       const report = engine.analyzeCalibration(bins);
       expect(report.binAnalysis.filter(b => b.sampleSizeAdequate).length).toBeLessThan(5);
     });
 
     it('should handle bins with zero samples', () => {
-      const bins: CalibrationBin[] = [
-        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 55, error: 0, sampleSize: 100 },
-        { binStart: 60, binEnd: 70, predictions: [], count: 0, averageConfidence: 0, actualFrequency: 0, error: 0, sampleSize: 0 },
-        { binStart: 70, binEnd: 80, predictions: [], count: 100, averageConfidence: 75, actualFrequency: 75, error: 0, sampleSize: 100 },
-      ];
+      const bins = createCalibrationBins([
+        { binStart: 50, binEnd: 60, predictions: [], count: 100, averageConfidence: 55, actualFrequency: 55, error: 0 },
+        { binStart: 60, binEnd: 70, predictions: [], count: 0, averageConfidence: 0, actualFrequency: 0, error: 0 },
+        { binStart: 70, binEnd: 80, predictions: [], count: 100, averageConfidence: 75, actualFrequency: 75, error: 0 },
+      ]);
       const report = engine.analyzeCalibration(bins);
       expect(report.binAnalysis.length).toBe(3);
     });

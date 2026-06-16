@@ -11,9 +11,9 @@
 
 import type {
   StudentId,
-  CareerId,
 } from '../outcome-tracking/outcome-types.js';
 import type {
+  CareerId,
   EvidenceGap,
   EvidenceGapId,
   EvidenceGapType,
@@ -343,8 +343,9 @@ export class EvidenceGapEngine {
     // Calculate progress
     const gapProgress = gaps.map(gap => {
       const tracking = this.gapTracking.get(gap.gapId);
-      const previousCoverage = tracking?.coverageHistory.length > 1
-        ? tracking.coverageHistory[tracking.coverageHistory.length - 2].coverage
+      const coverageHistory = tracking?.coverageHistory ?? [];
+      const previousCoverage = coverageHistory.length > 1
+        ? coverageHistory[coverageHistory.length - 2].coverage
         : 0;
 
       return {
@@ -365,6 +366,7 @@ export class EvidenceGapEngine {
       timestamp: Date.now(),
       gaps,
       criticalGaps: criticalGaps.map(g => g.gapId),
+      gapProgress,
       recommendedFocus: criticalGaps.slice(0, 3).map(g => g.gapId),
       estimatedImpact: Math.min(100, estimatedImpact),
     };

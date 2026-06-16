@@ -29,6 +29,10 @@ import {
   OptionNarrativeEngine,
 } from './OptionNarrativeEngine';
 
+import {
+  DEFAULT_REAL_OPTIONS_CONFIG,
+} from './types';
+
 import type {
   RealOptionsId,
   CareerId,
@@ -38,7 +42,6 @@ import type {
   RealOptionsComparisonInput,
   RealOptionsEngineConfig,
   CareerOption,
-  DEFAULT_REAL_OPTIONS_CONFIG,
 } from './types';
 
 /**

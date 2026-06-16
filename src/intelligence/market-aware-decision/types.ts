@@ -35,6 +35,8 @@ import type {
   ConfidenceScore,
 } from '@/intelligence/market-signal-intelligence/types.js';
 
+export type { MarketIntelligenceReport, MarketRisk, MarketTrend, MarketOpportunity, ConfidenceScore };
+
 // ============================================================================
 // CORE IDENTIFIERS
 // ============================================================================

@@ -8,7 +8,7 @@
  * the intelligence system.
  */
 
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import type {
   MarketSignal,
   MarketSignalId,
@@ -133,14 +133,21 @@ export class SignalAdapter {
           unit: extractedSignal.unit,
           confidence,
           timestamp: extractedSignal.periodEnd,
-          metadata: {
+          rawData: {
+            payload: rawData.payload,
             originalTitle: extractedSignal.careerTitle,
-            periodStart: extractedSignal.periodStart,
-            periodEnd: extractedSignal.periodEnd,
             context: extractedSignal.context,
             sourceId,
             fetchId: rawData.fetchedAt.toISOString(),
             careerMappingConfidence: careerMapping.confidence,
+          },
+          metadata: {
+            sourceReliability: this.reliabilityEngine.getReliability(sourceId),
+            geography: this.mapMetadataGeography(geography),
+            timePeriod: {
+              start: extractedSignal.periodStart,
+              end: extractedSignal.periodEnd,
+            },
           },
         };
 
@@ -404,10 +411,40 @@ export class SignalAdapter {
   }
 
   /**
+   * Map normalized provider geography to the canonical MarketSignal metadata scope.
+   */
+  private mapMetadataGeography(geography: string): MarketSignal['metadata']['geography'] {
+    const normalized = geography.toLowerCase();
+
+    if (normalized === 'global') {
+      return 'global';
+    }
+
+    if (normalized === 'india' || normalized === 'all-india' || normalized === 'pan-india') {
+      return 'india';
+    }
+
+    if (
+      normalized.includes('delhi') ||
+      normalized.includes('mumbai') ||
+      normalized.includes('bangalore') ||
+      normalized.includes('bengaluru') ||
+      normalized.includes('hyderabad') ||
+      normalized.includes('chennai') ||
+      normalized.includes('pune') ||
+      normalized.includes('kolkata')
+    ) {
+      return 'city';
+    }
+
+    return 'state';
+  }
+
+  /**
    * Generate unique signal ID.
    */
   private generateSignalId(): MarketSignalId {
-    return `sig-${uuidv4()}` as MarketSignalId;
+    return `sig-${randomUUID()}` as MarketSignalId;
   }
 }
 

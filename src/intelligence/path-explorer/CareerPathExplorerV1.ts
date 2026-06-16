@@ -768,14 +768,7 @@ export class CareerPathExplorerV1 {
   private calculatePathScores(path: { nodes: CareerNode[]; edges: CareerEdge[] }): PathScores {
     // Calculate optionality score (average of final node optionality)
     const lastNode = path.nodes[path.nodes.length - 1];
-    let optionalityScore = 50;
-    try {
-      const optionalityAnalysis = this.optionalityEngine.calculateOptionality(lastNode.id);
-      optionalityScore = optionalityAnalysis.overallScore;
-    } catch {
-      // Use fallback
-      optionalityScore = lastNode?.isTerminal ? 30 : 70;
-    }
+    const optionalityScore = lastNode?.isTerminal ? 30 : 70;
 
     // Calculate criticality score
     let criticalityScore = 50;
@@ -1351,25 +1344,3 @@ export function exploreSinglePath(
   const explorer = new CareerPathExplorerV1(graph, optionalityEngine, criticalityEngine);
   return explorer.exploreSinglePath(startingCareerId, strategy, options);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  CareerPathExplorerResult,
-  ExploredCareerPath,
-  PathMetrics,
-  PathScores,
-  PathExplanation,
-  PathComparison,
-  PathRecommendation,
-  PathExplorerOptions,
-  PathFilters,
-  RiskAssessment,
-  RiskFactor,
-  PathType,
-  PathStrategy,
-  PathDifference,
-  PathExplorerId,
-};

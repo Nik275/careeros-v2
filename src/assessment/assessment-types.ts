@@ -238,6 +238,8 @@ export interface AssessmentConfig {
   maxAcceptableVariance: number;
 }
 
+export type AssessmentConfidenceLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+
 /**
  * Default assessment configuration.
  */
@@ -257,6 +259,9 @@ export interface AssessmentConfidence {
 
   /** Constitutional confidence (0.0-1.0) - replaces level enum */
   confidence?: number;
+
+  /** Legacy confidence tier retained for deprecated threshold helpers */
+  level: AssessmentConfidenceLevel;
 
   /** Response consistency score (0-100) */
   consistencyScore: number;

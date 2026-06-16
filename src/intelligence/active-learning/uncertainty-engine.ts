@@ -646,12 +646,13 @@ export function calculateRankUncertainty(
   const rankStability = historicalRecommendations.length > 0
     ? sameRankCount / historicalRecommendations.length
     : 0;
+  const recommendationRank = recommendation.rank ?? 0;
   
   // Uncertainty from rank instability
   const instabilityUncertainty = 1 - rankStability;
   
   // Uncertainty from being in middle ranks (more competition)
-  const middleRankUncertainty = recommendation.rank > 2 && recommendation.rank < 8
+  const middleRankUncertainty = recommendationRank > 2 && recommendationRank < 8
     ? 0.2
     : 0;
   
@@ -1067,7 +1068,7 @@ export class UncertaintyEngine {
     const history = this.uncertaintyHistory.get(studentId);
     if (!history || history.length < 2) return null;
     
-    return history[history.length - 1].uncertaintyTrend;
+    return history[history.length - 1].uncertaintyTrend ?? null;
   }
   
   /**
@@ -1076,12 +1077,33 @@ export class UncertaintyEngine {
   getUncertaintyHistory(studentId: string): UncertaintyProfile[] {
     return this.uncertaintyHistory.get(studentId) || [];
   }
+
+  updateUncertainty(
+    studentId: string,
+    update: { predicted: number; actual: number; confidence: number }
+  ): void {
+    const value = Math.min(Math.abs(update.actual - update.predicted) / 100, 1);
+    const profile = this.uncertaintyHistory.get(studentId)?.at(-1);
+    if (!profile) {
+      return;
+    }
+
+    profile.compositeUncertainty = {
+      value,
+      level: valueToUncertaintyLevel(value),
+      confidence: update.confidence,
+    };
+  }
   
   /**
    * Get engine metrics
    */
   getMetrics(): ActiveLearningMetrics {
     return { ...this.metrics };
+  }
+
+  getStats(): ActiveLearningMetrics {
+    return this.getMetrics();
   }
   
   /**
@@ -1103,6 +1125,10 @@ export class UncertaintyEngine {
    */
   clearHistory(): void {
     this.uncertaintyHistory.clear();
+  }
+
+  clear(): void {
+    this.clearHistory();
   }
   
   /**

@@ -393,7 +393,8 @@ export class RecommendationConsensusEngine {
    * Get consensus quality score (0-100)
    */
   calculateConsensusQuality(consensus: ConsensusResult): number {
-    const { primaryConsensusPercentage, normalizedEntropy, giniCoefficient } = consensus;
+    const { normalizedEntropy, giniCoefficient } = consensus;
+    const primaryConsensusPercentage = consensus.primaryRecommendation.consensusPercentage;
     
     // Handle edge cases
     const safePercentage = Number.isFinite(primaryConsensusPercentage) ? primaryConsensusPercentage : 0;
@@ -423,7 +424,7 @@ export class RecommendationConsensusEngine {
       consensus.consensusStrength === 'STRONG' ||
       consensus.consensusStrength === 'UNANIMOUS' ||
       (consensus.consensusStrength === 'MODERATE' &&
-        consensus.runnerUpRecommendation &&
+        consensus.runnerUpRecommendation !== undefined &&
         consensus.primaryRecommendation.consensusPercentage -
           consensus.runnerUpRecommendation.consensusPercentage >
           0.15)

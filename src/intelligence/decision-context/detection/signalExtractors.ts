@@ -50,6 +50,130 @@ function createEvidence(
   };
 }
 
+type AcademicProfileInput = ContextDetectionInput['profile']['academic'];
+
+type AssessmentResponseInput = NonNullable<ContextDetectionInput['assessmentResponses']>[number];
+
+type SearchableAssessmentResponse = AssessmentResponseInput & {
+  value?: unknown;
+  selectedOptionId?: string;
+  selectedOptionIds?: string[];
+  orderedOptionIds?: string[];
+};
+
+interface LegacyAptitudeExam {
+  name: string;
+}
+
+type AcademicProfileReadable = AcademicProfileInput & {
+  currentEducation?: string;
+  aptitudeExams?: LegacyAptitudeExam[];
+  subjectInterests?: string[];
+};
+
+function readCurrentEducation(academic: AcademicProfileInput): string | undefined {
+  const readable = academic as AcademicProfileReadable;
+
+  if (readable.currentEducation) {
+    return readable.currentEducation;
+  }
+
+  const stage = readable.performance?.stage;
+  const stream = readable.performance?.stream;
+  return [stage, stream].filter(Boolean).join(' ') || undefined;
+}
+
+function readAptitudeExamNames(academic: AcademicProfileInput): string[] {
+  const readable = academic as AcademicProfileReadable;
+  const legacyNames = readable.aptitudeExams?.map((exam) => exam.name) ?? [];
+  const examResultNames = readable.examResults?.map((exam) => exam.examType) ?? [];
+
+  return [...legacyNames, ...examResultNames];
+}
+
+function readSubjectInterests(academic: AcademicProfileInput): string[] {
+  const readable = academic as AcademicProfileReadable;
+  const legacyInterests = readable.subjectInterests ?? [];
+  const favoriteSubjects = readable.interests?.favoriteSubjects ?? [];
+  const stream = readable.performance?.stream ? [readable.performance.stream] : [];
+
+  return [...legacyInterests, ...favoriteSubjects, ...stream];
+}
+
+function readAutonomyMotivation(input: ContextDetectionInput): number {
+  const motivations = input.profile.motivations as ContextDetectionInput['profile']['motivations'] & {
+    autonomy?: number;
+  };
+
+  return motivations.autonomy ?? motivations.freedom;
+}
+
+type ConstraintsInput = ContextDetectionInput['profile']['constraints'];
+
+type ConstraintsReadable = ConstraintsInput & {
+  familyExpectations?: string;
+  geographicLimitation?: string;
+  financialSupport?: string;
+};
+
+function readFamilyExpectation(input: ContextDetectionInput): string | undefined {
+  const constraints = input.profile.constraints as ConstraintsReadable;
+  return constraints.familyExpectations ?? constraints.family?.familyPreferredField;
+}
+
+function readGeographicLimitation(input: ContextDetectionInput): string | undefined {
+  const constraints = input.profile.constraints as ConstraintsReadable;
+  if (constraints.geographicLimitation) {
+    return constraints.geographicLimitation;
+  }
+
+  if (constraints.family?.mustStayNearFamily || constraints.geographic?.willingToRelocate === false) {
+    return constraints.geographic?.relocationConstraints ?? constraints.geographic?.currentCity ?? 'location_bound';
+  }
+
+  return undefined;
+}
+
+function readFinancialSupportConstraint(input: ContextDetectionInput): string | undefined {
+  const constraints = input.profile.constraints as ConstraintsReadable;
+  if (constraints.financialSupport) {
+    return constraints.financialSupport;
+  }
+
+  if (constraints.financial?.hasEducationLoan) {
+    return 'loan_dependent';
+  }
+
+  if (constraints.financial && (!constraints.financial.canAffordPrivateCollege || !constraints.financial.canAffordCoaching)) {
+    return 'scholarship_required';
+  }
+
+  return undefined;
+}
+
+function readAssessmentResponseText(response: AssessmentResponseInput): string[] {
+  const searchable = response as SearchableAssessmentResponse;
+  const parts: string[] = [];
+
+  if (typeof searchable.value === 'string') {
+    parts.push(searchable.value);
+  }
+
+  if (searchable.selectedOptionId) {
+    parts.push(searchable.selectedOptionId);
+  }
+
+  if (searchable.selectedOptionIds) {
+    parts.push(...searchable.selectedOptionIds);
+  }
+
+  if (searchable.orderedOptionIds) {
+    parts.push(...searchable.orderedOptionIds);
+  }
+
+  return parts;
+}
+
 /**
  * Extract text content for pattern matching.
  */
@@ -59,9 +183,7 @@ function extractSearchableText(input: ContextDetectionInput): string {
   // Add assessment responses
   if (input.assessmentResponses) {
     for (const response of input.assessmentResponses) {
-      if (typeof response.value === 'string') {
-        parts.push(response.value.toLowerCase());
-      }
+      parts.push(...readAssessmentResponseText(response).map((value) => value.toLowerCase()));
     }
   }
   
@@ -77,11 +199,13 @@ function extractSearchableText(input: ContextDetectionInput): string {
   
   // Add profile education info
   const academic = input.profile.academic;
-  if (academic.currentEducation) {
-    parts.push(academic.currentEducation.toLowerCase());
+  const currentEducation = readCurrentEducation(academic);
+  if (currentEducation) {
+    parts.push(currentEducation.toLowerCase());
   }
-  if (academic.aptitudeExams) {
-    parts.push(...academic.aptitudeExams.map(e => e.name.toLowerCase()));
+  const aptitudeExamNames = readAptitudeExamNames(academic);
+  if (aptitudeExamNames.length > 0) {
+    parts.push(...aptitudeExamNames.map(e => e.toLowerCase()));
   }
   
   return parts.join(' ');
@@ -144,41 +268,45 @@ export function extractJeeSignals(input: ContextDetectionInput): ContextEvidence
   
   // Check profile for engineering focus
   const academic = input.profile.academic;
-  if (academic.subjectInterests?.includes('Engineering') ||
-      academic.subjectInterests?.includes('Technology')) {
+  const subjectInterests = readSubjectInterests(academic);
+  const currentEducation = readCurrentEducation(academic);
+  const aptitudeExamNames = readAptitudeExamNames(academic);
+  if (subjectInterests.includes('Engineering') ||
+      subjectInterests.includes('Technology') ||
+      subjectInterests.includes('science')) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.MODERATE,
       'Profile shows interest in Engineering/Technology subjects',
       'profile_subject_interests',
-      academic.subjectInterests
+      subjectInterests
     ));
   }
   
   // Check for aptitude exams
-  const jeeExam = academic.aptitudeExams?.find(
-    e => e.name.toLowerCase().includes('jee') ||
-         e.name.toLowerCase().includes('bitsat')
+  const jeeExam = aptitudeExamNames.find(
+    name => name.toLowerCase().includes('jee') ||
+      name.toLowerCase().includes('bitsat')
   );
   if (jeeExam) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.STRONG,
-      `Registered for ${jeeExam.name}`,
+      `Registered for ${jeeExam}`,
       'profile_aptitude_exams',
       jeeExam
     ));
   }
   
   // Check education level (Class 11-12 is typical JEE prep time)
-  if (academic.currentEducation?.toLowerCase().includes('12') ||
-      academic.currentEducation?.toLowerCase().includes('secondar')) {
+  if (currentEducation?.toLowerCase().includes('12') ||
+      currentEducation?.toLowerCase().includes('secondar')) {
     evidence.push(createEvidence(
       EvidenceType.TEMPORAL_INFERENCE,
       EvidenceStrength.WEAK,
       'Education level aligns with typical JEE preparation period',
       'profile_education_level',
-      academic.currentEducation
+      currentEducation
     ));
   }
   
@@ -211,28 +339,30 @@ export function extractNeetSignals(input: ContextDetectionInput): ContextEvidenc
   
   // Check profile
   const academic = input.profile.academic;
-  if (academic.subjectInterests?.includes('Medicine') ||
-      academic.subjectInterests?.includes('Biology') ||
-      academic.subjectInterests?.includes('Healthcare')) {
+  const subjectInterests = readSubjectInterests(academic);
+  const aptitudeExamNames = readAptitudeExamNames(academic);
+  if (subjectInterests.includes('Medicine') ||
+      subjectInterests.includes('Biology') ||
+      subjectInterests.includes('Healthcare')) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.MODERATE,
       'Profile shows interest in Medicine/Healthcare subjects',
       'profile_subject_interests',
-      academic.subjectInterests
+      subjectInterests
     ));
   }
   
   // Check for NEET registration
-  const neetExam = academic.aptitudeExams?.find(
-    e => e.name.toLowerCase().includes('neet') ||
-         e.name.toLowerCase().includes('aiims')
+  const neetExam = aptitudeExamNames.find(
+    name => name.toLowerCase().includes('neet') ||
+      name.toLowerCase().includes('aiims')
   );
   if (neetExam) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.STRONG,
-      `Registered for ${neetExam.name}`,
+      `Registered for ${neetExam}`,
       'profile_aptitude_exams',
       neetExam
     ));
@@ -268,18 +398,20 @@ export function extractUpscSignals(input: ContextDetectionInput): ContextEvidenc
   
   // Check for graduation+ (UPSC typically after graduation)
   const academic = input.profile.academic;
-  if (academic.currentEducation?.toLowerCase().includes('graduation') ||
-      academic.currentEducation?.toLowerCase().includes('bachelor') ||
-      academic.currentEducation?.toLowerCase().includes('b.a') ||
-      academic.currentEducation?.toLowerCase().includes('b.sc') ||
-      academic.currentEducation?.toLowerCase().includes('b.com') ||
-      academic.currentEducation?.toLowerCase().includes('b.tech')) {
+  const currentEducation = readCurrentEducation(academic);
+  if (currentEducation?.toLowerCase().includes('graduation') ||
+      currentEducation?.toLowerCase().includes('bachelor') ||
+      currentEducation?.toLowerCase().includes('b.a') ||
+      currentEducation?.toLowerCase().includes('b.sc') ||
+      currentEducation?.toLowerCase().includes('b.com') ||
+      currentEducation?.toLowerCase().includes('b.tech') ||
+      currentEducation?.toLowerCase().includes('undergraduate')) {
     evidence.push(createEvidence(
       EvidenceType.TEMPORAL_INFERENCE,
       EvidenceStrength.MODERATE,
       'Education level aligns with typical UPSC preparation timing',
       'profile_education_level',
-      academic.currentEducation
+      currentEducation
     ));
   }
   
@@ -342,15 +474,17 @@ export function extractCaSignals(input: ContextDetectionInput): ContextEvidence[
   
   // Check profile for commerce background
   const academic = input.profile.academic;
-  if (academic.subjectInterests?.includes('Commerce') ||
-      academic.subjectInterests?.includes('Accounting') ||
-      academic.subjectInterests?.includes('Finance')) {
+  const subjectInterests = readSubjectInterests(academic);
+  if (subjectInterests.includes('Commerce') ||
+      subjectInterests.includes('Accounting') ||
+      subjectInterests.includes('Finance') ||
+      subjectInterests.includes('commerce')) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.MODERATE,
       'Profile shows interest in Commerce/Finance subjects',
       'profile_subject_interests',
-      academic.subjectInterests
+      subjectInterests
     ));
   }
   
@@ -439,14 +573,16 @@ export function extractCollegeSelectionSignals(input: ContextDetectionInput): Co
   
   // Check education timing
   const academic = input.profile.academic;
-  if (academic.currentEducation?.toLowerCase().includes('12') ||
-      academic.currentEducation?.toLowerCase().includes('senior secondary')) {
+  const currentEducation = readCurrentEducation(academic);
+  if (currentEducation?.toLowerCase().includes('12') ||
+      currentEducation?.toLowerCase().includes('senior secondary') ||
+      currentEducation?.toLowerCase().includes('high_school_11_12')) {
     evidence.push(createEvidence(
       EvidenceType.TEMPORAL_INFERENCE,
       EvidenceStrength.MODERATE,
       'Currently in Class 12, typical college selection period',
       'profile_education_level',
-      academic.currentEducation
+      currentEducation
     ));
   }
   
@@ -535,13 +671,14 @@ export function extractCareerExplorationSignals(input: ContextDetectionInput): C
   
   // Check for diverse interests (no clear singular focus)
   const academic = input.profile.academic;
-  if (academic.subjectInterests && academic.subjectInterests.length > 3) {
+  const subjectInterests = readSubjectInterests(academic);
+  if (subjectInterests.length > 3) {
     evidence.push(createEvidence(
       EvidenceType.PATTERN_MATCH,
       EvidenceStrength.MODERATE,
       'Multiple diverse subject interests suggest exploration phase',
       'profile_subject_interests',
-      academic.subjectInterests
+      subjectInterests
     ));
   }
   
@@ -691,7 +828,7 @@ export function extractStartupExplorationSignals(input: ContextDetectionInput): 
   
   // Check for entrepreneurial motivation
   const motivations = input.profile.motivations;
-  if (motivations?.autonomy > 0.7) {
+  if (readAutonomyMotivation(input) > 0.7) {
     evidence.push(createEvidence(
       EvidenceType.IMPLICIT_SIGNAL,
       EvidenceStrength.MODERATE,
@@ -760,14 +897,14 @@ export function extractFamilyBusinessSignals(input: ContextDetectionInput): Cont
   }
   
   // Check constraints
-  const constraints = input.profile.constraints;
-  if (constraints?.familyExpectations === 'family_business') {
+  const familyExpectation = readFamilyExpectation(input);
+  if (familyExpectation === 'family_business') {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.STRONG,
       'Profile indicates family business expectations',
       'profile_family_constraints',
-      constraints.familyExpectations
+      familyExpectation
     ));
   }
   
@@ -803,14 +940,14 @@ export function extractRegionalConstraintSignals(input: ContextDetectionInput): 
   }
   
   // Check profile constraints
-  const constraints = input.profile.constraints;
-  if (constraints?.geographicLimitation) {
+  const geographicLimitation = readGeographicLimitation(input);
+  if (geographicLimitation) {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.STRONG,
       'Profile indicates geographic limitations',
       'profile_geographic_constraints',
-      constraints.geographicLimitation
+      geographicLimitation
     ));
   }
   
@@ -842,15 +979,15 @@ export function extractFinancialConstraintSignals(input: ContextDetectionInput):
   }
   
   // Check profile constraints
-  const constraints = input.profile.constraints;
-  if (constraints?.financialSupport === 'scholarship_required' ||
-      constraints?.financialSupport === 'loan_dependent') {
+  const financialSupport = readFinancialSupportConstraint(input);
+  if (financialSupport === 'scholarship_required' ||
+      financialSupport === 'loan_dependent') {
     evidence.push(createEvidence(
       EvidenceType.EDUCATION_DATA,
       EvidenceStrength.STRONG,
       'Profile indicates financial limitations',
       'profile_financial_constraints',
-      constraints.financialSupport
+      financialSupport
     ));
   }
   

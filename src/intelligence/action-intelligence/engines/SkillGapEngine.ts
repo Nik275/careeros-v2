@@ -432,6 +432,25 @@ export class SkillGapEngine {
   }
 
   /**
+   * Build an ordered learning pathway across all skill gaps.
+   */
+  private buildLearningPathway(gaps: SkillGap[]): LearningStep[] {
+    return gaps.flatMap((gap) =>
+      this.generateLearningPath(
+        {
+          skillId: gap.skillId,
+          skillName: gap.skillName,
+          minimumLevel: gap.requiredLevel,
+          preferredLevel: gap.requiredLevel,
+          isRequired: gap.isCritical,
+          rationale: gap.isCritical ? 'Critical skill gap' : 'Optional skill gap',
+        },
+        gap.gapSize
+      )
+    );
+  }
+
+  /**
    * Suggest practice projects
    */
   private suggestPracticeProjects(

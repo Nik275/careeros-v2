@@ -325,7 +325,7 @@ export class ScenarioEngine {
     }
 
     // Location preferences
-    const stabilityPref = input.dimensionScores.get('stabilityPreference')?.percentileScore ?? 50;
+    const stabilityPref = input.dimensionScores.get('stabilityPreference')?.score ?? 50;
     if (option.location && stabilityPref > 60) {
       score += 5;
     }
@@ -407,7 +407,7 @@ export class ScenarioEngine {
     }
 
     // Resilience buffer
-    const resilience = input.dimensionScores.get('resilience')?.percentileScore ?? 50;
+    const resilience = input.dimensionScores.get('resilience')?.score ?? 50;
     score -= (resilience - 50) * 0.3;
 
     return Math.min(100, Math.max(0, score));
@@ -425,12 +425,12 @@ export class ScenarioEngine {
     // Dimension alignment
     for (const [dimension, score_data] of input.dimensionScores) {
       if (option.description.toLowerCase().includes(dimension.toLowerCase())) {
-        score += score_data.percentileScore * 0.1;
+        score += score_data.score * 0.1;
       }
     }
 
     // Risk alignment
-    const riskTolerance = input.dimensionScores.get('riskTolerance')?.percentileScore ?? 50;
+    const riskTolerance = input.dimensionScores.get('riskTolerance')?.score ?? 50;
     const optionRisk =
       option.riskLevel === 'LOW'
         ? 30

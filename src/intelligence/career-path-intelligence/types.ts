@@ -217,6 +217,30 @@ export interface RecoveryPath {
   tradeoffs: string[];
 }
 
+/**
+ * Template for generating a milestone inside a career path.
+ */
+export interface MilestoneTemplate {
+  name: string;
+  description: string;
+  duration: number;
+  skills: string[];
+  credentials?: string[];
+}
+
+/**
+ * Template for generating a full career path.
+ */
+export interface PathTemplate {
+  name: string;
+  type: PathType;
+  milestones: MilestoneTemplate[];
+  difficulty: PathDifficulty;
+  risk: PathRisk;
+  costMultiplier: number;
+  durationMultiplier: number;
+}
+
 // =============================================================================
 // CAREER PATH TYPE
 // =============================================================================
@@ -654,6 +678,16 @@ export interface PathRecommendation {
   warnings: string[];
   nextSteps: string[];
 }
+
+/**
+ * Backward-compatible career-path recommendation alias.
+ *
+ * Career Path Intelligence's canonical recommendation output is
+ * PathRecommendation. This alias preserves the existing public type surface for
+ * consumers that import IntegratedRecommendation from this module without
+ * introducing a separate recommendation shape.
+ */
+export type IntegratedRecommendation = PathRecommendation;
 
 /**
  * Optionality analysis

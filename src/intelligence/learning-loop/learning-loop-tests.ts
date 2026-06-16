@@ -20,6 +20,8 @@ import {
   LearningLoopEngine,
   
   // Types
+  OutcomeFeedback,
+  OutcomeMetrics,
   SuccessLevel,
   LearningEventType,
   DEFAULT_LEARNING_CONFIG,
@@ -29,7 +31,7 @@ import {
 // TEST UTILITIES
 // ============================================================================
 
-function createOutcomeMetrics(overrides: Partial<any> = {}) {
+function createOutcomeMetrics(overrides: Partial<OutcomeMetrics> = {}): OutcomeMetrics {
   return {
     satisfactionScore: 0.7,
     regretScore: 0.2,
@@ -41,7 +43,7 @@ function createOutcomeMetrics(overrides: Partial<any> = {}) {
   };
 }
 
-function createPositiveOutcome(recommendationId: string = 'rec-1'): any {
+function createPositiveOutcome(recommendationId: string = 'rec-1'): OutcomeFeedback {
   return {
     id: `feedback-${recommendationId}`,
     recommendationId,
@@ -87,7 +89,7 @@ function createPositiveOutcome(recommendationId: string = 'rec-1'): any {
   };
 }
 
-function createNegativeOutcome(recommendationId: string = 'rec-1'): any {
+function createNegativeOutcome(recommendationId: string = 'rec-1'): OutcomeFeedback {
   return {
     id: `feedback-${recommendationId}`,
     recommendationId,
@@ -805,7 +807,7 @@ describe('PopulationLearningEngine', () => {
           studentId: `student-${i}`,
           profileSignature: 'common-profile',
           recommendationSequence: ['common-rec'],
-          outcomes: [createOutcomeMetrics()],
+          outcomes: [createNegativeOutcome('common-rec')],
           timestamp: Date.now(),
         });
       }
@@ -1049,7 +1051,7 @@ describe('LearningLoopEngine Integration', () => {
       // Add data
       for (let i = 0; i < 30; i++) {
         const outcomeId = engine.trackOutcome(`rec-${i}`, `student-${i % 10}`, 0.75);
-        engine.recordCompleteOutcome(outcomeId, createPositiveOutcome());
+        engine.recordCompleteOutcome(outcomeId, createPositiveOutcome().metrics);
       }
       
       const report = engine.runLearningCycle();
@@ -1060,7 +1062,7 @@ describe('LearningLoopEngine Integration', () => {
       // Only add a few outcomes
       for (let i = 0; i < 5; i++) {
         const outcomeId = engine.trackOutcome(`rec-${i}`, 'student-1', 0.75);
-        engine.recordCompleteOutcome(outcomeId, createNegativeOutcome());
+        engine.recordCompleteOutcome(outcomeId, createNegativeOutcome().metrics);
       }
       
       const report = engine.runLearningCycle();
@@ -1072,7 +1074,7 @@ describe('LearningLoopEngine Integration', () => {
   describe('Data Export', () => {
     it('should export all learning data', () => {
       const outcomeId = engine.trackOutcome('rec-1', 'student-1', 0.75);
-      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome());
+      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome().metrics);
       
       const data = engine.exportData();
       expect(data.outcomes).toBeDefined();
@@ -1085,7 +1087,7 @@ describe('LearningLoopEngine Integration', () => {
   describe('Reset', () => {
     it('should reset all data', () => {
       const outcomeId = engine.trackOutcome('rec-1', 'student-1', 0.75);
-      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome());
+      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome().metrics);
       
       engine.reset();
       
@@ -1162,7 +1164,7 @@ describe('Edge Cases and Stress Tests', () => {
     
     // Complete all outcomes
     outcomeIds.forEach((id, i) => {
-      engine.recordCompleteOutcome(id, i % 3 === 0 ? createNegativeOutcome() : createPositiveOutcome());
+      engine.recordCompleteOutcome(id, i % 3 === 0 ? createNegativeOutcome().metrics : createPositiveOutcome().metrics);
     });
     
     const report = engine.runLearningCycle();
@@ -1203,7 +1205,7 @@ describe('Edge Cases and Stress Tests', () => {
     // Add initial data
     for (let i = 0; i < 20; i++) {
       const outcomeId = engine.trackOutcome(`rec-${i}`, 'student-1', 0.75);
-      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome());
+      engine.recordCompleteOutcome(outcomeId, createPositiveOutcome().metrics);
     }
     
     // Run multiple learning cycles

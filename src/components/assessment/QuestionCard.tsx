@@ -55,7 +55,7 @@ export function QuestionCard({
       transition={{ duration: duration.slow, ease: ease.luxury }}
       style={{
         width: '100%',
-        maxWidth: '640px',
+        maxWidth: '720px',
         display: 'flex',
         flexDirection: 'column',
         gap: '24px',
@@ -66,18 +66,20 @@ export function QuestionCard({
         style={{
           width: '100%',
           height: '3px',
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.06)',
           borderRadius: '2px',
           overflow: 'hidden',
         }}
       >
         <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: progress / 100 }}
           transition={{ duration: duration.normal, ease: ease.luxury }}
           style={{
             height: '100%',
-            background: 'linear-gradient(90deg, rgba(125,156,116,0.8) 0%, rgba(130,165,200,0.8) 100%)',
+            width: '100%',
+            transformOrigin: 'left',
+            background: 'linear-gradient(90deg, #8052ff 0%, #6c42db 100%)',
             borderRadius: '2px',
           }}
         />
@@ -95,7 +97,7 @@ export function QuestionCard({
             fontWeight: 580,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
-            color: 'rgba(125, 156, 116, 0.85)',
+            color: '#8052ff',
           }}
         >
           {question.category}
@@ -114,7 +116,7 @@ export function QuestionCard({
             fontWeight: 640,
             lineHeight: '1.3',
             letterSpacing: '-0.02em',
-            color: '#0d0b09',
+            color: '#ffffff',
             margin: '0 0 12px 0',
           }}
         >
@@ -130,7 +132,7 @@ export function QuestionCard({
               fontSize: 'clamp(14px, 3.5vw, 16px)',
               fontWeight: 400,
               lineHeight: '1.6',
-              color: 'rgba(26, 24, 22, 0.55)',
+              color: 'rgba(255, 255, 255, 0.55)',
               margin: 0,
             }}
           >
@@ -176,17 +178,17 @@ export function QuestionCard({
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '4px',
-                padding: '20px 24px',
+                padding: '16px 20px',
                 borderRadius: '16px',
                 background: isSelected
-                  ? 'linear-gradient(135deg, rgba(125, 156, 116, 0.12) 0%, rgba(130, 165, 200, 0.08) 100%)'
-                  : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(252, 252, 251, 0.9) 100%)',
+                  ? 'linear-gradient(135deg, rgba(128, 82, 255, 0.2) 0%, rgba(100, 50, 200, 0.15) 100%)'
+                  : 'linear-gradient(135deg, rgba(20, 20, 25, 0.9) 0%, rgba(10, 10, 15, 0.85) 100%)',
                 border: isSelected
-                  ? '1.5px solid rgba(125, 156, 116, 0.4)'
-                  : '1px solid rgba(0,0,0,0.06)',
+                  ? '1.5px solid rgba(128, 82, 255, 0.6)'
+                  : '1px solid rgba(128, 82, 255, 0.12)',
                 boxShadow: isSelected
-                  ? '0 4px 20px rgba(125,156,116,0.15), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 1px rgba(255,255,255,0.9)'
-                  : '0 2px 12px rgba(0,0,0,0.03), inset 0 1px 1px rgba(255,255,255,0.9)',
+                  ? '0 6px 24px rgba(128, 82, 255, 0.25), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.05)'
+                  : '0 2px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.02)',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
@@ -208,11 +210,11 @@ export function QuestionCard({
                     height: '22px',
                     borderRadius: question.allowMultiple ? '6px' : '50%',
                     background: isSelected
-                      ? 'rgba(125, 156, 116, 0.15)'
-                      : 'rgba(0,0,0,0.03)',
+                      ? 'rgba(128, 82, 255, 0.15)'
+                      : 'rgba(255,255,255,0.03)',
                     border: isSelected
-                      ? '2px solid rgba(125, 156, 116, 0.6)'
-                      : '2px solid rgba(0,0,0,0.08)',
+                      ? '2px solid rgba(128, 82, 255, 0.6)'
+                      : '2px solid rgba(255,255,255,0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -224,11 +226,11 @@ export function QuestionCard({
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: duration.instant, ease: ease.snappy }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                     >
                       {question.allowMultiple ? (
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M5 12L10 17L20 7" stroke="#7D9C74" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 12L10 17L20 7" stroke="#8052ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       ) : (
                         <div
@@ -236,7 +238,7 @@ export function QuestionCard({
                             width: '10px',
                             height: '10px',
                             borderRadius: '50%',
-                            background: '#7D9C74',
+                            background: '#8052ff',
                           }}
                         />
                       )}
@@ -250,7 +252,7 @@ export function QuestionCard({
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '16px',
                     fontWeight: isSelected ? 550 : 450,
-                    color: isSelected ? '#0d0b09' : 'rgba(26, 24, 22, 0.75)',
+                    color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
                     transition: 'all 0.25s ease',
                   }}
                 >
@@ -271,7 +273,7 @@ export function QuestionCard({
                     fontSize: '13px',
                     fontWeight: 400,
                     lineHeight: '1.5',
-                    color: isSelected ? 'rgba(26, 24, 22, 0.6)' : 'rgba(26, 24, 22, 0.4)',
+                    color: isSelected ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.55)',
                     margin: '0 0 0 34px',
                     paddingTop: '4px',
                     transition: 'all 0.25s ease',
@@ -300,7 +302,7 @@ export function QuestionCard({
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: '13px',
             fontWeight: 450,
-            color: 'rgba(26, 24, 22, 0.4)',
+            color: 'rgba(255, 255, 255, 0.4)',
           }}
         >
           {questionNumber} of {totalQuestions}

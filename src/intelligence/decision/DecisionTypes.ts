@@ -750,6 +750,12 @@ export type DecisionEventType =
   | 'decision-completed'
   | 'decision-rejected'
   | 'decision-appealed'
+  | 'meta-decision-analysis-started'
+  | 'meta-decision-analysis-completed'
+  | 'meta-decision-analysis-failed'
+  | 'coalition-evaluation-started'
+  | 'coalition-evaluation-completed'
+  | 'coalition-evaluation-failed'
   | 'decision-error';
 
 /**

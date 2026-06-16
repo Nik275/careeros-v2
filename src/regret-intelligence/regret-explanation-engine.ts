@@ -17,6 +17,7 @@ import type {
   RegretIntelligenceConfig,
   RegretScenarios,
 } from './regret-types';
+import { DEFAULT_REGRET_INTELLIGENCE_CONFIG } from './regret-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 
 /**
@@ -335,7 +336,7 @@ export function createRegretExplanationEngine(
   config?: Partial<RegretIntelligenceConfig>
 ): RegretExplanationEngine {
   const fullConfig: RegretIntelligenceConfig = {
-    ...import('./regret-types').DEFAULT_REGRET_INTELLIGENCE_CONFIG,
+    ...DEFAULT_REGRET_INTELLIGENCE_CONFIG,
     ...config,
   };
 

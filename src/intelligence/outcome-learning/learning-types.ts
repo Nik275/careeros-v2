@@ -61,6 +61,7 @@ export type SignalSource =
   | 'GROWTH_ENGINE'
   | 'REGRET_PREDICTION'
   | 'CRITICALITY_ENGINE'
+  | 'AGGREGATE'
   | 'MANUAL_FEEDBACK';
 
 /**

@@ -387,6 +387,19 @@ export interface Career {
   lifestyle: LifestyleProfile;
 }
 
+export interface CareerDataInput {
+  identity?: Partial<CareerIdentity>;
+  psychology?: Partial<PsychologyProfile>;
+  workStyle?: Partial<WorkStyleProfile>;
+  reward?: Partial<RewardProfile>;
+  risk?: Partial<RiskProfile>;
+  optionality?: Partial<OptionalityProfile>;
+  education?: Partial<EducationProfile>;
+  indiaReality?: Partial<IndiaRealityProfile>;
+  future?: Partial<FutureProfile>;
+  lifestyle?: Partial<LifestyleProfile>;
+}
+
 // ============================================================================
 // OPTIONS & RESULT TYPES
 // ============================================================================
@@ -635,7 +648,7 @@ export function validateCareer(career: Partial<Career>): CareerValidationResult 
 /**
  * Normalize career data to ensure all fields have values
  */
-export function normalizeCareerData(partial: Partial<Career>): Career {
+export function normalizeCareerData(partial: CareerDataInput): Career {
   const now = Date.now();
 
   return {

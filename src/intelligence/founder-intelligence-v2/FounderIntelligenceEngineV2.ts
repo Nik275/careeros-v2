@@ -28,6 +28,7 @@ import {
   FounderEngineConfigV2,
   DEFAULT_FOUNDER_ENGINE_CONFIG,
   calculateReadinessV2,
+  FounderTypeV2,
 } from './types';
 
 import {
@@ -215,7 +216,7 @@ export class FounderIntelligenceEngineV2 {
     const recommendations = this.generateRecommendations(preliminaryAnalysis);
 
     // Generate roadmap if enabled
-    let roadmap: FounderRoadmapEngineV2['generateRoadmap'] | undefined;
+    let roadmap: ReturnType<FounderRoadmapEngineV2['generateRoadmap']> | undefined;
     if (this.config.generateRoadmap) {
       roadmap = this.roadmapEngine.generateRoadmap(
         readiness,
@@ -244,7 +245,7 @@ export class FounderIntelligenceEngineV2 {
     overallPotential: number;
     confidence: number;
     readiness: FounderReadinessV2;
-    primaryType: FounderDimensionV2 | null;
+    primaryType: FounderTypeV2 | null;
     isFalsePositiveRisk: boolean;
     topStrengths: FounderDimensionV2[];
     developmentAreas: FounderDimensionV2[];

@@ -510,7 +510,7 @@ export class ExplainabilityEngine {
     } else if (m.motivation.includes('Stability') && m.studentImportance > 0.6) {
       return `You value stability (${this.formatPercent(m.studentImportance)}), but this career carries more uncertainty (${this.formatPercent(m.careerReward)}). Consider your risk tolerance carefully.`;
     } else {
-      return `This career doesn't strongly deliver on ${m.motivation.toLowerCase()} (${this.formatPercent(m.careerDelivery)}), though this matters less to you (${this.formatPercent(m.studentImportance)}).`;
+      return `This career doesn't strongly deliver on ${m.motivation.toLowerCase()} (${this.formatPercent(m.careerReward)}), though this matters less to you (${this.formatPercent(m.studentImportance)}).`;
     }
   }
 

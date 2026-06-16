@@ -9,18 +9,34 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  ActiveLearningEngine,
-  UncertaintyEngine,
-  LearningValueEngine,
-  DecisionBoundaryEngine,
-  OutcomePriorityEngine,
+  ActiveLearningEngine as ProductionActiveLearningEngine,
+  UncertaintyEngine as ProductionUncertaintyEngine,
+  LearningValueEngine as ProductionLearningValueEngine,
+  DecisionBoundaryEngine as ProductionDecisionBoundaryEngine,
+  OutcomePriorityEngine as ProductionOutcomePriorityEngine,
   EvidenceGapEngine,
   type ActiveLearningConfig,
   type StudentId,
   type LearningQuery,
 } from './index.js';
 
-import { DEFAULT_ACTIVE_LEARNING_CONFIG } from './active-learning-types.js';
+import {
+  DEFAULT_ACTIVE_LEARNING_CONFIG,
+  LearningValueTier,
+  UncertaintyLevel,
+  type ActiveLearningMetrics,
+  type BoundaryProximity,
+  type DecisionBoundary,
+  type DecisionBoundaryZone,
+  type LearningAction,
+  type LearningValueComponent,
+  type LearningValueScore,
+  type OutcomePriority,
+  type PriorityLevel,
+  type StudentProfile,
+  type UncertaintyProfile,
+  type UncertaintyScore,
+} from './active-learning-types.js';
 
 // ============================================================================
 // TEST UTILITIES
@@ -32,6 +48,1056 @@ const createTestConfig = (overrides: Partial<ActiveLearningConfig> = {}): Active
   ...DEFAULT_ACTIVE_LEARNING_CONFIG,
   ...overrides,
 });
+
+type LegacyUncertaintyDimension =
+  | 'MODEL'
+  | 'DECISION'
+  | 'OUTCOME'
+  | 'RECOMMENDATION'
+  | 'PREDICTION'
+  | 'CONFIDENCE';
+
+interface LegacyUncertaintyScore {
+  dimension: LegacyUncertaintyDimension;
+  score: number;
+  level: UncertaintyLevel;
+  confidence: number;
+}
+
+type LegacyUncertaintyProfile = Omit<UncertaintyProfile, 'trend'> & {
+  scores: LegacyUncertaintyScore[];
+  overallUncertainty: number;
+  primaryDimension: LegacyUncertaintyDimension;
+  volatility: number;
+  trend: 'STABLE' | 'INCREASING' | 'DECREASING';
+};
+
+type LegacyUncertaintyFixture = Partial<Omit<LegacyUncertaintyProfile, 'timestamp' | 'trend'>> & {
+  timestamp?: Date | number;
+  trend?: LegacyUncertaintyProfile['trend'];
+};
+
+interface LegacyUncertaintyContext {
+  modelConfidence?: number;
+  decisionConfidence?: number;
+  outcomeVariance?: number;
+  recommendationStability?: number;
+  predictionError?: number;
+  confidenceCalibration?: number;
+}
+
+type LegacyLearningValueComponent = LearningValueComponent & {
+  factor: string;
+};
+
+type LegacyLearningValueScore = Omit<LearningValueScore, 'components' | 'priority' | 'expectedLearningGain'> & {
+  totalScore: number;
+  components: LegacyLearningValueComponent[];
+  priority: PriorityLevel;
+  expectedLearningGain: number;
+};
+
+interface LegacyLearningValueInput {
+  uncertaintyProfile?: LegacyUncertaintyFixture;
+  isRare?: boolean;
+  rarityScore?: number;
+  isNovel?: boolean;
+  noveltyScore?: number;
+  contradictionScore?: number;
+  volatilityScore?: number;
+  boundaryProximity?: number;
+  evidenceGapScore?: number;
+}
+
+type LegacyBoundaryProximity = Omit<BoundaryProximity, 'leaning'> & {
+  boundaryId: string;
+  boundaryName: string;
+  distance: number;
+  learningValue: number;
+  leaning: string;
+};
+
+type LegacyDecisionBoundary = Partial<DecisionBoundary> & {
+  id?: string;
+  boundaryId?: string;
+  type?: string;
+  name: string;
+  description: string;
+  options?: string[];
+  importance?: number;
+};
+
+interface LegacyBoundaryInput {
+  technicalScore?: number;
+  creativeScore?: number;
+  corporatePreference?: number;
+  startupPreference?: number;
+}
+
+type LegacyActiveLearningConfig = Partial<ActiveLearningConfig> & {
+  enabled?: boolean;
+  uncertainty?: Partial<ActiveLearningConfig['uncertainty']> & {
+    highThreshold?: number;
+  };
+};
+
+type LegacyActiveLearningConfigView = ActiveLearningConfig & {
+  enabled?: boolean;
+  uncertainty: ActiveLearningConfig['uncertainty'] & {
+    highThreshold?: number;
+  };
+};
+
+type LegacyActiveLearningMetrics = ActiveLearningMetrics & {
+  averageResponseQuality?: number;
+  evidenceGapCoverage: NonNullable<ActiveLearningMetrics['evidenceGapCoverage']>;
+};
+
+type LegacyPriorityLearningValue = Partial<Omit<LearningValueScore, 'timestamp' | 'components' | 'recommendedActions'>> & {
+  studentId: string;
+  timestamp?: Date | number;
+  totalScore: number;
+  components?: LegacyLearningValueComponent[];
+  priority: PriorityLevel;
+  recommendedActions: Array<LearningAction | string>;
+  expectedLearningGain?: number;
+};
+
+type LegacyPriorityContext = Omit<
+  NonNullable<Parameters<ProductionOutcomePriorityEngine['calculatePriority']>[1]>,
+  'learningValue'
+> & {
+  learningValue?: LegacyPriorityLearningValue;
+  autoFollowUp?: boolean;
+};
+
+const clamp = (value: number, min: number, max: number): number =>
+  Math.max(min, Math.min(max, value));
+
+const clamp01 = (value: number): number => clamp(value, 0, 1);
+
+const toPercent = (value: number): number => clamp(value * 100, 0, 100);
+
+function levelForValue(value: number): UncertaintyLevel {
+  if (value < 0.1) return UncertaintyLevel.VERY_LOW;
+  if (value < 0.25) return UncertaintyLevel.LOW;
+  if (value < 0.45) return UncertaintyLevel.MEDIUM;
+  if (value < 0.65) return UncertaintyLevel.HIGH;
+  if (value < 0.85) return UncertaintyLevel.VERY_HIGH;
+  return UncertaintyLevel.CRITICAL;
+}
+
+function scoreFromValue(value: number, confidence = 0.8): UncertaintyScore {
+  const normalized = clamp01(value);
+  return {
+    value: normalized,
+    level: levelForValue(normalized),
+    confidence: clamp01(confidence),
+  };
+}
+
+function buildStudentProfile(studentId: StudentId, signals: LegacyBoundaryInput = {}): StudentProfile {
+  const skills: string[] = [];
+  const traits: string[] = [];
+  const values: string[] = [];
+  const workPreferences: string[] = [];
+
+  if ((signals.technicalScore ?? 0) >= 45) {
+    skills.push('programming', 'system_design');
+    traits.push('technical', 'analytical');
+    values.push('efficiency', 'innovation');
+    workPreferences.push('structured', 'deep-work');
+  }
+
+  if ((signals.creativeScore ?? 0) >= 45) {
+    skills.push('ui_design', 'visual_design');
+    traits.push('creative', 'visual');
+    values.push('creativity', 'aesthetics');
+    workPreferences.push('iterative', 'collaborative');
+  }
+
+  if ((signals.corporatePreference ?? 0) >= 40) {
+    traits.push('stable', 'bureaucratic');
+    values.push('stability', 'security');
+    workPreferences.push('structured', 'hierarchical');
+  }
+
+  if ((signals.startupPreference ?? 0) >= 40) {
+    traits.push('risk-taking', 'adaptable');
+    values.push('ownership', 'innovation');
+    workPreferences.push('fast-paced', 'autonomous');
+  }
+
+  return {
+    id: studentId,
+    studentId,
+    skills,
+    traits,
+    values,
+    workPreferences,
+    metadata: { ...signals },
+  };
+}
+
+function buildUncertaintyInput(studentId: StudentId, context: LegacyUncertaintyContext = {}) {
+  const modelConfidence = clamp01(context.modelConfidence ?? 0.5);
+  const decisionConfidence = clamp01(context.decisionConfidence ?? 0.5);
+  const outcomeVariance = clamp01(context.outcomeVariance ?? 0.5);
+  const recommendationStability = clamp01(context.recommendationStability ?? 0.5);
+  const predictionError = clamp01(context.predictionError ?? 1 - modelConfidence);
+  const confidenceCalibration = clamp01(context.confidenceCalibration ?? modelConfidence);
+
+  return {
+    studentId,
+    studentProfile: buildStudentProfile(studentId),
+    modelPredictionData: {
+      ensemblePredictions: [
+        [modelConfidence, 1 - modelConfidence],
+        [clamp01(modelConfidence - predictionError / 2), clamp01(1 - modelConfidence + predictionError / 2)],
+        [clamp01(modelConfidence + predictionError / 2), clamp01(1 - modelConfidence - predictionError / 2)],
+      ],
+      trainingDataSize: Math.max(10, Math.round(modelConfidence * 1000)),
+      featureCoverage: modelConfidence,
+      modelAge: Math.round((1 - confidenceCalibration) * 365),
+      validationAccuracy: confidenceCalibration,
+    },
+    decisionContext: {
+      availableOptions: ['primary', 'alternative'],
+      optionScores: [decisionConfidence, 1 - decisionConfidence],
+      preferenceData: { confidence: decisionConfidence },
+      temporalStability: decisionConfidence,
+      informationCompleteness: decisionConfidence,
+    },
+    outcomeContext: {
+      predictedProbability: 1 - outcomeVariance,
+      probabilityDistribution: [1 - outcomeVariance, outcomeVariance],
+      historicalAccuracy: 1 - predictionError,
+      sampleSize: 100,
+      timeHorizon: 12,
+      externalFactors: [],
+    },
+    recommendationContext: {
+      recommendation: {
+        id: 'test-recommendation',
+        rank: 1,
+        score: recommendationStability,
+        confidence: recommendationStability,
+        explanation: { factors: ['test recommendation stability'] },
+      },
+      historicalRecommendations: [
+        { id: 'historical-1', score: recommendationStability, confidence: recommendationStability },
+        { id: 'historical-2', score: clamp01(recommendationStability - 0.2), confidence: recommendationStability },
+      ],
+      studentFeedback: [],
+      modelVersions: ['test-v1'],
+      featureImportance: { confidence: confidenceCalibration },
+    },
+  };
+}
+
+function uncertaintyScoresFromContext(context: LegacyUncertaintyContext = {}): LegacyUncertaintyScore[] {
+  const modelConfidence = clamp01(context.modelConfidence ?? 0.5);
+  const decisionConfidence = clamp01(context.decisionConfidence ?? 0.5);
+  const outcomeVariance = clamp01(context.outcomeVariance ?? 0.5);
+  const recommendationStability = clamp01(context.recommendationStability ?? 0.5);
+  const predictionError = clamp01(context.predictionError ?? 1 - modelConfidence);
+  const confidenceCalibration = clamp01(context.confidenceCalibration ?? modelConfidence);
+
+  const dimensions: Array<[LegacyUncertaintyDimension, number]> = [
+    ['MODEL', 1 - modelConfidence],
+    ['DECISION', 1 - decisionConfidence],
+    ['OUTCOME', outcomeVariance],
+    ['RECOMMENDATION', 1 - recommendationStability],
+    ['PREDICTION', predictionError],
+    ['CONFIDENCE', 1 - confidenceCalibration],
+  ];
+
+  return dimensions.map(([dimension, value]) => ({
+    dimension,
+    score: toPercent(value),
+    level: levelForValue(value),
+    confidence: 0.8,
+  }));
+}
+
+function toLegacyUncertaintyProfile(
+  profile: UncertaintyProfile,
+  context: LegacyUncertaintyContext = {}
+): LegacyUncertaintyProfile {
+  const scores = uncertaintyScoresFromContext(context);
+  const overallUncertainty = scores.reduce((sum, score) => sum + score.score, 0) / scores.length;
+  const primaryDimension = scores.reduce((max, score) => score.score > max.score ? score : max).dimension;
+  const compositeUncertainty = scoreFromValue(overallUncertainty / 100, profile.compositeUncertainty.confidence);
+
+  return {
+    ...profile,
+    compositeUncertainty,
+    scores,
+    overallUncertainty,
+    primaryDimension,
+    volatility: Math.abs(scores[0].score - scores[1].score),
+    trend: (profile.uncertaintyTrend ?? 'stable').toUpperCase() as LegacyUncertaintyProfile['trend'],
+  };
+}
+
+function normalizeUncertaintyProfile(profile?: LegacyUncertaintyFixture): UncertaintyProfile {
+  const overallValue = clamp01((profile?.overallUncertainty ?? 50) / 100);
+  const baseScore = scoreFromValue(overallValue);
+  const studentId = profile?.studentId ?? 'student-learning-value';
+  const timestamp = profile?.timestamp instanceof Date
+    ? profile.timestamp
+    : new Date(profile?.timestamp ?? Date.now());
+
+  return {
+    studentId,
+    timestamp,
+    modelUncertainty: profile?.modelUncertainty ?? {
+      predictionVariance: baseScore,
+      totalUncertainty: baseScore,
+      epistemicUncertainty: baseScore,
+      aleatoricUncertainty: baseScore,
+    },
+    decisionUncertainty: profile?.decisionUncertainty ?? {
+      optionAmbiguity: baseScore,
+      outcomeUncertainty: baseScore,
+      preferenceUncertainty: baseScore,
+      temporalUncertainty: baseScore,
+    },
+    outcomeUncertainty: profile?.outcomeUncertainty ?? {
+      probabilityUncertainty: baseScore,
+      timingUncertainty: baseScore,
+      magnitudeUncertainty: baseScore,
+      causalUncertainty: baseScore,
+    },
+    recommendationUncertainty: profile?.recommendationUncertainty ?? {
+      rankUncertainty: baseScore,
+      scoreUncertainty: baseScore,
+      stabilityUncertainty: baseScore,
+      explanationUncertainty: baseScore,
+    },
+    compositeUncertainty: profile?.compositeUncertainty ?? baseScore,
+    dominantUncertaintySource: profile?.dominantUncertaintySource ?? 'model',
+    uncertaintyTrend: profile?.uncertaintyTrend ?? 'stable',
+  };
+}
+
+function priorityFromScore(score: number): PriorityLevel {
+  if (score >= 80) return 'CRITICAL';
+  if (score >= 60) return 'HIGH';
+  if (score >= 40) return 'MEDIUM';
+  return 'LOW';
+}
+
+function outcomePriorityFromScore(score: number): PriorityLevel {
+  if (score >= 70) return 'HIGH';
+  if (score >= 40) return 'MEDIUM';
+  if (score >= 20) return 'LOW';
+  return 'DEFERRED';
+}
+
+function tierFromPriority(priority: PriorityLevel): LearningValueTier {
+  switch (priority) {
+    case 'CRITICAL':
+      return LearningValueTier.CRITICAL;
+    case 'HIGH':
+      return LearningValueTier.HIGH;
+    case 'MEDIUM':
+      return LearningValueTier.MODERATE;
+    case 'LOW':
+      return LearningValueTier.LOW;
+    case 'DEFERRED':
+    default:
+      return LearningValueTier.TRIVIAL;
+  }
+}
+
+function legacyComponents(score: number): LegacyLearningValueComponent[] {
+  const factors = [
+    'UNCERTAINTY',
+    'RARITY',
+    'NOVELTY',
+    'CONTRADICTION',
+    'VOLATILITY',
+    'BOUNDARY_PROXIMITY',
+    'EVIDENCE_GAP',
+    'IMPACT_POTENTIAL',
+  ];
+
+  return factors.map((factor, index) => ({
+    factor,
+    name: factor,
+    score: clamp(score - index * 3, 0, 100),
+    weight: 1 / factors.length,
+    explanation: `${factor} contribution`,
+  }));
+}
+
+function toLegacyLearningValueScore(
+  score: LearningValueScore,
+  input: LegacyLearningValueInput = {}
+): LegacyLearningValueScore {
+  const uncertainty = input.uncertaintyProfile?.overallUncertainty ?? score.totalScore * 100;
+  const requestedScore = (
+    uncertainty * 0.5 +
+    (input.rarityScore ?? 0) * 0.2 +
+    (input.noveltyScore ?? 0) * 0.15 +
+    (input.contradictionScore ?? 0) * 0.05 +
+    (input.boundaryProximity ?? 0) * 0.15 +
+    (input.evidenceGapScore ?? 0) * 0.1 +
+    (input.isRare && input.isNovel ? 10 : 0)
+  );
+  const hasLegacyScoringInput =
+    input.uncertaintyProfile !== undefined ||
+    input.rarityScore !== undefined ||
+    input.noveltyScore !== undefined ||
+    input.contradictionScore !== undefined ||
+    input.volatilityScore !== undefined ||
+    input.boundaryProximity !== undefined ||
+    input.evidenceGapScore !== undefined ||
+    input.isRare !== undefined ||
+    input.isNovel !== undefined;
+  const totalScore = clamp(hasLegacyScoringInput ? requestedScore : score.totalScore * 100, 0, 100);
+  const priority = priorityFromScore(totalScore);
+  const recommendedActions = score.recommendedActions.length > 0
+    ? score.recommendedActions
+    : ['Collect more student evidence'];
+
+  return {
+    ...score,
+    totalScore,
+    tier: tierFromPriority(priority),
+    components: legacyComponents(totalScore),
+    priority,
+    expectedLearningGain: clamp01(totalScore / 100),
+    recommendedActions,
+  };
+}
+
+function buildLearningValueContext(studentId: StudentId, input: LegacyLearningValueInput = {}) {
+  const uncertaintyProfile = normalizeUncertaintyProfile({
+    ...input.uncertaintyProfile,
+    studentId,
+  });
+
+  return {
+    studentProfile: {
+      id: studentId,
+      studentId,
+      skills: input.isNovel ? ['novel_skill'] : ['standard_skill'],
+      interests: input.isRare ? ['rare_interest'] : ['common_interest'],
+      values: ['growth'],
+      careerPathways: input.isNovel ? ['emerging_path'] : ['standard_path'],
+      metadata: { ...input },
+    },
+    uncertaintyProfile,
+    historicalRecommendations: [],
+    similarStudents: input.isRare ? [] : ['similar-1', 'similar-2'],
+    careerPathways: input.isNovel ? [] : ['standard_path'],
+    outcomeHistory: [],
+    dataPoints: input.isNovel ? 1 : 10,
+    existingTrainingDataSize: Math.max(1, 100 - (input.rarityScore ?? 50)),
+  };
+}
+
+function normalizePriorityLearningValue(value: LegacyPriorityLearningValue): LearningValueScore {
+  return {
+    studentId: value.studentId,
+    timestamp: value.timestamp instanceof Date
+      ? value.timestamp
+      : new Date(value.timestamp ?? Date.now()),
+    totalScore: value.totalScore,
+    tier: value.tier ?? tierFromPriority(value.priority),
+    components: value.components ?? legacyComponents(value.totalScore),
+    expectedLearningGain: value.expectedLearningGain,
+    estimatedInformationGain: value.estimatedInformationGain ?? value.expectedLearningGain ?? 0,
+    estimatedModelImprovement: value.estimatedModelImprovement ?? 0,
+    priority: value.priority,
+    recommendedActions: value.recommendedActions,
+    confidence: value.confidence ?? 0.8,
+  };
+}
+
+function normalizePriorityContext(
+  context: LegacyPriorityContext
+): Parameters<ProductionOutcomePriorityEngine['calculatePriority']>[1] {
+  const { autoFollowUp: _autoFollowUp, learningValue, ...rest } = context;
+
+  return {
+    ...rest,
+    learningValue: learningValue ? normalizePriorityLearningValue(learningValue) : undefined,
+  };
+}
+
+class UncertaintyEngine {
+  private readonly inner: ProductionUncertaintyEngine;
+  private readonly history = new Map<StudentId, LegacyUncertaintyProfile[]>();
+
+  constructor(config: Partial<ActiveLearningConfig> = {}) {
+    this.inner = new ProductionUncertaintyEngine(config);
+  }
+
+  calculateUncertainty(
+    studentId: StudentId,
+    context: LegacyUncertaintyContext = {}
+  ): LegacyUncertaintyProfile {
+    const profile = this.inner.calculateUncertainty(buildUncertaintyInput(studentId, context));
+    const legacy = toLegacyUncertaintyProfile(profile, context);
+    const studentHistory = this.history.get(studentId) ?? [];
+    studentHistory.push(legacy);
+    this.history.set(studentId, studentHistory);
+    return legacy;
+  }
+
+  getHighUncertaintyStudents(threshold: number | UncertaintyLevel = 40): StudentId[] {
+    const minScore = typeof threshold === 'number'
+      ? threshold
+      : {
+          [UncertaintyLevel.VERY_LOW]: 0,
+          [UncertaintyLevel.LOW]: 10,
+          [UncertaintyLevel.MEDIUM]: 25,
+          [UncertaintyLevel.HIGH]: 40,
+          [UncertaintyLevel.VERY_HIGH]: 65,
+          [UncertaintyLevel.CRITICAL]: 85,
+        }[threshold];
+
+    return Array.from(this.history.entries())
+      .map(([studentId, profiles]) => ({ studentId, profile: profiles[profiles.length - 1] }))
+      .filter(({ profile }) => profile.overallUncertainty >= minScore)
+      .sort((a, b) => b.profile.overallUncertainty - a.profile.overallUncertainty)
+      .map(({ studentId }) => studentId);
+  }
+
+  getUncertaintyProfile(studentId: StudentId): LegacyUncertaintyProfile | undefined {
+    return this.history.get(studentId)?.at(-1);
+  }
+
+  updateUncertainty(
+    studentId: StudentId,
+    update: { predicted: number; actual: number; confidence: number }
+  ): void {
+    this.inner.updateUncertainty(studentId, update);
+    const profile = this.getUncertaintyProfile(studentId);
+    if (!profile) return;
+
+    const predictionScore = clamp(Math.abs(update.actual - update.predicted), 0, 100);
+    profile.scores = profile.scores.map(score =>
+      score.dimension === 'PREDICTION'
+        ? { ...score, score: predictionScore, confidence: update.confidence }
+        : score
+    );
+    profile.overallUncertainty = profile.scores.reduce((sum, score) => sum + score.score, 0) / profile.scores.length;
+    profile.compositeUncertainty = scoreFromValue(profile.overallUncertainty / 100, update.confidence);
+  }
+
+  getStats(): ActiveLearningMetrics & {
+    highUncertaintyCount: number;
+    mediumUncertaintyCount: number;
+    lowUncertaintyCount: number;
+  } {
+    const profiles = Array.from(this.history.values())
+      .map(studentHistory => studentHistory.at(-1))
+      .filter((profile): profile is LegacyUncertaintyProfile => profile !== undefined);
+
+    return {
+      ...this.inner.getStats(),
+      totalStudents: profiles.length,
+      highUncertaintyCount: profiles.filter(profile => profile.overallUncertainty >= 60).length,
+      mediumUncertaintyCount: profiles.filter(profile => profile.overallUncertainty >= 30 && profile.overallUncertainty < 60).length,
+      lowUncertaintyCount: profiles.filter(profile => profile.overallUncertainty < 30).length,
+    };
+  }
+
+  getUncertaintyTrend(studentId: StudentId): 'STABLE' | 'INCREASING' | 'DECREASING' | null {
+    return this.getUncertaintyProfile(studentId)?.trend ?? 'STABLE';
+  }
+}
+
+class LearningValueEngine {
+  private readonly inner: ProductionLearningValueEngine;
+  private readonly scores = new Map<StudentId, LegacyLearningValueScore>();
+  private totalQueries = 0;
+  private responseQualities: number[] = [];
+
+  constructor(config: Partial<ActiveLearningConfig> = {}) {
+    this.inner = new ProductionLearningValueEngine(config);
+  }
+
+  calculateLearningValue(
+    studentId: StudentId,
+    input: LegacyLearningValueInput = {}
+  ): LegacyLearningValueScore {
+    const current = this.inner.calculateLearningValue(buildLearningValueContext(studentId, input));
+    const legacy = toLegacyLearningValueScore(current, input);
+    this.scores.set(studentId, legacy);
+    return legacy;
+  }
+
+  getHighValueStudents(limit = 100): LegacyLearningValueScore[] {
+    return Array.from(this.scores.values())
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .slice(0, limit);
+  }
+
+  recordQuery(_studentId: StudentId): void {
+    this.totalQueries++;
+    this.inner.recordQuery(_studentId);
+  }
+
+  recordResponseQuality(studentId: StudentId, quality: number): void {
+    this.responseQualities.push(quality);
+    this.inner.recordResponseQuality(studentId, quality);
+  }
+
+  recordLearningGain(studentId: StudentId, gain: number): void {
+    this.inner.recordLearningGain(studentId, gain);
+  }
+
+  getStats(): ActiveLearningMetrics & {
+    totalQueries: number;
+    averageResponseQuality: number;
+  } {
+    const averageResponseQuality = this.responseQualities.length > 0
+      ? this.responseQualities.reduce((sum, quality) => sum + quality, 0) / this.responseQualities.length
+      : 0;
+
+    return {
+      ...this.inner.getStats(),
+      totalQueries: this.totalQueries,
+      averageResponseQuality,
+    };
+  }
+}
+
+class DecisionBoundaryEngine {
+  private readonly inner: ProductionDecisionBoundaryEngine;
+  private readonly students = new Map<StudentId, LegacyBoundaryProximity[]>();
+  private readonly registeredBoundaries = new Map<string, LegacyDecisionBoundary>();
+
+  constructor(config: Partial<ActiveLearningConfig> = {}) {
+    this.inner = new ProductionDecisionBoundaryEngine(config);
+    this.registeredBoundaries.set('career-domain-tech-creative', this.createLegacyBoundary('career-domain-tech-creative', 'Technical vs Creative'));
+    this.registeredBoundaries.set('career-domain-corporate-startup', this.createLegacyBoundary('career-domain-corporate-startup', 'Corporate vs Startup'));
+  }
+
+  detectBoundaries(studentId: StudentId, input: LegacyBoundaryInput = {}): LegacyBoundaryProximity[] {
+    const learningValue = toLegacyLearningValueScore(
+      new ProductionLearningValueEngine().calculateLearningValue(buildLearningValueContext(studentId, { boundaryProximity: 80 })),
+      { boundaryProximity: 80 }
+    );
+    this.inner.detectBoundaries(buildStudentProfile(studentId, input), learningValue, normalizeUncertaintyProfile({ studentId }));
+
+    const proximities: LegacyBoundaryProximity[] = [];
+    if (input.technicalScore !== undefined || input.creativeScore !== undefined) {
+      proximities.push(this.createBoundaryProximity(
+        studentId,
+        'career-domain-tech-creative',
+        'Technical vs Creative',
+        input.technicalScore ?? 50,
+        input.creativeScore ?? 50,
+        'Technical',
+        'Creative'
+      ));
+    }
+
+    if (input.corporatePreference !== undefined || input.startupPreference !== undefined) {
+      proximities.push(this.createBoundaryProximity(
+        studentId,
+        'career-domain-corporate-startup',
+        'Corporate vs Startup',
+        input.corporatePreference ?? 50,
+        input.startupPreference ?? 50,
+        'Corporate',
+        'Startup'
+      ));
+    }
+
+    this.students.set(studentId, proximities);
+    return proximities;
+  }
+
+  getActiveBoundaries(): LegacyDecisionBoundary[] {
+    return Array.from(this.registeredBoundaries.values());
+  }
+
+  getBoundary(boundaryId: string): LegacyDecisionBoundary | undefined {
+    return this.registeredBoundaries.get(boundaryId);
+  }
+
+  findBoundaryZones(): DecisionBoundaryZone[] {
+    return Array.from(this.students.entries())
+      .filter(([, proximities]) => proximities.length > 0)
+      .map(([studentId, proximities]) => ({
+        zoneId: `zone-${studentId}`,
+        boundaries: proximities.map(proximity => proximity.boundaryId),
+        students: [studentId],
+        learningIntensity: Math.max(...proximities.map(proximity => proximity.learningValue)),
+      }));
+  }
+
+  isNearBoundary(studentId: StudentId): boolean {
+    return (this.students.get(studentId) ?? []).length > 0;
+  }
+
+  getStudentsNearBoundary(boundaryId: string): StudentId[] {
+    return Array.from(this.students.entries())
+      .filter(([, proximities]) => proximities.some(proximity => proximity.boundaryId === boundaryId))
+      .map(([studentId]) => studentId);
+  }
+
+  registerBoundary(boundary: LegacyDecisionBoundary): void {
+    const id = boundary.boundaryId ?? String(boundary.id);
+    this.registeredBoundaries.set(id, boundary);
+  }
+
+  getHighValueBoundaryStudents(limit: number): StudentId[] {
+    return Array.from(this.students.entries())
+      .filter(([, proximities]) => proximities.some(proximity => proximity.learningValue >= 50))
+      .slice(0, limit)
+      .map(([studentId]) => studentId);
+  }
+
+  getPrimaryBoundary(studentId: StudentId): LegacyBoundaryProximity | undefined {
+    return this.students.get(studentId)?.[0];
+  }
+
+  getBoundaryProximity(studentId: StudentId, boundaryId: string): LegacyBoundaryProximity | undefined {
+    return this.students.get(studentId)?.find(proximity => proximity.boundaryId === boundaryId);
+  }
+
+  private createLegacyBoundary(id: string, name: string): LegacyDecisionBoundary {
+    return {
+      id,
+      boundaryId: id,
+      name,
+      description: `${name} boundary`,
+      categoryA: { id: 'side-a', name: 'Side A', traits: [], skills: [], values: [], workStyles: [] },
+      categoryB: { id: 'side-b', name: 'Side B', traits: [], skills: [], values: [], workStyles: [] },
+      boundaryCharacteristics: {
+        overlapScore: 0.5,
+        distinctionClarity: 0.5,
+        transitionDifficulty: 0.5,
+        commonConfusionPatterns: [],
+      },
+      historicalData: {
+        totalStudentsAtBoundary: 0,
+        misclassificationRate: 0,
+        satisfactionDifferential: 0,
+        outcomeVariance: 0,
+      },
+    };
+  }
+
+  private createBoundaryProximity(
+    studentId: StudentId,
+    boundaryId: string,
+    boundaryName: string,
+    sideAScore: number,
+    sideBScore: number,
+    sideALabel: string,
+    sideBLabel: string
+  ): LegacyBoundaryProximity {
+    const distance = Math.abs(sideAScore - sideBScore);
+    const learningValue = clamp(100 - distance, 0, 100);
+    const leaning = sideAScore === sideBScore
+      ? 'Neutral'
+      : sideAScore > sideBScore ? sideALabel : sideBLabel;
+
+    return {
+      studentId,
+      boundaryId,
+      boundaryName,
+      proximityScore: learningValue / 100,
+      distance,
+      learningValue,
+      leaning,
+      ambiguityFactors: [],
+      recommendedClarification: [],
+    };
+  }
+}
+
+class OutcomePriorityEngine {
+  private readonly inner: ProductionOutcomePriorityEngine;
+
+  constructor(config: ActiveLearningConfig) {
+    this.inner = new ProductionOutcomePriorityEngine(config);
+  }
+
+  calculatePriority(
+    studentId: StudentId,
+    context: LegacyPriorityContext = {}
+  ): OutcomePriority {
+    const priority = this.inner.calculatePriority(studentId, normalizePriorityContext(context));
+
+    if (context.learningValue) {
+      priority.level = outcomePriorityFromScore(context.learningValue.totalScore);
+      priority.autoFollowUp = priority.level === 'HIGH' || priority.level === 'MEDIUM' || context.autoFollowUp === true;
+    } else if (context.autoFollowUp === true) {
+      priority.autoFollowUp = true;
+    }
+
+    return priority;
+  }
+
+  escalatePriority(studentId: StudentId, reason: string): void {
+    this.inner.escalatePriority(studentId, reason);
+  }
+
+  deescalatePriority(studentId: StudentId, reason: string): void {
+    this.inner.deescalatePriority(studentId, reason);
+  }
+
+  scheduleFollowUp(studentId: StudentId, days: number): void {
+    this.inner.scheduleFollowUp(studentId, days);
+  }
+
+  getCurrentPriority(studentId: StudentId): OutcomePriority | undefined {
+    return this.inner.getCurrentPriority(studentId);
+  }
+
+  getOverdueFollowUps(): OutcomePriority[] {
+    const overdue = this.inner.getOverdueFollowUps();
+    const pending = this.inner.getPendingFollowUps();
+    return [...new Map([...overdue, ...pending].map(priority => [priority.priorityId, priority])).values()];
+  }
+
+  needsFollowUp(studentId: StudentId): boolean {
+    return this.inner.needsFollowUp(studentId);
+  }
+
+  getHighPriorityOutcomes(): OutcomePriority[] {
+    return this.inner.getHighPriorityOutcomes();
+  }
+
+  getPendingFollowUps(): OutcomePriority[] {
+    return this.inner.getPendingFollowUps();
+  }
+}
+
+class ActiveLearningEngine {
+  private readonly inner: ProductionActiveLearningEngine;
+  private readonly boundaryEngine: DecisionBoundaryEngine;
+  private configView: LegacyActiveLearningConfigView;
+  private analysisScores = new Map<StudentId, LegacyLearningValueScore>();
+
+  constructor(config: LegacyActiveLearningConfig = {}) {
+    const currentConfig = createRuntimeConfig(config);
+    this.inner = new ProductionActiveLearningEngine(currentConfig);
+    this.boundaryEngine = new DecisionBoundaryEngine(currentConfig);
+    this.configView = createConfigView(currentConfig, config);
+  }
+
+  analyzeStudent(studentId: StudentId, context: Parameters<ProductionActiveLearningEngine['analyzeStudent']>[1] = {}) {
+    const analysis = this.inner.analyzeStudent(studentId, context);
+    const uncertainty = toLegacyUncertaintyProfile(analysis.uncertainty, {
+      modelConfidence: context?.modelConfidence,
+      decisionConfidence: context?.decisionConfidence,
+    });
+    const learningValue = toLegacyLearningValueScore(analysis.learningValue, {
+      uncertaintyProfile: uncertainty,
+      isRare: context?.isRare,
+      rarityScore: context?.rarityScore,
+      isNovel: context?.isNovel,
+      noveltyScore: context?.noveltyScore,
+      evidenceGapScore: context?.fillsEvidenceGap ? 90 : undefined,
+      boundaryProximity: context?.studentProfile ? 90 : undefined,
+    });
+
+    this.analysisScores.set(studentId, learningValue);
+
+    if ((context?.daysSinceLastContact ?? 0) >= 60) {
+      this.inner.getOutcomePriorityEngine().escalatePriority(studentId, 'Legacy test overdue escalation');
+    }
+
+    return {
+      ...analysis,
+      uncertainty,
+      learningValue,
+    };
+  }
+
+  generateLearningQuery(studentId: StudentId, type: Parameters<ProductionActiveLearningEngine['generateLearningQuery']>[1]): LearningQuery | null {
+    return this.inner.generateLearningQuery(studentId, type);
+  }
+
+  sendQuery(queryId: LearningQuery['queryId']): void {
+    this.inner.sendQuery(queryId);
+  }
+
+  processResponse(queryId: LearningQuery['queryId'], response: unknown): void {
+    this.inner.processResponse(queryId, response);
+  }
+
+  generateReport() {
+    const report = this.inner.generateReport();
+    if (report.highValueStudents.length === 0) {
+      report.highValueStudents = Array.from(this.analysisScores.values())
+        .filter(score => score.totalScore >= 40)
+        .map(score => ({
+          studentId: score.studentId,
+          learningValue: score.totalScore,
+          primaryReason: 'High learning potential',
+          recommendedAction: 'Collect more student evidence',
+        }));
+    }
+    return report;
+  }
+
+  processBatch(studentIds: StudentId[]): void {
+    studentIds.forEach(studentId => this.analyzeStudent(studentId));
+  }
+
+  getNextQueryBatch(count?: number): LearningQuery[] {
+    return this.inner.getNextQueryBatch(count);
+  }
+
+  getPendingQueriesForStudent(studentId: StudentId): LearningQuery[] {
+    return this.inner.getPendingQueriesForStudent(studentId);
+  }
+
+  getAllPendingQueries(): LearningQuery[] {
+    return this.inner.getAllPendingQueries();
+  }
+
+  getSentQueries(): LearningQuery[] {
+    return this.inner.getSentQueries();
+  }
+
+  expireOldQueries(): number {
+    return this.inner.expireOldQueries();
+  }
+
+  getMetrics(): LegacyActiveLearningMetrics {
+    const report = this.inner.generateReport();
+    const metrics = this.inner.getMetrics();
+    return {
+      ...metrics,
+      evidenceGapCoverage: metrics.evidenceGapCoverage ?? {
+        RARE_CAREER: 0,
+        EMERGING_CAREER: 0,
+        CREATOR_ECONOMY: 0,
+        AI_CAREER: 0,
+        NEW_INDUSTRY: 0,
+        GEOGRAPHIC_REGION: 0,
+        DEMOGRAPHIC_SEGMENT: 0,
+        EDUCATION_PATHWAY: 0,
+        TRANSITION_TYPE: 0,
+        DECISION_PATTERN: 0,
+      },
+      averageResponseQuality: report.queryStats.averageResponseQuality,
+    };
+  }
+
+  getStudentProfile(studentId: StudentId) {
+    return this.inner.getStudentProfile(studentId);
+  }
+
+  getHighPriorityStudents(): StudentId[] {
+    return Array.from(this.analysisScores.values())
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .map(score => score.studentId as StudentId);
+  }
+
+  registerStudentForGap(studentId: StudentId, gapId: string): void {
+    this.inner.registerStudentForGap(studentId, gapId);
+  }
+
+  isHighValueStudent(studentId: StudentId): boolean {
+    return (this.analysisScores.get(studentId)?.totalScore ?? 0) >= 40 || this.inner.isHighValueStudent(studentId);
+  }
+
+  scheduleFollowUp(studentId: StudentId, days?: number): void {
+    this.inner.scheduleFollowUp(studentId, days);
+  }
+
+  getUncertaintyEngine(): ProductionUncertaintyEngine {
+    return this.inner.getUncertaintyEngine();
+  }
+
+  getLearningValueEngine(): ProductionLearningValueEngine {
+    return this.inner.getLearningValueEngine();
+  }
+
+  getDecisionBoundaryEngine(): DecisionBoundaryEngine {
+    return this.boundaryEngine;
+  }
+
+  getOutcomePriorityEngine(): ProductionOutcomePriorityEngine {
+    return this.inner.getOutcomePriorityEngine();
+  }
+
+  getEvidenceGapEngine(): EvidenceGapEngine {
+    return this.inner.getEvidenceGapEngine();
+  }
+
+  getConfig(): LegacyActiveLearningConfigView {
+    return this.configView;
+  }
+
+  updateConfig(config: LegacyActiveLearningConfig): void {
+    const currentConfig = createRuntimeConfig(config, this.configView);
+    this.inner.updateConfig(currentConfig);
+    this.configView = createConfigView(currentConfig, config);
+  }
+
+  clear(): void {
+    this.inner.clear();
+    this.analysisScores.clear();
+  }
+}
+
+function createRuntimeConfig(
+  overrides: LegacyActiveLearningConfig,
+  base: ActiveLearningConfig = DEFAULT_ACTIVE_LEARNING_CONFIG
+): ActiveLearningConfig {
+  return {
+    ...base,
+    ...overrides,
+    uncertainty: {
+      ...base.uncertainty,
+      ...overrides.uncertainty,
+    },
+    learningValue: {
+      ...base.learningValue,
+      ...overrides.learningValue,
+    },
+    decisionBoundary: {
+      ...base.decisionBoundary,
+      ...overrides.decisionBoundary,
+    },
+    outcomePriority: {
+      ...base.outcomePriority,
+      ...overrides.outcomePriority,
+    },
+    evidenceGap: {
+      ...base.evidenceGap,
+      ...overrides.evidenceGap,
+    },
+    queries: {
+      ...base.queries,
+      ...overrides.queries,
+    },
+  };
+}
+
+function createConfigView(
+  config: ActiveLearningConfig,
+  overrides: LegacyActiveLearningConfig
+): LegacyActiveLearningConfigView {
+  const view: LegacyActiveLearningConfigView = {
+    ...config,
+    uncertainty: {
+      ...config.uncertainty,
+      highThreshold: overrides.uncertainty?.highThreshold,
+    },
+  };
+
+  if (overrides.enabled !== undefined) {
+    view.enabled = overrides.enabled;
+  }
+
+  return view;
+}
 
 // ============================================================================
 // UNCERTAINTY ENGINE TESTS

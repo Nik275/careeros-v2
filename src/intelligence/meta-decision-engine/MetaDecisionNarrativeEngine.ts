@@ -7,9 +7,9 @@
 import type {
   MetaDecisionAnalysis,
   DecisionTiming,
-  DecisionState,
   DecisionQualityLevel,
 } from './types';
+import { DecisionState } from './types';
 
 /**
  * Generates narratives for meta-decision analysis.

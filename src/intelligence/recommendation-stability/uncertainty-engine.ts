@@ -565,7 +565,7 @@ export class UncertaintyEngine {
   ): Array<{ source: UncertaintySource; priority: number; effort: 'LOW' | 'MEDIUM' | 'HIGH' }> {
     return contributions
       .filter(c => c.reducible && c.contribution > 15)
-      .map(c => ({
+      .map((c): { source: UncertaintySource; priority: number; effort: 'LOW' | 'MEDIUM' | 'HIGH' } => ({
         source: c.source,
         priority: Math.round(c.contribution),
         effort: c.source === 'SPARSE_DATA' ? 'LOW' : 

@@ -5,6 +5,7 @@
  * Tests detection, scoring, explanation, and integration.
  */
 
+import { vi } from 'vitest';
 import {
   createDecisionContextEngine,
   createQuickContextEngine,
@@ -13,54 +14,244 @@ import {
   ContextCategory,
   ContextPriority,
   EvidenceType,
+  getContextTypeDescription,
+  getContextTypeLabel,
+  isDecisionContextType,
 } from '../index';
-import { ContextDetectionInput } from '../types';
+import type { ContextDetectionInput } from '../types';
+import {
+  AcademicStream,
+  CoachingAccess,
+  CompetitiveExamType,
+  DecisionConfidence,
+  DecisionUrgency,
+  EducationBoard,
+  EducationStage,
+  ExplorationStage,
+  FamilyIncomeBracket,
+  FamilyPressure,
+  GradeScale,
+  LanguageComfort,
+  LocationType,
+  type AcademicProfile,
+  type Motivations,
+  type RealityConstraints,
+  type StudentProfile,
+} from '../../../domains/student';
 
 // ============================================================================
 // TEST FIXTURES
 // ============================================================================
 
-const mockStudentProfile = {
-  studentId: 'test-student-001',
-  psychology: {
-    openness: 0.7,
-    conscientiousness: 0.8,
-    extraversion: 0.5,
-    agreeableness: 0.6,
-    neuroticism: 0.3,
-  },
-  motivations: {
-    money: 0.7,
-    impact: 0.6,
-    status: 0.5,
-    autonomy: 0.8,
-    stability: 0.4,
-  },
-  primaryMotivation: 'autonomy',
-  constraints: {
-    financialSupport: 'family_supported',
-    geographicLimitation: null,
-    familyExpectations: null,
-  },
-  academic: {
-    currentEducation: 'Class 12',
-    subjectInterests: ['Physics', 'Chemistry', 'Mathematics'],
-    aptitudeExams: [
-      { name: 'JEE Main', status: 'registered' },
-      { name: 'JEE Advanced', status: 'preparing' },
-    ],
-  },
-  decision: {
-    timeline: 'immediate',
-    confidence: 0.7,
-    informationNeeds: ['college_rankings', 'branch_selection'],
-  },
-  dataConfidence: 0.8,
-  completeness: 0.75,
+interface LegacyAptitudeExamFixture {
+  name: string;
+  status: string;
+}
+
+type DecisionContextAcademicFixture = AcademicProfile & {
+  currentEducation?: string;
+  subjectInterests?: string[];
+  aptitudeExams?: LegacyAptitudeExamFixture[];
 };
+
+type DecisionContextMotivationsFixture = Motivations & {
+  autonomy?: number;
+};
+
+type DecisionContextConstraintsFixture = RealityConstraints & {
+  financialSupport?: string;
+  geographicLimitation?: string | null;
+  familyExpectations?: string | null;
+};
+
+type DecisionContextStudentProfileFixture = StudentProfile & {
+  academic: DecisionContextAcademicFixture;
+  motivations: DecisionContextMotivationsFixture;
+  constraints: DecisionContextConstraintsFixture;
+};
+
+type StudentProfileFixtureOverrides = Omit<
+  Partial<DecisionContextStudentProfileFixture>,
+  'academic' | 'motivations' | 'constraints' | 'decision'
+> & {
+  academic?: Partial<DecisionContextAcademicFixture>;
+  motivations?: Partial<DecisionContextMotivationsFixture>;
+  constraints?: Partial<DecisionContextConstraintsFixture>;
+  decision?: Partial<StudentProfile['decision']>;
+};
+
+const createStudentProfileFixture = (
+  overrides: StudentProfileFixtureOverrides = {}
+): DecisionContextStudentProfileFixture => {
+  const base: DecisionContextStudentProfileFixture = {
+    id: 'profile-test-student-001',
+    studentId: 'test-student-001',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    schemaVersion: 1,
+    psychology: {
+      analyticalThinking: 0.7,
+      creativity: 0.6,
+      socialOrientation: 0.5,
+      leadership: 0.6,
+      detailOrientation: 0.8,
+      curiosity: 0.7,
+      competitiveness: 0.5,
+      riskTolerance: 0.3,
+    },
+    motivations: {
+      money: 0.7,
+      impact: 0.6,
+      status: 0.5,
+      freedom: 0.8,
+      autonomy: 0.8,
+      stability: 0.4,
+    },
+    primaryMotivation: 'freedom',
+    constraints: {
+      financial: {
+        familyIncomeBracket: FamilyIncomeBracket.BETWEEN_12_25_LPA,
+        hasPersonalIncome: false,
+        hasEducationLoan: false,
+        canAffordCoaching: true,
+        canAffordPrivateCollege: true,
+      },
+      family: {
+        familyPressure: FamilyPressure.MILD,
+        isFirstGeneration: false,
+        dependentCount: 0,
+        expectedToContribute: false,
+        mustStayNearFamily: false,
+      },
+      geographic: {
+        locationType: LocationType.METRO_TIER_1,
+        currentCity: 'Mumbai',
+        currentState: 'Maharashtra',
+        willingToRelocate: true,
+      },
+      accessibility: {
+        languageComfort: LanguageComfort.FLUENT_ENGLISH,
+        nativeLanguage: 'English',
+        coachingAccess: CoachingAccess.MODERATE,
+        hasInternetAccess: true,
+        hasLearningDevice: true,
+        localInstitutionQuality: 'good',
+      },
+      financialSupport: 'family_supported',
+      geographicLimitation: null,
+      familyExpectations: null,
+    },
+    academic: {
+      performance: {
+        stage: EducationStage.HIGH_SCHOOL_11_12,
+        stream: AcademicStream.SCIENCE,
+        board: EducationBoard.CBSE,
+        gradeScale: GradeScale.PERCENTAGE,
+        overallScore: 0.85,
+        subjectGrades: [],
+        currentYear: 12,
+      },
+      aptitude: {
+        logicalReasoning: 0.8,
+        numericalAbility: 0.85,
+        verbalAbility: 0.7,
+      },
+      examResults: [
+        {
+          examType: CompetitiveExamType.JEE_MAIN,
+          qualified: false,
+          year: 2026,
+          attemptNumber: 1,
+        },
+        {
+          examType: CompetitiveExamType.JEE_ADVANCED,
+          qualified: false,
+          year: 2026,
+          attemptNumber: 1,
+        },
+      ],
+      interests: {
+        favoriteSubjects: ['Physics', 'Chemistry', 'Mathematics'],
+        dislikedSubjects: [],
+        extracurriculars: [],
+      },
+      currentEducation: 'Class 12',
+      subjectInterests: ['Physics', 'Chemistry', 'Mathematics'],
+      aptitudeExams: [
+        { name: 'JEE Main', status: 'registered' },
+        { name: 'JEE Advanced', status: 'preparing' },
+      ],
+    },
+    decision: {
+      explorationStage: ExplorationStage.NARROWING,
+      timeline: {
+        urgency: DecisionUrgency.IMMEDIATE,
+        monthsToDecision: 1,
+        decisionPoint: 'Class 12',
+      },
+      confidence: {
+        level: DecisionConfidence.CONFIDENT,
+        score: 0.7,
+        confidentAreas: ['engineering preparation'],
+        uncertainAreas: ['college rankings', 'branch selection'],
+      },
+      informationNeeds: {
+        gaps: ['college_rankings', 'branch_selection'],
+        careersToResearch: [],
+        openQuestions: [],
+        hasDoneInformationalInterviews: false,
+      },
+      previousAssessments: ['test-assessment-001'],
+      hasMentor: false,
+    },
+    dataConfidence: 0.8,
+    completeness: 0.75,
+    dataSource: 'assessment',
+  };
+
+  return {
+    ...base,
+    ...overrides,
+    motivations: {
+      ...base.motivations,
+      ...overrides.motivations,
+    },
+    constraints: {
+      ...base.constraints,
+      ...overrides.constraints,
+    },
+    academic: {
+      ...base.academic,
+      ...overrides.academic,
+      performance: {
+        ...base.academic.performance,
+        ...overrides.academic?.performance,
+      },
+      aptitude: {
+        ...base.academic.aptitude,
+        ...overrides.academic?.aptitude,
+      },
+      interests: {
+        ...base.academic.interests,
+        ...overrides.academic?.interests,
+      },
+    },
+    decision: {
+      ...base.decision,
+      ...overrides.decision,
+    },
+  };
+};
+
+const mockStudentProfile = createStudentProfileFixture();
+
+const mockAssessmentResponses: NonNullable<ContextDetectionInput['assessmentResponses']> = [
+  { questionId: 'context-confidence', type: 'likert', value: 5 },
+];
 
 const mockJeeInput: ContextDetectionInput = {
   profile: mockStudentProfile,
+  assessmentResponses: mockAssessmentResponses,
   explicitGoals: ['Clear JEE Advanced', 'Get into IIT Bombay', 'Study Computer Science'],
   userInput: 'I am preparing for JEE and want to get into a good IIT',
   timestamp: Date.now(),
@@ -71,58 +262,91 @@ const mockJeeInput: ContextDetectionInput = {
 };
 
 const mockNeetInput: ContextDetectionInput = {
-  profile: {
-    ...mockStudentProfile,
+  profile: createStudentProfileFixture({
     academic: {
-      ...mockStudentProfile.academic,
       currentEducation: 'Class 12',
       subjectInterests: ['Biology', 'Chemistry', 'Physics'],
+      examResults: [
+        {
+          examType: CompetitiveExamType.NEET,
+          qualified: false,
+          year: 2026,
+          attemptNumber: 1,
+        },
+      ],
+      interests: {
+        favoriteSubjects: ['Biology', 'Chemistry', 'Physics'],
+        dislikedSubjects: [],
+        extracurriculars: [],
+      },
       aptitudeExams: [
         { name: 'NEET', status: 'registered' },
       ],
     },
-  },
+  }),
   explicitGoals: ['Clear NEET', 'Get into AIIMS Delhi', 'Become a doctor'],
   userInput: 'I want to crack NEET and get into a good medical college',
   timestamp: Date.now(),
 };
 
 const mockUpscInput: ContextDetectionInput = {
-  profile: {
-    ...mockStudentProfile,
+  profile: createStudentProfileFixture({
     academic: {
-      ...mockStudentProfile.academic,
       currentEducation: 'B.A. Political Science',
       subjectInterests: ['Public Administration', 'History', 'Polity'],
+      performance: {
+        stage: EducationStage.UNDERGRADUATE,
+        stream: AcademicStream.ARTS,
+        gradeScale: GradeScale.PERCENTAGE,
+        overallScore: 0.8,
+        subjectGrades: [],
+        currentYear: 3,
+      },
+      examResults: [],
+      interests: {
+        favoriteSubjects: ['Public Administration', 'History', 'Polity'],
+        dislikedSubjects: [],
+        extracurriculars: [],
+      },
       aptitudeExams: [],
     },
-  },
+  }),
   explicitGoals: ['Clear UPSC', 'Become an IAS officer', 'Serve the nation'],
   userInput: 'I am preparing for UPSC civil services examination',
+  assessmentResponses: [
+    {
+      questionId: 'upsc-goal',
+      type: 'forcedChoice',
+      selectedOptionId: 'UPSC IAS civil services preparation',
+    },
+  ],
   timestamp: Date.now(),
 };
 
 const mockStartupInput: ContextDetectionInput = {
-  profile: {
-    ...mockStudentProfile,
+  profile: createStudentProfileFixture({
     motivations: {
-      ...mockStudentProfile.motivations,
+      freedom: 0.95,
       autonomy: 0.95,
     },
-  },
+  }),
   explicitGoals: ['Build a startup', 'Solve real problems', 'Be my own boss'],
   userInput: 'I have a startup idea and want to build my own company',
   timestamp: Date.now(),
 };
 
 const mockCareerSwitchInput: ContextDetectionInput = {
-  profile: {
-    ...mockStudentProfile,
+  profile: createStudentProfileFixture({
     academic: {
-      ...mockStudentProfile.academic,
       currentEducation: 'Working Professional',
+      performance: {
+        stage: EducationStage.WORKING_PROFESSIONAL,
+        gradeScale: GradeScale.PERCENTAGE,
+        overallScore: 0.75,
+        subjectGrades: [],
+      },
     },
-  },
+  }),
   explicitGoals: ['Change my career', 'Move to tech industry', 'Learn coding'],
   userInput: 'I am working in a different field and want to switch to software',
   timestamp: Date.now(),
@@ -200,10 +424,22 @@ describe('DecisionContextOrchestrator', () => {
     });
 
     it('should have higher confidence with explicit goals', () => {
-      const withGoals = engine.analyze(mockJeeInput);
+      const confidenceProfile = createStudentProfileFixture({
+        academic: {
+          examResults: [],
+          aptitudeExams: [],
+        },
+      });
+
+      const withGoals = engine.analyze({
+        ...mockJeeInput,
+        profile: confidenceProfile,
+      });
       
       const withoutGoals: ContextDetectionInput = {
         ...mockJeeInput,
+        profile: confidenceProfile,
+        assessmentResponses: undefined,
         explicitGoals: undefined,
         userInput: undefined,
       };
@@ -266,16 +502,28 @@ describe('DecisionContextOrchestrator', () => {
     it('should detect mutually exclusive contexts', () => {
       // Student claiming both JEE and NEET prep (unusual but possible)
       const conflictingInput: ContextDetectionInput = {
-        profile: {
-          ...mockStudentProfile,
+        profile: createStudentProfileFixture({
           academic: {
-            ...mockStudentProfile.academic,
+            examResults: [
+              {
+                examType: CompetitiveExamType.JEE_MAIN,
+                qualified: false,
+                year: 2026,
+                attemptNumber: 1,
+              },
+              {
+                examType: CompetitiveExamType.NEET,
+                qualified: false,
+                year: 2026,
+                attemptNumber: 1,
+              },
+            ],
             aptitudeExams: [
               { name: 'JEE Main', status: 'registered' },
               { name: 'NEET', status: 'registered' },
             ],
           },
-        },
+        }),
         explicitGoals: ['Clear JEE', 'Clear NEET'],
         timestamp: Date.now(),
       };
@@ -365,7 +613,7 @@ describe('DecisionContextOrchestrator', () => {
     });
 
     it('should support custom signal extractors', () => {
-      const customExtractor = jest.fn(() => [
+      const customExtractor = vi.fn(() => [
         {
           id: 'custom-1',
           type: EvidenceType.EXPLICIT_ANSWER,
@@ -506,8 +754,6 @@ describe('Engine Variants', () => {
 
 describe('Type Guards', () => {
   it('should identify valid context types', () => {
-    const { isDecisionContextType } = require('../types');
-
     expect(isDecisionContextType(DecisionContextType.JEE_PREPARATION)).toBe(true);
     expect(isDecisionContextType('INVALID_TYPE')).toBe(false);
     expect(isDecisionContextType(null)).toBe(false);
@@ -520,15 +766,11 @@ describe('Type Guards', () => {
 
 describe('Context Labels & Descriptions', () => {
   it('should provide human-readable labels', () => {
-    const { getContextTypeLabel } = require('../types');
-
     expect(getContextTypeLabel(DecisionContextType.JEE_PREPARATION)).toBe('JEE Preparation');
     expect(getContextTypeLabel(DecisionContextType.UPSC_PREPARATION)).toBe('UPSC Preparation');
   });
 
   it('should provide descriptions', () => {
-    const { getContextTypeDescription } = require('../types');
-
     const desc = getContextTypeDescription(DecisionContextType.JEE_PREPARATION);
     expect(desc).toContain('Joint Entrance Examination');
     expect(desc.length).toBeGreaterThan(0);

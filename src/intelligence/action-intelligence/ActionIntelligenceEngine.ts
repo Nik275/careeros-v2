@@ -44,11 +44,9 @@ import type {
   MonthlyPlan,
   Milestone,
   PlannedMilestone,
-  ActionPriority,
-  TimeHorizon,
 } from './types';
 
-import { ActionType, ActionStatus } from './types';
+import { ActionPriority, ActionStatus, ActionType, TimeHorizon } from './types';
 
 // Import sub-engines
 import {
@@ -220,7 +218,7 @@ export class ActionIntelligenceEngine {
    * Generate actions from all intelligence inputs
    */
   private generateActions(input: ActionIntelligenceInput): Action[] {
-    return this.actionGenerator.generateAll(input);
+    return Object.values(this.actionGenerator.generate(input)).flat();
   }
 
   /**

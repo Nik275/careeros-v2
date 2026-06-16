@@ -254,9 +254,9 @@ export interface FamilyBusinessContext {
   successionPlan?: 'DEFINED' | 'UNDEFINED' | 'NO_SUCCESSION';
   studentRoleIfJoining: 'OWNER' | 'MANAGER' | 'EMPLOYEE' | 'UNDECIDED';
   parentsExpectStudentToJoin: boolean;
-  pressureLevel: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH';
+  pressureLevel: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME';
   studentInterestInJoining: 'HIGH' | 'MODERATE' | 'LOW' | 'NONE';
-  modernizationPotential: 'HIGH' | 'MODERATE' | 'LOW' | 'NA';
+  modernizationPotential: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW' | 'NA';
   growthProspects: 'HIGH' | 'MODERATE' | 'LOW';
 }
 
@@ -419,13 +419,13 @@ export interface JEEPathwayAnalysis {
  * Tier vs Branch tradeoff
  */
 export interface TierVsBranchTradeoff {
-  higherTierLowerBranch: {
+  higherTierLowerBranch?: {
     option: JEEOutcome;
     pros: string[];
     cons: string[];
     bestFor: string[];
   };
-  lowerTierHigherBranch: {
+  lowerTierHigherBranch?: {
     option: JEEOutcome;
     pros: string[];
     cons: string[];
@@ -439,13 +439,13 @@ export interface TierVsBranchTradeoff {
  * College vs Location tradeoff
  */
 export interface CollegeVsLocationTradeoff {
-  betterCollegeFar: {
+  betterCollegeFar?: {
     option: JEEOutcome;
     relocation: boolean;
     pros: string[];
     cons: string[];
   };
-  worseCollegeNear: {
+  worseCollegeNear?: {
     option: JEEOutcome;
     pros: string[];
     cons: string[];
@@ -457,12 +457,12 @@ export interface CollegeVsLocationTradeoff {
  * Fees vs Placement tradeoff
  */
 export interface FeesVsPlacementTradeoff {
-  expensiveGoodPlacements: {
+  expensiveGoodPlacements?: {
     option: JEEOutcome;
     roi: number;
     loanRequired: boolean;
   };
-  affordableAveragePlacements: {
+  affordableAveragePlacements?: {
     option: JEEOutcome;
     roi: number;
   };
@@ -590,7 +590,7 @@ export interface MedicalEmployment {
   role: string;
   startingSalary: number;
   growthTrajectory: string;
-  workLifeBalance: 'DEMANDING' | 'MODERATE' | 'BALANCED';
+  workLifeBalance: 'DEMANDING' | 'MODERATE' | 'BALANCED' | 'VARIES';
 }
 
 /**
@@ -847,7 +847,7 @@ export interface FamilyBusinessAnalysis {
     industry: string;
     size: FamilyBusinessInvolvement;
     growthStage: 'STARTUP' | 'GROWTH' | 'MATURE' | 'DECLINE';
-    modernizationNeed: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW';
+    modernizationNeed: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW' | 'NA';
   };
   succession: SuccessionAnalysis;
   integrationOptions: FamilyBusinessIntegration[];

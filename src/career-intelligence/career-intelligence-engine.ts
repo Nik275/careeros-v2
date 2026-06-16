@@ -13,10 +13,10 @@ import type {
   CareerIntelligence,
   CareerId,
   CareerIntelligenceConfig,
-  DEFAULT_CAREER_INTELLIGENCE_CONFIG,
   CareerIntelligenceQuery,
   CareerIntelligenceResult,
 } from './career-types';
+import { DEFAULT_CAREER_INTELLIGENCE_CONFIG } from './career-types';
 
 import { CareerEvidenceEngine } from './career-evidence-engine';
 import { CareerAnalyzer } from './career-analyzer';
@@ -51,7 +51,7 @@ export class CareerIntelligenceEngine {
     const validation = this.evidenceEngine.validateEvidence(career);
 
     if (!validation.valid && this.config.enableEvidenceTracking) {
-      console.warn(`Career ${career.careerId} has evidence issues:`, validation.issues);
+      console.warn('A career has evidence issues.');
     }
 
     // Build evidence summary
@@ -124,9 +124,10 @@ export class CareerIntelligenceEngine {
     }
 
     // Filter by minimum confidence
-    if (query.minConfidence) {
+    if (query.minConfidence !== undefined) {
+      const minConfidence = query.minConfidence;
       careers = careers.filter(
-        (c) => c.evidence.overallConfidence >= query.minConfidence
+        (c) => c.evidence.overallConfidence >= minConfidence
       );
     }
 

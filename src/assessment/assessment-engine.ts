@@ -38,6 +38,11 @@ import type {
 import { createSignalExtractor } from './signal-extractor';
 import { createDimensionScorer } from './dimension-scorer';
 import { createConfidenceCalculator } from './confidence-calculator';
+import {
+  createAssessmentObserveHook,
+  type AssessmentObserveHook,
+  type AssessmentObserveHookOptions,
+} from '../intelligence/orchestrator/observe/AssessmentObserveHook';
 
 /**
  * Orchestrates assessment processing pipeline.
@@ -49,9 +54,13 @@ export class AssessmentEngine {
   private signalExtractor = createSignalExtractor();
   private dimensionScorer = createDimensionScorer();
   private confidenceCalculator: ReturnType<typeof createConfidenceCalculator>;
+  private observeHook: AssessmentObserveHook;
+  private readonly config?: Partial<AssessmentConfig>;
 
-  constructor(config?: Partial<AssessmentConfig>) {
+  constructor(config?: Partial<AssessmentConfig>, observeOptions?: AssessmentObserveHookOptions) {
+    this.config = config ? { ...config } : undefined;
     this.confidenceCalculator = createConfidenceCalculator(config);
+    this.observeHook = createAssessmentObserveHook(observeOptions);
   }
 
   /**
@@ -68,8 +77,19 @@ export class AssessmentEngine {
     const signals = this.extractSignals(questions, responses);
     const dimensionScores = this.calculateDimensionScores(signals);
     const confidence = this.calculateAssessmentConfidence(signals, responses);
+    const profile = this.generateStudentProfile(dimensionScores, confidence);
 
-    return this.generateStudentProfile(dimensionScores, confidence);
+    this.observeHook.observeProcessResponses({
+      questions,
+      responses,
+      productionOutput: profile,
+      independentDryRunOperation: () => {
+        const dryRunEngine = new AssessmentEngine(this.config);
+        return dryRunEngine.processResponses(questions, responses);
+      },
+    });
+
+    return profile;
   }
 
   /**
@@ -279,9 +299,10 @@ export class AssessmentEngine {
  * Factory function for AssessmentEngine.
  */
 export function createAssessmentEngine(
-  config?: Partial<AssessmentConfig>
+  config?: Partial<AssessmentConfig>,
+  observeOptions?: AssessmentObserveHookOptions
 ): AssessmentEngine {
-  return new AssessmentEngine(config);
+  return new AssessmentEngine(config, observeOptions);
 }
 
 export { createSignalExtractor, createDimensionScorer, createConfidenceCalculator };

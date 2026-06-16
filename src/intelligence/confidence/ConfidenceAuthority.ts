@@ -11,7 +11,6 @@
  * @version 1.0.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import type {
   Confidence,
   ConfidenceValue,
@@ -25,7 +24,7 @@ import type {
   ConfidenceFactor,
   ReliabilityTrend,
   HistoryQueryOptions,
-  ConfidenceHistory,
+  ConfidenceHistory as ConfidenceHistorySnapshot,
 } from './ConfidenceTypes';
 
 import { ConfidenceCalculator, getConfidenceCalculator } from './ConfidenceCalculator';
@@ -35,6 +34,7 @@ import { ConfidenceHistory, getConfidenceHistory } from './ConfidenceHistory';
 import { ConfidenceMonitor, getConfidenceMonitor } from './ConfidenceMonitoring';
 import { ConfidenceEventEmitter, createCalculatedEvent } from './ConfidenceEvents';
 import type { IConfidenceAuthority } from './IConfidenceAuthority';
+import { uuidv4 } from './ConfidenceId';
 
 // ============================================================================
 // AUTHORITY CONFIGURATION
@@ -157,12 +157,12 @@ export class ConfidenceAuthority implements IConfidenceAuthority {
       }
 
       return calibratedConfidence;
-    } catch (error) {
+    } catch {
       // Record error
       this.monitor.recordError();
       
       // Return fallback confidence
-      console.error('Confidence calculation error:', error);
+      console.error('Confidence calculation failed safely.');
       return this.createFallbackConfidence(request);
     }
   }
@@ -230,24 +230,24 @@ export class ConfidenceAuthority implements IConfidenceAuthority {
     const trend = this.history.getTrend(request.systemId);
 
     // Build factors
-    const factors = [
+    const factors: ReliabilityAssessment['factors'] = [
       {
         name: 'calibration-accuracy',
         score: 1 - profile.calibrationError,
         weight: 0.4,
-        impact: profile.calibrationError < 0.15 ? 'positive' : 'negative' as const,
+        impact: profile.calibrationError < 0.15 ? 'positive' : 'negative',
       },
       {
         name: 'sample-size',
         score: Math.min(1, profile.sampleSize / 100),
         weight: 0.3,
-        impact: profile.sampleSize > 50 ? 'positive' : 'negative' as const,
+        impact: profile.sampleSize > 50 ? 'positive' : 'negative',
       },
       {
         name: 'trend-stability',
         score: trend.direction === 'stable' ? 0.9 : 0.6,
         weight: 0.3,
-        impact: trend.direction === 'stable' ? 'positive' : 'negative' as const,
+        impact: trend.direction === 'stable' ? 'positive' : 'negative',
       },
     ];
 
@@ -421,8 +421,9 @@ export class ConfidenceAuthority implements IConfidenceAuthority {
     sourceId: string,
     outcome: { predicted: boolean; actual: boolean; confidence: Confidence }
   ): Promise<void> {
-    // In a real implementation, this would update a source trust store
-    console.log(`Updated source trust for ${sourceId}`, outcome);
+    void sourceId;
+    void outcome;
+    // In a real implementation, this would update a privacy-safe source trust store.
   }
 
   // ========================================================================
@@ -462,7 +463,7 @@ export class ConfidenceAuthority implements IConfidenceAuthority {
   async getConfidenceHistory(
     systemId: string,
     options?: HistoryQueryOptions
-  ): Promise<ConfidenceHistory> {
+  ): Promise<ConfidenceHistorySnapshot> {
     return this.history.getHistory(systemId);
   }
 

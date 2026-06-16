@@ -31,6 +31,23 @@ import type { CriticalityAnalysis } from '../../criticality-engine';
 // MOCK DATA FACTORIES
 // ============================================================================
 
+interface MockStudentInterestsOverride {
+  coreInterests: string[];
+  interestStrengths: Map<string, number>;
+  topInterestCategories: string[];
+}
+
+interface MockStudentValuesOverride {
+  coreValues: string[];
+  valuePriorities: Map<string, number>;
+  topValueCategories: string[];
+}
+
+type MockStudentBeliefV3Overrides = Partial<Omit<StudentBeliefV3, 'values'>> & {
+  interests?: MockStudentInterestsOverride;
+  values?: StudentBeliefV3['values'] | MockStudentValuesOverride;
+};
+
 const createMockCareerNode = (overrides: Partial<CareerNode> & { id?: string; name?: string } = {}): CareerNode => ({
   id: overrides.id || 'test-node',
   name: overrides.name || 'Test Node',
@@ -182,7 +199,7 @@ const createMockCareerPathExplorerResult = (
   ...overrides,
 });
 
-const createMockStudentBeliefV3 = (overrides: Partial<StudentBeliefV3> = {}): StudentBeliefV3 => ({
+const createMockStudentBeliefV3 = (overrides: MockStudentBeliefV3Overrides = {}): StudentBeliefV3 => ({
   studentId: 'student-1',
   interests: {
     coreInterests: ['technology', 'design'],

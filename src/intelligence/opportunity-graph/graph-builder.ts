@@ -324,14 +324,16 @@ export function createGraphBuilder(): GraphBuilder {
 /**
  * Merge multiple graphs into one
  */
-export function mergeGraphs(...graphs: OpportunityGraph[]): OpportunityGraph {
+export function mergeGraphs(...graphs: Array<OpportunityGraph | OpportunityGraph[]>): OpportunityGraph {
   const merged: OpportunityGraph = {
     nodes: new Map(),
     edges: new Map(),
     adjacencyList: new Map(),
   };
 
-  for (const graph of graphs) {
+  const graphList = graphs.flatMap(graph => Array.isArray(graph) ? graph : [graph]);
+
+  for (const graph of graphList) {
     for (const [id, node] of graph.nodes) {
       merged.nodes.set(id, node);
     }

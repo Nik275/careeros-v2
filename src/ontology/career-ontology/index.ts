@@ -12,6 +12,16 @@ export {
   createCareerSlug,
   normalizeCareerData,
   generateCareerId,
+  ONTOLOGY_SCHEMA_VERSION,
+  DEFAULT_PSYCHOLOGY_PROFILE,
+  DEFAULT_WORK_STYLE_PROFILE,
+  DEFAULT_REWARD_PROFILE,
+  DEFAULT_RISK_PROFILE,
+  DEFAULT_OPTIONALITY_PROFILE,
+  DEFAULT_EDUCATION_PROFILE,
+  DEFAULT_INDIA_REALITY_PROFILE,
+  DEFAULT_FUTURE_PROFILE,
+  DEFAULT_LIFESTYLE_PROFILE,
 } from './CareerOntologyV2';
 
 export type {
@@ -52,6 +62,8 @@ export type {
   // Options & Configuration
   CareerCreationOptions,
   CareerValidationResult,
+  CareerValidationError,
+  CareerValidationWarning,
   CareerFilterCriteria,
   CareerComparisonResult,
 } from './CareerOntologyV2';

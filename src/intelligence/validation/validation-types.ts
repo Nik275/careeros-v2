@@ -25,7 +25,7 @@ export interface ConfidenceCalibrationReport {
   // Overall calibration status
   overallCalibration: {
     score: CalibrationScore;
-    status: 'well-calibrated' | 'overconfident' | 'underconfident' | 'unstable';
+    status: 'well-calibrated' | 'overconfident' | 'underconfident' | 'unstable' | 'severely-miscalibrated';
     confidence: ConfidenceLevel;
   };
 
@@ -58,6 +58,32 @@ export interface ConfidenceCalibrationReport {
   totalRecommendationsAnalyzed: number;
   timeRange: { start: ValidationTimestamp; end: ValidationTimestamp };
 }
+
+export type CalibrationBin = ConfidenceCalibrationReport['confidenceBins'][number];
+export type CalibrationStats = ConfidenceCalibrationReport['overallCalibration'];
+export type CalibrationReport = {
+  overallCalibration: {
+    score: number;
+    status: 'well-calibrated' | 'overconfident' | 'underconfident' | 'severely-miscalibrated';
+    ece: number;
+    miscalibration: number;
+    overconfidence: number;
+    underconfidence: number;
+    actualAccuracy: number;
+    confidenceAccuracyCorrelation: number;
+  };
+  binAnalysis: Array<{
+    binStart: number;
+    binEnd: number;
+    predictedAccuracy: number;
+    actualAccuracy: number;
+    error: number;
+    sampleSize: number;
+    sampleSizeAdequate: boolean;
+  }>;
+  recommendations: string[];
+  passed?: boolean;
+};
 
 // ============================================================================
 // STABILITY
@@ -167,6 +193,7 @@ export interface UncertaintyAssessment {
     level: 'none' | 'low' | 'medium' | 'high' | 'critical';
     score: number; // 0-100, higher = more uncertain
     admissionRequired: boolean;
+    explanation?: string;
   };
 
   // Uncertainty sources
@@ -191,6 +218,8 @@ export interface UncertaintyAssessment {
     lowerBound: ConfidenceLevel;
     upperBound: ConfidenceLevel;
     confidenceInterval: number;
+    lower?: ConfidenceLevel;
+    upper?: ConfidenceLevel;
   };
 
   // System response
@@ -199,8 +228,16 @@ export interface UncertaintyAssessment {
     shouldGatherMoreData: boolean;
     shouldEscalate: boolean;
     alternativeApproaches: string[];
+    shouldAdmitUncertainty?: boolean;
+    explanation?: string;
   };
 }
+
+export type EvidenceGap = UncertaintyAssessment['evidenceGaps'][number];
+export type UncertaintySource = UncertaintyAssessment['sources'][number];
+export type SystemResponse = UncertaintyAssessment['systemResponse'];
+export type ConfidenceBounds = UncertaintyAssessment['confidenceBounds'];
+export type OverallUncertainty = UncertaintyAssessment['overallUncertainty'];
 
 // ============================================================================
 // COUNTERFACTUAL
@@ -251,6 +288,12 @@ export interface CounterfactualReport {
     aboveRecommendation: string;
   }>;
 }
+
+export type PathComparison = ConsistencyReport['pathComparisons'][number];
+export type CounterfactualScenario = CounterfactualReport['scenarios'][number];
+export type SensitivityRanking = CounterfactualReport['sensitivityRanking'][number];
+export type Robustness = CounterfactualReport['robustness'];
+export type DecisionBoundary = CounterfactualReport['decisionBoundaries'][number];
 
 // ============================================================================
 // RECOMMENDATION AUDIT
@@ -334,6 +377,14 @@ export interface RecommendationAuditReport {
     caveats: string[];
   };
 }
+
+export type EvidenceSource = RecommendationAuditReport['evidence']['sources'][number];
+export type EngineAudit = RecommendationAuditReport['engines'][number];
+export type ConfidenceBasis = RecommendationAuditReport['confidenceBasis'];
+export type OpportunityCost = RecommendationAuditReport['opportunityCosts'];
+export type UncertaintyAudit = RecommendationAuditReport['uncertainties'][number];
+export type AuditFinding = RecommendationAuditReport['findings'];
+export type AuditVerdict = RecommendationAuditReport['verdict'];
 
 // ============================================================================
 // VALIDATION INPUTS
@@ -553,5 +604,50 @@ export const DEFAULT_VALIDATION_CONFIG: ValidationConfig = {
 // TYPE ALIASES
 // ============================================================================
 
-/** Alias for backward compatibility */
-export type ValidationReport = IntelligenceValidationReport;
+export type ValidationStatus = 'passed' | 'failed' | 'warning' | 'skipped';
+
+export interface ValidationSummary {
+  overallScore: number;
+  overallStatus: ValidationStatus;
+  confidenceScore: number;
+  trustworthinessScore: number;
+  individualScores: Record<string, number>;
+  statusBreakdown: Record<string, ValidationStatus>;
+  recommendationCount?: number;
+  issueCount?: number;
+  engineResults?: Record<string, {
+    status: ValidationStatus;
+    score: number;
+    passed: boolean;
+  }>;
+}
+
+/** Run-level validation report used by the validation orchestrator. */
+export interface ValidationReport {
+  reportId: ValidationId;
+  generatedAt: ValidationTimestamp;
+  studentId?: string;
+  requestId?: string;
+  status: ValidationStatus;
+  summary: ValidationSummary;
+  results: {
+    calibration?: CalibrationReport;
+    stability?: StabilityReport;
+    consistency?: ConsistencyReport;
+    uncertainty?: UncertaintyAssessment;
+    counterfactual?: CounterfactualReport;
+    audit?: RecommendationAuditReport;
+  };
+  gates: {
+    passed: boolean;
+    failed: string[];
+    warnings: string[];
+  };
+  recommendations: string[];
+  errors?: Array<{ engine: string; error: string }>;
+  overallStatus?: IntelligenceValidationReport['overallStatus'];
+  crossCutting?: IntelligenceValidationReport['crossCutting'];
+  insights?: IntelligenceValidationReport['insights'];
+  improvementRecommendations?: string[];
+  metadata?: IntelligenceValidationReport['metadata'];
+}

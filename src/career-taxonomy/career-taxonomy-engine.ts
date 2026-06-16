@@ -18,9 +18,9 @@ import type {
   CareerOptionality,
   AlternativeCareer,
   FutureOption,
-  DEFAULT_TAXONOMY_CONFIG,
   TaxonomyConfig,
 } from './career-taxonomy-types';
+import { DEFAULT_TAXONOMY_CONFIG } from './career-taxonomy-types';
 import type { CareerIntelligence } from '../career-intelligence/career-types';
 
 import { CareerGraphEngine } from './career-graph-engine';

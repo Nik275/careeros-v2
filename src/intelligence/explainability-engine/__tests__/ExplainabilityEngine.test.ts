@@ -29,64 +29,172 @@ import type { CareerMatch } from '../../matching-engine/MatchingEngineV1';
 // TEST FIXTURES
 // ============================================================================
 
-const createMockStudentProfile = (overrides: Partial<StudentProfile> = {}): StudentProfile => ({
+type RealityConstraintsFixtureOverrides = Omit<
+  Partial<RealityConstraints>,
+  'financial' | 'family' | 'geographic' | 'accessibility'
+> & {
+  financial?: Partial<RealityConstraints['financial']>;
+  family?: Partial<RealityConstraints['family']>;
+  geographic?: Partial<RealityConstraints['geographic']>;
+  accessibility?: Partial<RealityConstraints['accessibility']>;
+};
+
+type StudentProfileFixtureOverrides = Omit<
+  Partial<StudentProfile>,
+  'psychology' | 'motivations' | 'constraints'
+> & {
+  psychology?: Partial<PsychologyProfile>;
+  motivations?: Partial<Motivations>;
+  constraints?: RealityConstraintsFixtureOverrides;
+};
+
+type CareerFixtureOverrides = Omit<
+  Partial<Career>,
+  'psychologicalProfile' | 'workStyle' | 'rewardProfile' | 'riskProfile' | 'indiaReality'
+> & {
+  psychologicalProfile?: Partial<PsychologicalProfile>;
+  workStyle?: Partial<WorkStyleProfile>;
+  rewardProfile?: Partial<RewardProfile>;
+  riskProfile?: Partial<RiskProfile>;
+  indiaReality?: Partial<Career['indiaReality']>;
+};
+
+const createPsychologyProfileFixture = (
+  overrides: Partial<PsychologyProfile> = {}
+): PsychologyProfile => ({
+  analyticalThinking: 0.8,
+  creativity: 0.6,
+  socialOrientation: 0.5,
+  leadership: 0.6,
+  detailOrientation: 0.8,
+  curiosity: 0.7,
+  competitiveness: 0.5,
+  riskTolerance: 0.6,
+  ...overrides,
+});
+
+const createCareerPsychologyProfileFixture = (
+  overrides: Partial<PsychologicalProfile> = {}
+): PsychologicalProfile => ({
+  analyticalThinking: 0.9,
+  creativity: 0.6,
+  socialOrientation: 0.4,
+  leadership: 0.5,
+  detailOrientation: 0.8,
+  curiosity: 0.9,
+  competitiveness: 0.6,
+  riskTolerance: 0.5,
+  ...overrides,
+});
+
+const createMotivationsFixture = (
+  overrides: Partial<Motivations> = {}
+): Motivations => ({
+  money: 0.7,
+  impact: 0.6,
+  status: 0.5,
+  freedom: 0.8,
+  stability: 0.4,
+  ...overrides,
+});
+
+const createWorkStyleProfileFixture = (
+  overrides: Partial<WorkStyleProfile> = {}
+): WorkStyleProfile => ({
+  remoteWork: 0.8,
+  officeWork: 0.3,
+  fieldWork: 0.0,
+  travelRequirement: 0.2,
+  teamOrientation: 0.6,
+  soloOrientation: 0.4,
+  structuredEnvironment: 0.5,
+  unstructuredEnvironment: 0.5,
+  ...overrides,
+});
+
+const createRewardProfileFixture = (
+  overrides: Partial<RewardProfile> = {}
+): RewardProfile => ({
+  incomePotential: 0.9,
+  statusPotential: 0.7,
+  impactPotential: 0.6,
+  freedomPotential: 0.8,
+  stabilityPotential: 0.7,
+  ...overrides,
+});
+
+const createRiskProfileFixture = (
+  overrides: Partial<RiskProfile> = {}
+): RiskProfile => ({
+  burnoutRisk: 0.6,
+  automationRisk: 0.3,
+  competitionLevel: 0.7,
+  incomeVolatility: 0.4,
+  ...overrides,
+});
+
+const createRealityConstraintsFixture = (
+  overrides: RealityConstraintsFixtureOverrides = {}
+): RealityConstraints => ({
+  financial: {
+    familyIncomeBracket: FamilyIncomeBracket.BETWEEN_6_12_LPA,
+    hasPersonalIncome: false,
+    hasEducationLoan: false,
+    canAffordCoaching: true,
+    canAffordPrivateCollege: false,
+    ...overrides.financial,
+  },
+  family: {
+    familyPressure: FamilyPressure.MILD,
+    isFirstGeneration: false,
+    dependentCount: 0,
+    expectedToContribute: false,
+    mustStayNearFamily: false,
+    ...overrides.family,
+  },
+  geographic: {
+    locationType: LocationType.TIER_2_CITY,
+    willingToRelocate: true,
+    ...overrides.geographic,
+  },
+  accessibility: {
+    languageComfort: LanguageComfort.FUNCTIONAL_ENGLISH,
+    nativeLanguage: 'Hindi',
+    coachingAccess: CoachingAccess.MODERATE,
+    hasInternetAccess: true,
+    hasLearningDevice: true,
+    localInstitutionQuality: 'good',
+    ...overrides.accessibility,
+  },
+});
+
+const createIndiaRealityProfileFixture = (
+  overrides: Partial<Career['indiaReality']> = {}
+): Career['indiaReality'] => ({
+  coachingDependency: 0.2,
+  urbanAdvantage: 0.6,
+  englishDependency: 0.6,
+  migrationRequirement: 0.2,
+  reservationApplicable: false,
+  ...overrides,
+});
+
+const createMockStudentProfile = (overrides: StudentProfileFixtureOverrides = {}): StudentProfile => {
+  const { psychology, motivations, constraints, ...profileOverrides } = overrides;
+
+  return {
   id: 'profile-1',
   studentId: 'student-1',
   createdAt: Date.now(),
   updatedAt: Date.now(),
   schemaVersion: 1,
-  psychology: {
-    analyticalThinking: 0.8,
-    creativity: 0.6,
-    socialOrientation: 0.5,
-    leadership: 0.6,
-    detailOrientation: 0.8,
-    curiosity: 0.7,
-    competitiveness: 0.5,
-    riskTolerance: 0.6,
-    ...overrides.psychology,
-  },
-  motivations: {
-    money: 0.7,
-    impact: 0.6,
-    status: 0.5,
-    freedom: 0.8,
-    stability: 0.4,
-    ...overrides.motivations,
-  },
+  psychology: createPsychologyProfileFixture(psychology),
+  motivations: createMotivationsFixture(motivations),
   primaryMotivation: 'freedom',
-  constraints: {
-    financial: {
-      familyIncomeBracket: FamilyIncomeBracket.BETWEEN_6_12_LPA,
-      hasPersonalIncome: false,
-      hasEducationLoan: false,
-      canAffordCoaching: true,
-      canAffordPrivateCollege: false,
-    },
-    family: {
-      familyPressure: FamilyPressure.MILD,
-      isFirstGeneration: false,
-      dependentCount: 0,
-      expectedToContribute: false,
-      mustStayNearFamily: false,
-    },
-    geographic: {
-      locationType: LocationType.TIER_2_CITY,
-      willingToRelocate: true,
-    },
-    accessibility: {
-      languageComfort: LanguageComfort.FUNCTIONAL_ENGLISH,
-      nativeLanguage: 'Hindi',
-      coachingAccess: CoachingAccess.MODERATE,
-      hasInternetAccess: true,
-      hasLearningDevice: true,
-      localInstitutionQuality: 'good',
-    },
-    ...overrides.constraints,
-  },
+  constraints: createRealityConstraintsFixture(constraints),
   academic: {
     performance: {
-      stage: EducationStage.HIGH_SCHOOL_12,
+      stage: EducationStage.HIGH_SCHOOL_11_12,
       gradeScale: GradeScale.PERCENTAGE,
       overallScore: 0.85,
       subjectGrades: [],
@@ -106,52 +214,31 @@ const createMockStudentProfile = (overrides: Partial<StudentProfile> = {}): Stud
   dataConfidence: 0.8,
   completeness: 0.7,
   dataSource: 'assessment',
-});
+  ...profileOverrides,
+  };
+};
 
-const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
+const createMockCareer = (overrides: CareerFixtureOverrides = {}): Career => {
+  const {
+    psychologicalProfile,
+    workStyle,
+    rewardProfile,
+    riskProfile,
+    indiaReality,
+    ...careerOverrides
+  } = overrides;
+
+  return {
   id: 'software-engineer',
   name: 'Software Engineer',
   slug: 'software-engineer',
   category: 'technology' as any,
   description: 'Builds software applications and systems.',
   tagline: 'Code the future',
-  psychologicalProfile: {
-    analyticalThinking: 0.9,
-    creativity: 0.6,
-    socialOrientation: 0.4,
-    leadership: 0.5,
-    detailOrientation: 0.8,
-    curiosity: 0.9,
-    competitiveness: 0.6,
-    riskTolerance: 0.5,
-    ...overrides.psychologicalProfile,
-  },
-  workStyle: {
-    remoteWork: 0.8,
-    officeWork: 0.3,
-    fieldWork: 0.0,
-    travelRequirement: 0.2,
-    teamOrientation: 0.6,
-    soloOrientation: 0.4,
-    structuredEnvironment: 0.5,
-    unstructuredEnvironment: 0.5,
-    ...overrides.workStyle,
-  },
-  rewardProfile: {
-    incomePotential: 0.9,
-    statusPotential: 0.7,
-    impactPotential: 0.6,
-    freedomPotential: 0.8,
-    stabilityPotential: 0.7,
-    ...overrides.rewardProfile,
-  },
-  riskProfile: {
-    burnoutRisk: 0.6,
-    automationRisk: 0.3,
-    competitionLevel: 0.7,
-    incomeVolatility: 0.4,
-    ...overrides.riskProfile,
-  },
+  psychologicalProfile: createCareerPsychologyProfileFixture(psychologicalProfile),
+  workStyle: createWorkStyleProfileFixture(workStyle),
+  rewardProfile: createRewardProfileFixture(rewardProfile),
+  riskProfile: createRiskProfileFixture(riskProfile),
   optionality: {
     careerFlexibility: 0.9,
     transferableSkills: 0.9,
@@ -162,13 +249,7 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
     typicalDegrees: ['B.Tech', 'B.E.', 'B.Sc CS'] as any[],
     certifications: [],
   },
-  indiaReality: {
-    coachingDependency: 0.2,
-    urbanAdvantage: 0.6,
-    englishDependency: 0.6,
-    migrationRequirement: 0.2,
-    reservationApplicable: false,
-  },
+  indiaReality: createIndiaRealityProfileFixture(indiaReality),
   evolution: {
     adjacentCareers: [],
     futureCareerPaths: [],
@@ -181,8 +262,9 @@ const createMockCareer = (overrides: Partial<Career> = {}): Career => ({
   createdAt: new Date(),
   updatedAt: new Date(),
   schemaVersion: 1,
-  ...overrides,
-});
+  ...careerOverrides,
+  };
+};
 
 const createMockCareerMatch = (overrides: Partial<CareerMatch> = {}): CareerMatch => ({
   careerId: 'software-engineer',
@@ -852,8 +934,8 @@ describe('Dynamic Content Generation', () => {
       explanation.psychology.coreAlignment,
       ...(explanation.psychology.naturalStrengths || []).map(s => s.explanation),
       ...(explanation.psychology.growthAreas || []).map(g => g.explanation),
-      ...(explanation.motivation?.satisfactionAreas || []).map(s => s.explanation),
-      ...(explanation.motivation?.potentialGaps || []).map(g => g.explanation),
+      ...(explanation.motivations?.willSatisfy || []).map(s => s.explanation),
+      ...(explanation.motivations?.potentialGaps || []).map(g => g.explanation),
     ].join(' ');
 
     const hasPercentages = /\d+%/.test(allText);

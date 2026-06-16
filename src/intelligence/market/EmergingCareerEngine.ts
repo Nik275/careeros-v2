@@ -6,6 +6,7 @@
  */
 
 import type { MarketSignal } from './models/MarketSignal';
+import { GrowthTrajectory } from './models/EmergingCareer';
 import type {
   EmergingCareer,
   EmergingCareerStage,
@@ -131,7 +132,7 @@ export class EmergingCareerEngine {
 
     // Filter to matching career
     const careerSignals = signals.filter(
-      (s) => s.careerTitle.toLowerCase() === careerTitle.toLowerCase()
+      (s) => this.getSignalCareerTitle(s).toLowerCase() === careerTitle.toLowerCase()
     );
 
     if (careerSignals.length < 3) {
@@ -153,18 +154,19 @@ export class EmergingCareerEngine {
    * Identify candidate careers from signals.
    */
   private identifyCandidates(signals: MarketSignal[]): EmergingCandidate[] {
-    const byCareer = new Map<string, MarketSignal[]>();
+    const byCareer = new Map<string, { careerTitle: string; signals: MarketSignal[] }>();
 
     for (const signal of signals) {
-      const key = signal.careerTitle.toLowerCase();
-      const existing = byCareer.get(key) ?? [];
-      existing.push(signal);
+      const careerTitle = this.getSignalCareerTitle(signal);
+      const key = careerTitle.toLowerCase();
+      const existing = byCareer.get(key) ?? { careerTitle, signals: [] };
+      existing.signals.push(signal);
       byCareer.set(key, existing);
     }
 
     const candidates: EmergingCandidate[] = [];
 
-    for (const [careerTitle, careerSignals] of byCareer) {
+    for (const { careerTitle, signals: careerSignals } of byCareer.values()) {
       // Filter strong signals
       const strongSignals = careerSignals.filter(
         (s) => Math.abs(s.strength) >= this.config.minSignalStrength
@@ -229,20 +231,21 @@ export class EmergingCareerEngine {
     // Build emerging career
     return {
       id: `emerging-${candidate.careerIdentifier}-${Date.now()}`,
-      careerTitle: candidate.careerTitle,
-      careerIdentifier: candidate.careerIdentifier,
-      firstDetected: candidate.firstAppearance,
-      stage,
+      title: candidate.careerTitle,
+      alternativeTitles: [],
+      maturityStage: stage,
       confidence,
-      evidence,
-      emergenceIndicators: {
-        growthRate: Math.round(growthMetrics.growthRate),
-        volumeIncrease: Math.round(growthMetrics.volumeIncrease),
-        geographicSpread: growthMetrics.geographicSpread,
-        skillMentions: growthMetrics.skillMentions,
-      },
-      velocity,
+      growthTrajectory: this.determineGrowthTrajectory(growthMetrics.growthRate),
+      growthSignal: velocity,
+      annualGrowthRate: Math.round(growthMetrics.growthRate),
+      evidenceSources: evidence,
+      discoveredAt: candidate.firstAppearance,
       relatedCareers,
+      keySkills: [],
+      industrySectors: this.extractIndustrySectors(candidate.signals),
+      geography: this.extractGeography(candidate.signals),
+      adoptionTimeline: this.estimateAdoptionTimeline(confidence),
+      similarityToModeled: [],
       lastUpdated: new Date(),
     };
   }
@@ -279,7 +282,7 @@ export class EmergingCareerEngine {
     const growthRate = timeSpanDays > 0 ? (volumeIncrease / timeSpanDays) * 365 : 0;
 
     // Calculate geographic spread
-    const geographies = new Set(candidate.signals.map((s) => s.geography));
+    const geographies = new Set(candidate.signals.map((s) => s.metadata.geography));
     const geographicSpread = Math.min(100, geographies.size * 20);
 
     // Estimate skill mentions from metadata
@@ -303,7 +306,7 @@ export class EmergingCareerEngine {
     const evidence: EmergingCareerEvidence[] = [];
 
     // Group by evidence type
-    const byType = new Map<string, MarketSignal[]>();
+    const byType = new Map<EmergingCareerEvidence['sourceType'], MarketSignal[]>();
 
     for (const signal of candidate.signals) {
       const type = this.classifyEvidenceType(signal);
@@ -314,14 +317,18 @@ export class EmergingCareerEngine {
 
     for (const [type, signals] of byType) {
       evidence.push({
-        type: type as EmergingCareerEvidence['type'],
+        sourceType: type,
         source: signals[0].source,
         timestamp: new Date(Math.max(...signals.map((s) => s.timestamp.getTime()))),
-        description: `${signals.length} ${type} signals detected`,
-        confidence: Math.round(
+        strength: Math.round(
           signals.reduce((sum, s) => sum + s.confidence, 0) / signals.length
         ),
-        rawData: signals[0].metadata,
+        rawData: {
+          count: signals.length,
+          timePeriod: this.formatEvidenceTimePeriod(signals),
+          geography: signals[0].metadata.geography,
+          context: `${signals.length} ${type} signals detected`,
+        },
       });
     }
 
@@ -331,15 +338,15 @@ export class EmergingCareerEngine {
   /**
    * Classify evidence type from signal.
    */
-  private classifyEvidenceType(signal: MarketSignal): string {
-    const typeMap: Record<string, string> = {
-      job_postings: 'job_titles',
-      salary_growth: 'salary_trends',
+  private classifyEvidenceType(signal: MarketSignal): EmergingCareerEvidence['sourceType'] {
+    const typeMap: Record<string, EmergingCareerEvidence['sourceType']> = {
+      job_postings: 'job_postings',
+      salary_growth: 'industry_reports',
       skill_growth: 'skills_mention',
       government_push: 'industry_reports',
       startup_activity: 'startup_titles',
       investment_flow: 'industry_reports',
-      layoffs: 'job_titles',
+      layoffs: 'job_postings',
     };
 
     return typeMap[signal.signalType] ?? 'other';
@@ -371,7 +378,7 @@ export class EmergingCareerEngine {
 
     // Growth trajectory (from evidence)
     const evidenceConfidence =
-      evidence.reduce((sum, e) => sum + e.confidence, 0) / Math.max(evidence.length, 1);
+      evidence.reduce((sum, e) => sum + e.strength, 0) / Math.max(evidence.length, 1);
 
     // Weighted calculation
     const confidence =
@@ -396,26 +403,26 @@ export class EmergingCareerEngine {
 
     // Early stage: < 60 days, high growth
     if (ageDays < 60 && metrics.growthRate >= GROWTH_RATE_THRESHOLDS.rapid) {
-      return EmergingCareerStage.EARLY;
+      return 'emerging';
     }
 
     // Accelerating: consistent high growth
     if (metrics.growthRate >= GROWTH_RATE_THRESHOLDS.strong && confidence >= 70) {
-      return EmergingCareerStage.ACCELERATING;
+      return 'growing';
     }
 
     // Established: older, stable growth
     if (ageDays > 180 && metrics.growthRate >= GROWTH_RATE_THRESHOLDS.moderate) {
-      return EmergingCareerStage.ESTABLISHED;
+      return 'approaching_mainstream';
     }
 
     // Slowing: declining growth rate
     if (metrics.growthRate < GROWTH_RATE_THRESHOLDS.moderate && ageDays > 90) {
-      return EmergingCareerStage.SLOWING;
+      return 'emerging';
     }
 
     // Default to early
-    return EmergingCareerStage.EARLY;
+    return 'emerging';
   }
 
   /**
@@ -468,7 +475,7 @@ export class EmergingCareerEngine {
    */
   async getEmergingByStage(stage: EmergingCareerStage): Promise<EmergingCareer[]> {
     const all = await this.detectEmergingCareers();
-    return all.filter((e) => e.stage === stage);
+    return all.filter((e) => e.maturityStage === stage);
   }
 
   /**
@@ -488,8 +495,74 @@ export class EmergingCareerEngine {
     return {
       isEmerging: true,
       confidence: emerging.confidence,
-      stage: emerging.stage,
+      stage: emerging.maturityStage,
     };
+  }
+
+  /**
+   * Resolve display title from canonical signal fields without widening MarketSignal.
+   */
+  private getSignalCareerTitle(signal: MarketSignal): string {
+    const rawTitle = signal.rawData.careerTitle;
+    return typeof rawTitle === 'string' && rawTitle.trim().length > 0
+      ? rawTitle
+      : signal.careerId;
+  }
+
+  /**
+   * Map annual growth rate to the canonical growth trajectory enum.
+   */
+  private determineGrowthTrajectory(annualGrowthRate: number): GrowthTrajectory {
+    if (annualGrowthRate > GROWTH_RATE_THRESHOLDS.explosive) return GrowthTrajectory.EXPLOSIVE;
+    if (annualGrowthRate > GROWTH_RATE_THRESHOLDS.rapid) return GrowthTrajectory.RAPID;
+    if (annualGrowthRate > GROWTH_RATE_THRESHOLDS.strong) return GrowthTrajectory.STRONG;
+    if (annualGrowthRate > GROWTH_RATE_THRESHOLDS.moderate) return GrowthTrajectory.MODERATE;
+    return GrowthTrajectory.EARLY;
+  }
+
+  /**
+   * Preserve the model's required industry-sector field from existing signal metadata.
+   */
+  private extractIndustrySectors(signals: MarketSignal[]): string[] {
+    const sectors = signals
+      .map((signal) => signal.metadata.sector)
+      .filter((sector): sector is string => typeof sector === 'string' && sector.length > 0);
+
+    return [...new Set(sectors)];
+  }
+
+  /**
+   * Preserve the model's required geography field from existing signal metadata.
+   */
+  private extractGeography(signals: MarketSignal[]): EmergingCareer['geography'] {
+    const geographies = [...new Set(signals.map((signal) => signal.metadata.geography))];
+
+    return {
+      primary: geographies[0] ?? 'india',
+      secondary: geographies.slice(1),
+    };
+  }
+
+  /**
+   * Estimate adoption timeline without changing detection scoring.
+   */
+  private estimateAdoptionTimeline(confidence: number): EmergingCareer['adoptionTimeline'] {
+    return {
+      estimatedMainstreamYears: confidence > 70 ? 2 : confidence > 50 ? 3 : 5,
+      confidence: Math.max(0, Math.min(100, confidence - 20)),
+    };
+  }
+
+  /**
+   * Format source time windows for canonical evidence rawData.
+   */
+  private formatEvidenceTimePeriod(signals: MarketSignal[]): string {
+    const starts = signals.map((signal) => signal.metadata.timePeriod.start.getTime());
+    const ends = signals.map((signal) => signal.metadata.timePeriod.end.getTime());
+    const start = new Date(Math.min(...starts));
+    const end = new Date(Math.max(...ends));
+
+    return `${start.toISOString()}..${end.toISOString()}`;
   }
 }
 

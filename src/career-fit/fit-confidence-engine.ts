@@ -51,9 +51,9 @@ export class FitConfidenceEngine {
       requestingSystem: 'FitConfidenceEngine',
       predictionType: 'career-fit',
       prediction: {
-        careerId: career.id,
-        profileId: profile.id,
-        matchScore: fitResult.overall,
+        careerId: career.careerId,
+        profileId: fitResult.studentProfileId,
+        matchScore: fitResult.overallFitScore,
       },
       evidence: [
         {
@@ -82,8 +82,8 @@ export class FitConfidenceEngine {
         },
       ],
       context: {
-        studentId: profile.id,
-        careerId: career.id,
+        studentId: fitResult.studentProfileId,
+        careerId: career.careerId,
         timestamp: Date.now(),
         metadata: {
           profileConfidence,
@@ -104,9 +104,9 @@ export class FitConfidenceEngine {
     );
 
     const overall = Math.round(overallFloat * 100);
+    const level = overall >= 70 ? 'HIGH' : overall >= 40 ? 'MEDIUM' : 'LOW';
 
     // Map to constitutional confidence type (0.0-1.0)
-    // Level removed - use numeric confidence directly
     return {
       ...fitResult,
       confidence: {
@@ -115,9 +115,9 @@ export class FitConfidenceEngine {
         careerConfidence,
         evidenceConfidence,
         calculationConfidence,
-        // level removed - no longer using enum
+        level,
         constitutionalConfidence: overallFloat, // NEW: 0.0-1.0 value
-      } as FitConfidence,
+      },
     };
   }
 
@@ -138,8 +138,8 @@ export class FitConfidenceEngine {
     }
 
     // Adjust based on strengths/weaknesses clarity
-    const hasStrengths = profile.strengths?.topStrengths?.length > 0 ?? false;
-    const hasWeaknesses = profile.weaknesses?.developmentAreas?.length > 0 ?? false;
+    const hasStrengths = (profile.strengths?.topStrengths?.length ?? 0) > 0;
+    const hasWeaknesses = (profile.weaknesses?.developmentAreas?.length ?? 0) > 0;
     if (hasStrengths && hasWeaknesses) {
       confidence = Math.min(100, confidence + 5);
     }

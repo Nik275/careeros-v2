@@ -10,12 +10,11 @@
  */
 
 import type { ArchetypeType } from '@/types/archetype-profile';
-import type { ArchetypeSignal } from './archetype-types';
+import type { ArchetypeSignal, SignalSource } from './archetype-types';
 import type {
   EvidenceItem,
   EvidenceCollection,
   EvidenceQuality,
-  SignalSource,
 } from './confidence-types';
 import {
   EVIDENCE_QUALITY_WEIGHTS,

@@ -313,6 +313,109 @@ export interface CoalitionAnalysisOptions {
   depth?: 'surface' | 'moderate' | 'deep';
 }
 
+interface LegacyStudentInterestShape {
+  coreInterests?: string[];
+}
+
+interface LegacyStudentValueShape {
+  coreValues?: string[];
+}
+
+interface LegacyStudentGeographicConstraintShape {
+  willingToRelocate?: boolean;
+  preferredLocation?: 'urban' | 'rural' | 'suburban' | string;
+  openToRemote?: boolean;
+}
+
+interface LegacyStudentConstraintShape {
+  geographic?: LegacyStudentGeographicConstraintShape;
+  academicFeasibility?: 'high' | 'medium' | 'low';
+}
+
+type AcademicFeasibility = 'high' | 'medium' | 'low' | 'unknown';
+
+type StudentBeliefV3Readable = Partial<Omit<StudentBeliefV3, 'values' | 'constraints'>> & {
+  interests?: LegacyStudentInterestShape;
+  values?: StudentBeliefV3['values'] | LegacyStudentValueShape;
+  constraints?: StudentBeliefV3['constraints'] | LegacyStudentConstraintShape;
+};
+
+function normalizeToken(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function readStudentInterestTokens(belief: StudentBeliefV3): string[] {
+  const readable = belief as StudentBeliefV3Readable;
+  const legacyInterests = readable.interests?.coreInterests;
+
+  if (legacyInterests) {
+    return legacyInterests.map(normalizeToken);
+  }
+
+  const motivationTokens = readable.motivations?.map((motivation) => motivation.name) ?? [];
+  const strengthTokens = readable.strengths?.map((strength) => strength.category) ?? [];
+
+  return [...motivationTokens, ...strengthTokens].map(normalizeToken);
+}
+
+function readStudentValueTokens(belief: StudentBeliefV3): string[] {
+  const readable = belief as StudentBeliefV3Readable;
+  const values = readable.values;
+
+  if (values && !Array.isArray(values)) {
+    return (values.coreValues ?? []).map(normalizeToken);
+  }
+
+  return (values ?? [])
+    .flatMap((value) => [value.id, value.name])
+    .map(normalizeToken);
+}
+
+function readAcademicFeasibility(belief: StudentBeliefV3): AcademicFeasibility {
+  const readable = belief as StudentBeliefV3Readable;
+  const constraints = readable.constraints;
+
+  if (constraints && !Array.isArray(constraints) && constraints.academicFeasibility) {
+    return constraints.academicFeasibility;
+  }
+
+  const potential = readable.educationalReality?.overallPotential;
+  if (typeof potential === 'number') {
+    if (potential >= 0.7) return 'high';
+    if (potential >= 0.4) return 'medium';
+    return 'low';
+  }
+
+  const standing = readable.educationalReality?.performance?.overallStanding;
+  if (standing === 'EXCELLENT' || standing === 'GOOD') return 'high';
+  if (standing === 'AVERAGE') return 'medium';
+  if (standing === 'BELOW_AVERAGE' || standing === 'POOR') return 'low';
+
+  return 'unknown';
+}
+
+function readGeographicConstraints(belief: StudentBeliefV3): LegacyStudentGeographicConstraintShape {
+  const readable = belief as StudentBeliefV3Readable;
+  const constraints = readable.constraints;
+
+  if (constraints && !Array.isArray(constraints)) {
+    return constraints.geographic ?? {};
+  }
+
+  const geographicConstraint = constraints?.find((constraint) => constraint.type === 'geographic');
+  if (!geographicConstraint) {
+    return {};
+  }
+
+  const text = `${geographicConstraint.name} ${geographicConstraint.description}`.toLowerCase();
+
+  return {
+    willingToRelocate: geographicConstraint.isHardConstraint && geographicConstraint.severity > 0.7 ? false : undefined,
+    preferredLocation: text.includes('urban') || text.includes('metro') ? 'urban' : undefined,
+    openToRemote: text.includes('remote') ? true : undefined,
+  };
+}
+
 // ============================================================================
 // DEFAULT CONFIGURATION
 // ============================================================================
@@ -475,15 +578,13 @@ export class DecisionCoalitionEngineV3 {
     const endorsements: string[] = [];
 
     // Check alignment with student interests from belief
-    const interests = this.studentBelief.interests?.coreInterests || [];
-    const pathKeywords = path.name.toLowerCase();
+    const interests = readStudentInterestTokens(this.studentBelief);
+    const pathKeywords = normalizeToken(path.name);
 
     let alignmentScore = 50; // Default neutral
 
     // Check if path aligns with interests
-    const interestMatch = interests.some(i =>
-      pathKeywords.includes(i.toLowerCase())
-    );
+    const interestMatch = interests.some(i => pathKeywords.includes(i));
 
     if (interestMatch) {
       alignmentScore += 30;
@@ -526,7 +627,7 @@ export class DecisionCoalitionEngineV3 {
     const endorsements: string[] = [];
 
     // Check alignment with student values
-    const values = this.studentBelief.values?.coreValues || [];
+    const values = readStudentValueTokens(this.studentBelief);
     let alignmentScore = 50;
 
     // Value-based scoring
@@ -712,7 +813,7 @@ export class DecisionCoalitionEngineV3 {
     let alignmentScore = 50;
 
     // Educational accessibility
-    const studentConstraints = this.studentBelief.constraints || {};
+    const academicFeasibility = readAcademicFeasibility(this.studentBelief);
 
     // Check if path requires extensive education beyond current standing
     if (path.metrics.totalYears > 6) {
@@ -721,7 +822,7 @@ export class DecisionCoalitionEngineV3 {
     }
 
     // Feasibility based on current academic standing
-    if (studentConstraints.academicFeasibility === 'high') {
+    if (academicFeasibility === 'high') {
       alignmentScore += 10;
       endorsements.push('Path is academically feasible');
     }
@@ -770,7 +871,7 @@ export class DecisionCoalitionEngineV3 {
     let alignmentScore = 50;
 
     // Geographic constraints from student belief
-    const geoConstraints = this.studentBelief.constraints?.geographic || {};
+    const geoConstraints = readGeographicConstraints(this.studentBelief);
 
     // Check if path requires relocation
     const finalNode = path.nodes[path.nodes.length - 1];
@@ -1494,20 +1595,3 @@ export function analyzeDecisionCoalition(
   );
   return engine.analyze(options);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  DecisionCoalitionAnalysis,
-  PathCoalitionAnalysis,
-  CoalitionMemberEvaluation,
-  CoalitionMember,
-  MemberConflict,
-  CoalitionExplanation,
-  CoalitionPathComparison,
-  CoalitionRecommendation,
-  CoalitionAnalysisOptions,
-  CoalitionAnalysisId,
-};

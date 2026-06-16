@@ -7,8 +7,17 @@
  * @version 1.0.0
  */
 
-import type { Career, PsychologyProfile, WorkStyleProfile, EducationProfile } from '../../domains/career/Career';
-import type { CareerId, CareerCategory } from '../../ontology/career-ontology';
+import {
+  CareerCategory,
+} from '../../domains/career/Career';
+
+import type {
+  Career,
+  CareerId,
+  EducationRequirements,
+  PsychologicalProfile,
+  WorkStyleProfile,
+} from '../../domains/career/Career';
 
 // ============================================================================
 // TYPES
@@ -150,13 +159,18 @@ const TEAM_ORIENTATION_MAP: Record<string, number> = {
 /** Education level mapping */
 const EDUCATION_LEVEL_MAP: Record<string, number> = {
   'none': 0,
+  'no_formal_requirement': 0,
   'high-school': 1,
+  'high_school': 1,
   'diploma': 2,
   'associate': 3,
   'bachelor': 4,
+  'bachelors': 4,
   'master': 5,
+  'masters': 5,
   'doctorate': 6,
   'professional-degree': 7,
+  'professional_degree': 7,
   'post-doctoral': 8,
 };
 
@@ -258,19 +272,19 @@ export class CareerSimilarityEngine {
 
     // Analytical thinking similarity (key skill indicator)
     const analyticalDiff = Math.abs(
-      ((careerA.psychology?.analyticalThinking || 0.5) - (careerB.psychology?.analyticalThinking || 0.5)) * 100
+      ((careerA.psychologicalProfile.analyticalThinking ?? 0.5) - (careerB.psychologicalProfile.analyticalThinking ?? 0.5)) * 100
     );
     const analyticalScore = 100 - analyticalDiff;
 
     // Creativity similarity
     const creativityDiff = Math.abs(
-      ((careerA.psychology?.creativity || 0.5) - (careerB.psychology?.creativity || 0.5)) * 100
+      ((careerA.psychologicalProfile.creativity ?? 0.5) - (careerB.psychologicalProfile.creativity ?? 0.5)) * 100
     );
     const creativityScore = 100 - creativityDiff;
 
     // Detail orientation similarity
     const detailDiff = Math.abs(
-      ((careerA.psychology?.detailOrientation || 0.5) - (careerB.psychology?.detailOrientation || 0.5)) * 100
+      ((careerA.psychologicalProfile.detailOrientation ?? 0.5) - (careerB.psychologicalProfile.detailOrientation ?? 0.5)) * 100
     );
     const detailScore = 100 - detailDiff;
 
@@ -308,10 +322,10 @@ export class CareerSimilarityEngine {
    */
   private calculatePsychologyOverlap(careerA: Career, careerB: Career): DimensionSimilarity {
     const details: string[] = [];
-    const psychA = careerA.psychology || {} as PsychologyProfile;
-    const psychB = careerB.psychology || {} as PsychologyProfile;
+    const psychA = careerA.psychologicalProfile;
+    const psychB = careerB.psychologicalProfile;
 
-    const traits: Array<{ key: keyof PsychologyProfile; name: string }> = [
+    const traits: Array<{ key: keyof PsychologicalProfile; name: string }> = [
       { key: 'analyticalThinking', name: 'analytical thinking' },
       { key: 'creativity', name: 'creativity' },
       { key: 'socialOrientation', name: 'social orientation' },
@@ -359,36 +373,36 @@ export class CareerSimilarityEngine {
    */
   private calculateWorkStyleOverlap(careerA: Career, careerB: Career): DimensionSimilarity {
     const details: string[] = [];
-    const workA = careerA.workStyle || {} as WorkStyleProfile;
-    const workB = careerB.workStyle || {} as WorkStyleProfile;
+    const workA = careerA.workStyle;
+    const workB = careerB.workStyle;
 
     // Remote work compatibility
-    const remoteA = REMOTE_WORK_MAP[workA.remoteWork || 'hybrid'] ?? 0.5;
-    const remoteB = REMOTE_WORK_MAP[workB.remoteWork || 'hybrid'] ?? 0.5;
+    const remoteA = workA.remoteWork ?? 0.5;
+    const remoteB = workB.remoteWork ?? 0.5;
     const remoteDiff = Math.abs(remoteA - remoteB) * 100;
     const remoteScore = 100 - remoteDiff;
 
     // Travel requirement compatibility
-    const travelA = TRAVEL_MAP[workA.travelRequirement || 'occasional'] ?? 0.25;
-    const travelB = TRAVEL_MAP[workB.travelRequirement || 'occasional'] ?? 0.25;
+    const travelA = workA.travelRequirement ?? 0.25;
+    const travelB = workB.travelRequirement ?? 0.25;
     const travelDiff = Math.abs(travelA - travelB) * 100;
     const travelScore = 100 - travelDiff;
 
     // Team orientation compatibility
-    const teamA = TEAM_ORIENTATION_MAP[workA.teamOrientation || 'medium-team'] ?? 0.5;
-    const teamB = TEAM_ORIENTATION_MAP[workB.teamOrientation || 'medium-team'] ?? 0.5;
+    const teamA = workA.teamOrientation ?? 0.5;
+    const teamB = workB.teamOrientation ?? 0.5;
     const teamDiff = Math.abs(teamA - teamB) * 100;
     const teamScore = 100 - teamDiff;
 
     // Office/field work compatibility
-    const officeMatch = (workA.officeWork === workB.officeWork) ? 100 : 0;
-    const fieldMatch = (workA.fieldWork === workB.fieldWork) ? 100 : 0;
+    const officeMatch = 100 - Math.abs((workA.officeWork ?? 0.5) - (workB.officeWork ?? 0.5)) * 100;
+    const fieldMatch = 100 - Math.abs((workA.fieldWork ?? 0.5) - (workB.fieldWork ?? 0.5)) * 100;
 
     // Solo orientation compatibility
-    const soloMatch = (workA.soloOrientation === workB.soloOrientation) ? 100 : 50;
+    const soloMatch = 100 - Math.abs((workA.soloOrientation ?? 0.5) - (workB.soloOrientation ?? 0.5)) * 100;
 
     // Structured environment compatibility
-    const structuredMatch = (workA.structuredEnvironment === workB.structuredEnvironment) ? 100 : 30;
+    const structuredMatch = 100 - Math.abs((workA.structuredEnvironment ?? 0.5) - (workB.structuredEnvironment ?? 0.5)) * 100;
 
     const score = Math.round(
       remoteScore * 0.20 +
@@ -413,7 +427,7 @@ export class CareerSimilarityEngine {
       details.push('Similar team collaboration styles');
     }
     if (officeMatch === 100) {
-      details.push(workA.officeWork ? 'Both office-based' : 'Both non-office roles');
+      details.push((workA.officeWork ?? 0) > 0.5 ? 'Both office-based' : 'Both non-office roles');
     }
 
     return { score, weight: this.weights.workStyleOverlap, details };
@@ -425,18 +439,18 @@ export class CareerSimilarityEngine {
    */
   private calculateEducationOverlap(careerA: Career, careerB: Career): DimensionSimilarity {
     const details: string[] = [];
-    const eduA = careerA.education || {} as EducationProfile;
-    const eduB = careerB.education || {} as EducationProfile;
+    const eduA = careerA.education;
+    const eduB = careerB.education;
 
     // Education level comparison
-    const levelA = EDUCATION_LEVEL_MAP[eduA.minimumEducation || 'bachelor'] ?? 4;
-    const levelB = EDUCATION_LEVEL_MAP[eduB.minimumEducation || 'bachelor'] ?? 4;
+    const levelA = EDUCATION_LEVEL_MAP[eduA.minimumLevel] ?? 4;
+    const levelB = EDUCATION_LEVEL_MAP[eduB.minimumLevel] ?? 4;
     const levelDiff = Math.abs(levelA - levelB);
     const levelScore = Math.max(0, 100 - levelDiff * 20);
 
     // Years of study comparison
-    const yearsA = eduA.yearsOfStudy || 4;
-    const yearsB = eduB.yearsOfStudy || 4;
+    const yearsA = levelA;
+    const yearsB = levelB;
     const yearsDiff = Math.abs(yearsA - yearsB);
     const yearsScore = Math.max(0, 100 - yearsDiff * 15);
 
@@ -457,8 +471,8 @@ export class CareerSimilarityEngine {
       : 100; // If neither requires certs, they're similar in that aspect
 
     // Exam difficulty comparison
-    const examDiffA = RISK_LEVEL_MAP[eduA.examRequirements?.difficulty || 'moderate'] ?? 0.5;
-    const examDiffB = RISK_LEVEL_MAP[eduB.examRequirements?.difficulty || 'moderate'] ?? 0.5;
+    const examDiffA = careerA.indiaReality.coachingDependency ?? 0.5;
+    const examDiffB = careerB.indiaReality.coachingDependency ?? 0.5;
     const examDiff = Math.abs(examDiffA - examDiffB) * 100;
     const examScore = 100 - examDiff;
 
@@ -472,7 +486,7 @@ export class CareerSimilarityEngine {
 
     // Generate details
     if (levelScore > 80) {
-      details.push(`Both require ${eduA.minimumEducation || 'similar'} education`);
+      details.push(`Both require ${eduA.minimumLevel} education`);
     } else if (levelDiff > 2) {
       details.push(`Different education requirements (${levelDiff} levels apart)`);
     }
@@ -508,8 +522,8 @@ export class CareerSimilarityEngine {
     }
 
     // Future demand alignment
-    const demandA = DEMAND_LEVEL_MAP[careerA.future?.futureDemand || 'stable'] ?? 0.5;
-    const demandB = DEMAND_LEVEL_MAP[careerB.future?.futureDemand || 'stable'] ?? 0.5;
+    const demandA = Math.min(1, careerA.evolution.futureCareerPaths.length / 5);
+    const demandB = Math.min(1, careerB.evolution.futureCareerPaths.length / 5);
     const demandDiff = Math.abs(demandA - demandB) * 100;
     const demandScore = 100 - demandDiff;
 
@@ -518,23 +532,23 @@ export class CareerSimilarityEngine {
     }
 
     // Industry growth alignment
-    const growthA = careerA.future?.industryGrowth || 'moderate';
-    const growthB = careerB.future?.industryGrowth || 'moderate';
+    const growthA = careerA.evolution.futureCareerPaths.length;
+    const growthB = careerB.evolution.futureCareerPaths.length;
     const growthMatch = growthA === growthB ? 100 : 50;
 
     if (growthMatch === 100) {
-      details.push(`Both in ${growthA} growth industries`);
+      details.push('Similar future pathway breadth');
     }
 
     // AI disruption risk alignment
-    const aiRiskA = RISK_LEVEL_MAP[careerA.future?.aiDisruptionRisk || 'moderate'] ?? 0.5;
-    const aiRiskB = RISK_LEVEL_MAP[careerB.future?.aiDisruptionRisk || 'moderate'] ?? 0.5;
+    const aiRiskA = careerA.riskProfile.automationRisk ?? 0.5;
+    const aiRiskB = careerB.riskProfile.automationRisk ?? 0.5;
     const aiDiff = Math.abs(aiRiskA - aiRiskB) * 100;
     const aiScore = 100 - aiDiff;
 
     // Global mobility comparison
     const mobilityDiff = Math.abs(
-      ((careerA.future?.globalMobility || 0.5) - (careerB.future?.globalMobility || 0.5)) * 100
+      ((careerA.optionality.careerFlexibility ?? 0.5) - (careerB.optionality.careerFlexibility ?? 0.5)) * 100
     );
     const mobilityScore = 100 - mobilityDiff;
 
@@ -556,12 +570,12 @@ export class CareerSimilarityEngine {
     if (!catA || !catB) return false;
 
     const relatedGroups: CareerCategory[][] = [
-      ['technology', 'engineering', 'science'],
-      ['finance', 'business'],
-      ['healthcare', 'science'],
-      ['legal', 'business', 'government'],
-      ['creative', 'media'],
-      ['education', 'research'],
+      [CareerCategory.TECHNOLOGY, CareerCategory.ENGINEERING, CareerCategory.SCIENCE],
+      [CareerCategory.FINANCE, CareerCategory.BUSINESS],
+      [CareerCategory.HEALTHCARE, CareerCategory.SCIENCE],
+      [CareerCategory.LAW, CareerCategory.BUSINESS, CareerCategory.GOVERNMENT],
+      [CareerCategory.ARTS, CareerCategory.MEDIA],
+      [CareerCategory.EDUCATION, CareerCategory.SCIENCE],
     ];
 
     return relatedGroups.some(group => group.includes(catA) && group.includes(catB));
@@ -818,4 +832,3 @@ export const SimilarityEngines = {
 // ============================================================================
 
 export { DEFAULT_WEIGHTS };
-export type { DimensionWeights, SimilarityOptions };

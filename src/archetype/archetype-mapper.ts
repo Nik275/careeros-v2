@@ -9,13 +9,20 @@
  * @version 1.0.0
  */
 
-import type { ArchetypeType, ArchetypeTraitIndicators } from '@/types/archetype-profile';
+import type { ArchetypeType } from '@/types/archetype-profile';
 import type {
   ArchetypeSignal,
   ArchetypeSignalCollection,
   ArchetypeDetectionInput,
   SignalSource,
   SignalModifier,
+  CognitiveAssessmentResult,
+  InterestAssessmentResult,
+  ValuesAssessmentResult,
+  BehavioralAssessmentResult,
+  ArchetypeAssessmentScore,
+  ArchetypeProfileInsights,
+  ArchetypeStudentLifeProfile,
 } from './archetype-types';
 
 /**
@@ -75,15 +82,20 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapCognitiveAssessment(
-    cognitive: import('@/assessment-intelligence/assessment-types').CognitiveAssessmentResult
+    cognitive: CognitiveAssessmentResult
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
+    const analyticalReasoning = scoreOf(cognitive.analyticalReasoning);
+    const problemSolving = scoreOf(cognitive.problemSolving);
+    const abstractReasoning = scoreOf(cognitive.abstractReasoning);
+    const creativeThinking = scoreOf(cognitive.creativeThinking);
+    const attentionToDetail = scoreOf(cognitive.attentionToDetail);
 
     // BUILDER: High analytical + systematic
-    if (cognitive.analyticalReasoning?.score ?? 0 > 70) {
+    if (analyticalReasoning > 70) {
       signals.push({
         archetype: 'BUILDER',
-        strength: cognitive.analyticalReasoning.score,
+        strength: analyticalReasoning,
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Strong analytical reasoning indicates builder potential',
         weight: 1.0,
@@ -91,11 +103,10 @@ export class ArchetypeMapper {
     }
 
     // RESEARCHER: High analytical + problem solving
-    if ((cognitive.analyticalReasoning?.score ?? 0) > 65 &&
-        (cognitive.problemSolving?.score ?? 0) > 65) {
+    if (analyticalReasoning > 65 && problemSolving > 65) {
       signals.push({
         archetype: 'RESEARCHER',
-        strength: Math.round((cognitive.analyticalReasoning.score! + cognitive.problemSolving.score!) / 2),
+        strength: Math.round((analyticalReasoning + problemSolving) / 2),
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Strong analytical and problem-solving abilities indicate research orientation',
         weight: 1.0,
@@ -103,10 +114,10 @@ export class ArchetypeMapper {
     }
 
     // STRATEGIST: High pattern recognition + abstract reasoning
-    if ((cognitive.abstractReasoning?.score ?? 0) > 70) {
+    if (abstractReasoning > 70) {
       signals.push({
         archetype: 'STRATEGIST',
-        strength: cognitive.abstractReasoning.score,
+        strength: abstractReasoning,
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Strong abstract reasoning indicates strategic thinking',
         weight: 0.9,
@@ -114,10 +125,10 @@ export class ArchetypeMapper {
     }
 
     // CREATOR: High creative thinking
-    if (cognitive.creativeThinking?.score ?? 0 > 70) {
+    if (creativeThinking > 70) {
       signals.push({
         archetype: 'CREATOR',
-        strength: cognitive.creativeThinking.score,
+        strength: creativeThinking,
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Strong creative thinking indicates creator archetype',
         weight: 1.0,
@@ -125,10 +136,10 @@ export class ArchetypeMapper {
     }
 
     // OPERATOR: High detail orientation + processing speed
-    if ((cognitive.attentionToDetail?.score ?? 0) > 70) {
+    if (attentionToDetail > 70) {
       signals.push({
         archetype: 'OPERATOR',
-        strength: cognitive.attentionToDetail.score,
+        strength: attentionToDetail,
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Strong attention to detail indicates operator orientation',
         weight: 0.9,
@@ -136,11 +147,10 @@ export class ArchetypeMapper {
     }
 
     // CRAFTSMAN: High detail + analytical
-    if ((cognitive.attentionToDetail?.score ?? 0) > 65 &&
-        (cognitive.analyticalReasoning?.score ?? 0) > 65) {
+    if (attentionToDetail > 65 && analyticalReasoning > 65) {
       signals.push({
         archetype: 'CRAFTSMAN',
-        strength: Math.round((cognitive.attentionToDetail.score! + cognitive.analyticalReasoning.score!) / 2),
+        strength: Math.round((attentionToDetail + analyticalReasoning) / 2),
         source: 'COGNITIVE_ASSESSMENT',
         description: 'Precision + analysis indicates craftsman orientation',
         weight: 0.9,
@@ -157,16 +167,23 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapInterestAssessment(
-    interest: import('@/assessment-intelligence/assessment-types').InterestAssessmentResult
+    interest: InterestAssessmentResult
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
+    const interestInThings = scoreOf(interest.interestInThings);
+    const interestInTechnical = interest.interestInTechnical ?? 0;
+    const interestInInvestigation = scoreOf(interest.interestInInvestigation);
+    const interestInArtistic = scoreOf(interest.interestInArtistic);
+    const interestInEnterprising = scoreOf(interest.interestInEnterprising);
+    const interestInRealistic = scoreOf(interest.interestInRealistic);
+    const interestInSocial = scoreOf(interest.interestInSocial);
+    const interestInConventional = scoreOf(interest.interestInConventional);
 
     // BUILDER: Interest in things + technical
-    if ((interest.interestInThings?.score ?? 0) > 70 &&
-        (interest.interestInTechnical ?? 0) > 60) {
+    if (interestInThings > 70 && interestInTechnical > 60) {
       signals.push({
         archetype: 'BUILDER',
-        strength: Math.round((interest.interestInThings.score! + interest.interestInTechnical) / 2),
+        strength: Math.round((interestInThings + interestInTechnical) / 2),
         source: 'INTEREST_ASSESSMENT',
         description: 'Interest in technical/thing-oriented work',
         weight: 0.9,
@@ -174,10 +191,10 @@ export class ArchetypeMapper {
     }
 
     // RESEARCHER: Interest in investigation + data
-    if ((interest.interestInInvestigation?.score ?? 0) > 70) {
+    if (interestInInvestigation > 70) {
       signals.push({
         archetype: 'RESEARCHER',
-        strength: interest.interestInInvestigation.score,
+        strength: interestInInvestigation,
         source: 'INTEREST_ASSESSMENT',
         description: 'Strong investigative interest',
         weight: 0.9,
@@ -185,10 +202,10 @@ export class ArchetypeMapper {
     }
 
     // CREATOR: Interest in artistic + creative
-    if ((interest.interestInArtistic?.score ?? 0) > 70) {
+    if (interestInArtistic > 70) {
       signals.push({
         archetype: 'CREATOR',
-        strength: interest.interestInArtistic.score,
+        strength: interestInArtistic,
         source: 'INTEREST_ASSESSMENT',
         description: 'Strong artistic/creative interest',
         weight: 1.0,
@@ -196,10 +213,10 @@ export class ArchetypeMapper {
     }
 
     // LEADER: Interest in enterprising + social
-    if ((interest.interestInEnterprising?.score ?? 0) > 70) {
+    if (interestInEnterprising > 70) {
       signals.push({
         archetype: 'LEADER',
-        strength: interest.interestInEnterprising.score,
+        strength: interestInEnterprising,
         source: 'INTEREST_ASSESSMENT',
         description: 'Enterprising interest indicates leadership orientation',
         weight: 0.9,
@@ -207,11 +224,10 @@ export class ArchetypeMapper {
     }
 
     // EXPLORER: Interest in realistic + investigative (broad)
-    if ((interest.interestInRealistic?.score ?? 0) > 60 &&
-        (interest.interestInInvestigation?.score ?? 0) > 60) {
+    if (interestInRealistic > 60 && interestInInvestigation > 60) {
       signals.push({
         archetype: 'EXPLORER',
-        strength: Math.round((interest.interestInRealistic.score! + interest.interestInInvestigation.score!) / 2),
+        strength: Math.round((interestInRealistic + interestInInvestigation) / 2),
         source: 'INTEREST_ASSESSMENT',
         description: 'Broad exploratory interests',
         weight: 0.8,
@@ -219,10 +235,10 @@ export class ArchetypeMapper {
     }
 
     // TEACHER: Interest in social + conventional (knowledge sharing)
-    if ((interest.interestInSocial?.score ?? 0) > 70) {
+    if (interestInSocial > 70) {
       signals.push({
         archetype: 'TEACHER',
-        strength: interest.interestInSocial.score,
+        strength: interestInSocial,
         source: 'INTEREST_ASSESSMENT',
         description: 'Social interest with educational orientation',
         weight: 0.85,
@@ -230,11 +246,10 @@ export class ArchetypeMapper {
     }
 
     // PROTECTOR: Interest in conventional + social (service)
-    if ((interest.interestInConventional?.score ?? 0) > 60 &&
-        (interest.interestInSocial?.score ?? 0) > 60) {
+    if (interestInConventional > 60 && interestInSocial > 60) {
       signals.push({
         archetype: 'PROTECTOR',
-        strength: Math.round((interest.interestInConventional.score! + interest.interestInSocial.score!) / 2),
+        strength: Math.round((interestInConventional + interestInSocial) / 2),
         source: 'INTEREST_ASSESSMENT',
         description: 'Service-oriented conventional interests',
         weight: 0.8,
@@ -251,15 +266,25 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapValuesAssessment(
-    values: import('@/assessment-intelligence/assessment-types').ValuesAssessmentResult
+    values: ValuesAssessmentResult
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
+    const autonomy = scoreOf(values.autonomy);
+    const achievement = scoreOf(values.achievement);
+    const knowledge = scoreOf(values.knowledge);
+    const security = scoreOf(values.security);
+    const influence = scoreOf(values.influence);
+    const recognition = scoreOf(values.recognition);
+    const altruism = scoreOf(values.altruism);
+    const challenge = scoreOf(values.challenge);
+    const variety = scoreOf(values.variety);
+    const mastery = scoreOf(values.mastery);
 
     // FOUNDER: High autonomy + achievement
-    if ((values.autonomy?.score ?? 0) > 75) {
+    if (autonomy > 75) {
       signals.push({
         archetype: 'FOUNDER',
-        strength: values.autonomy.score,
+        strength: autonomy,
         source: 'VALUE_ASSESSMENT',
         description: 'High value on autonomy indicates founder orientation',
         weight: 1.0,
@@ -267,10 +292,10 @@ export class ArchetypeMapper {
     }
 
     // BUILDER: High achievement + recognition
-    if ((values.achievement?.score ?? 0) > 70) {
+    if (achievement > 70) {
       signals.push({
         archetype: 'BUILDER',
-        strength: values.achievement.score,
+        strength: achievement,
         source: 'VALUE_ASSESSMENT',
         description: 'Achievement-oriented values',
         weight: 0.85,
@@ -278,10 +303,10 @@ export class ArchetypeMapper {
     }
 
     // RESEARCHER: High knowledge + intrinsic
-    if ((values.knowledge?.score ?? 0) > 70) {
+    if (knowledge > 70) {
       signals.push({
         archetype: 'RESEARCHER',
-        strength: values.knowledge.score,
+        strength: knowledge,
         source: 'VALUE_ASSESSMENT',
         description: 'Knowledge-seeking values',
         weight: 0.95,
@@ -289,10 +314,10 @@ export class ArchetypeMapper {
     }
 
     // PROTECTOR: High security + helping
-    if ((values.security?.score ?? 0) > 70) {
+    if (security > 70) {
       signals.push({
         archetype: 'PROTECTOR',
-        strength: values.security.score,
+        strength: security,
         source: 'VALUE_ASSESSMENT',
         description: 'Security-focused values',
         weight: 0.9,
@@ -300,10 +325,10 @@ export class ArchetypeMapper {
     }
 
     // LEADER: High influence + status
-    if ((values.influence?.score ?? 0) > 70 || (values.recognition?.score ?? 0) > 70) {
+    if (influence > 70 || recognition > 70) {
       signals.push({
         archetype: 'LEADER',
-        strength: Math.max(values.influence?.score ?? 0, values.recognition?.score ?? 0),
+        strength: Math.max(influence, recognition),
         source: 'VALUE_ASSESSMENT',
         description: 'Influence and recognition values',
         weight: 0.9,
@@ -311,10 +336,10 @@ export class ArchetypeMapper {
     }
 
     // TEACHER: High helping + altruism
-    if ((values.altruism?.score ?? 0) > 70) {
+    if (altruism > 70) {
       signals.push({
         archetype: 'TEACHER',
-        strength: values.altruism.score,
+        strength: altruism,
         source: 'VALUE_ASSESSMENT',
         description: 'Altruistic/helping values',
         weight: 0.9,
@@ -322,10 +347,10 @@ export class ArchetypeMapper {
     }
 
     // STRATEGIST: High challenge + problem solving
-    if ((values.challenge?.score ?? 0) > 70) {
+    if (challenge > 70) {
       signals.push({
         archetype: 'STRATEGIST',
-        strength: values.challenge.score,
+        strength: challenge,
         source: 'VALUE_ASSESSMENT',
         description: 'Challenge-seeking values',
         weight: 0.85,
@@ -333,10 +358,10 @@ export class ArchetypeMapper {
     }
 
     // EXPLORER: High variety + adventure
-    if ((values.variety?.score ?? 0) > 70) {
+    if (variety > 70) {
       signals.push({
         archetype: 'EXPLORER',
-        strength: values.variety.score,
+        strength: variety,
         source: 'VALUE_ASSESSMENT',
         description: 'Variety-seeking values',
         weight: 0.9,
@@ -344,10 +369,10 @@ export class ArchetypeMapper {
     }
 
     // CRAFTSMAN: High mastery + excellence
-    if ((values.mastery?.score ?? 0) > 70) {
+    if (mastery > 70) {
       signals.push({
         archetype: 'CRAFTSMAN',
-        strength: values.mastery.score,
+        strength: mastery,
         source: 'VALUE_ASSESSMENT',
         description: 'Mastery-oriented values',
         weight: 1.0,
@@ -364,15 +389,20 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapBehavioralAssessment(
-    behavioral: import('@/assessment-intelligence/assessment-types').BehavioralAssessmentResult
+    behavioral: BehavioralAssessmentResult
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
+    const riskTolerance = scoreOf(behavioral.riskTolerance);
+    const conscientiousness = scoreOf(behavioral.conscientiousness);
+    const extraversion = scoreOf(behavioral.extraversion);
+    const openness = scoreOf(behavioral.openness);
+    const agreeableness = scoreOf(behavioral.agreeableness);
 
     // FOUNDER: High risk tolerance + proactivity
-    if ((behavioral.riskTolerance?.score ?? 0) > 70) {
+    if (riskTolerance > 70) {
       signals.push({
         archetype: 'FOUNDER',
-        strength: behavioral.riskTolerance.score,
+        strength: riskTolerance,
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'High risk tolerance indicates founder potential',
         weight: 0.95,
@@ -380,10 +410,10 @@ export class ArchetypeMapper {
     }
 
     // OPERATOR: High conscientiousness + reliability
-    if ((behavioral.conscientiousness?.score ?? 0) > 70) {
+    if (conscientiousness > 70) {
       signals.push({
         archetype: 'OPERATOR',
-        strength: behavioral.conscientiousness.score,
+        strength: conscientiousness,
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'High conscientiousness indicates operational excellence',
         weight: 0.9,
@@ -391,10 +421,10 @@ export class ArchetypeMapper {
     }
 
     // LEADER: High extraversion + assertiveness
-    if ((behavioral.extraversion?.score ?? 0) > 70) {
+    if (extraversion > 70) {
       signals.push({
         archetype: 'LEADER',
-        strength: behavioral.extraversion.score,
+        strength: extraversion,
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'Social orientation indicates leadership potential',
         weight: 0.85,
@@ -402,10 +432,10 @@ export class ArchetypeMapper {
     }
 
     // EXPLORER: High openness + adaptability
-    if ((behavioral.openness?.score ?? 0) > 70) {
+    if (openness > 70) {
       signals.push({
         archetype: 'EXPLORER',
-        strength: behavioral.openness.score,
+        strength: openness,
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'Openness to experience indicates exploratory nature',
         weight: 0.9,
@@ -413,10 +443,10 @@ export class ArchetypeMapper {
     }
 
     // PROTECTOR: High agreeableness + stability
-    if ((behavioral.agreeableness?.score ?? 0) > 70) {
+    if (agreeableness > 70) {
       signals.push({
         archetype: 'PROTECTOR',
-        strength: behavioral.agreeableness.score,
+        strength: agreeableness,
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'Cooperative nature indicates protective/service orientation',
         weight: 0.8,
@@ -424,11 +454,10 @@ export class ArchetypeMapper {
     }
 
     // STRATEGIST: High openness + conscientiousness
-    if ((behavioral.openness?.score ?? 0) > 65 &&
-        (behavioral.conscientiousness?.score ?? 0) > 65) {
+    if (openness > 65 && conscientiousness > 65) {
       signals.push({
         archetype: 'STRATEGIST',
-        strength: Math.round((behavioral.openness.score! + behavioral.conscientiousness.score!) / 2),
+        strength: Math.round((openness + conscientiousness) / 2),
         source: 'BEHAVIORAL_ASSESSMENT',
         description: 'Strategic combination of openness and conscientiousness',
         weight: 0.85,
@@ -445,7 +474,7 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapProfileInsights(
-    insights: import('@/profile-generator/profile-types').ProfileInsights
+    insights: ArchetypeProfileInsights
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
 
@@ -518,7 +547,7 @@ export class ArchetypeMapper {
    * @returns Array of archetype signals
    */
   private mapStudentProfile(
-    profile: import('@/types/student-profile').StudentLifeProfile
+    profile: ArchetypeStudentLifeProfile
   ): ArchetypeSignal[] {
     const signals: ArchetypeSignal[] = [];
 
@@ -756,4 +785,8 @@ export class ArchetypeMapper {
  */
 export function createArchetypeMapper(): ArchetypeMapper {
   return new ArchetypeMapper();
+}
+
+function scoreOf(score: ArchetypeAssessmentScore | undefined): number {
+  return score?.score ?? 0;
 }

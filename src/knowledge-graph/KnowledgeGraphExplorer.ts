@@ -958,7 +958,7 @@ export class KnowledgeGraphExplorer {
       minConfidence: this.config.minConfidence,
     });
 
-    const skillNodes = connections
+    const skillNodes: FoundNode[] = connections
       .filter(({ node }) => node.type === 'skill')
       .map(({ node, edge }) => ({
         node,
@@ -999,7 +999,7 @@ export class KnowledgeGraphExplorer {
       minConfidence: this.config.minConfidence,
     });
 
-    const requirementNodes = connections.map(({ node, edge }) => ({
+    const requirementNodes: FoundNode[] = connections.map(({ node, edge }) => ({
       node,
       discovery: { method: 'direct', source: careerId },
       relevanceScore: edge.metadata.confidence * 100,

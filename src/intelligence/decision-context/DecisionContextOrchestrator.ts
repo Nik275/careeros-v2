@@ -14,7 +14,6 @@
  * @module intelligence/decision-context
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import {
   DecisionContextType,
   ContextDetectionInput,
@@ -38,6 +37,14 @@ import {
   ContextExplanationEngine,
   DEFAULT_EXPLANATION_CONFIG,
 } from './explanation/ContextExplanationEngine';
+
+function generateContextAnalysisId(): string {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `context-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
 
 // ============================================================================
 // DEFAULT CONFIGURATION
@@ -332,7 +339,7 @@ export class DecisionContextOrchestrator implements IDecisionContextEngine {
     const recommendations = this.generateRecommendations(contexts, input);
     
     return {
-      id: uuidv4(),
+      id: generateContextAnalysisId(),
       timestamp: Date.now(),
       studentId: input.profile.studentId || 'unknown',
       contexts,
@@ -561,14 +568,20 @@ export function createPreciseContextEngine(): DecisionContextOrchestrator {
 
 export {
   ContextScoringEngine,
-  ConfidenceResult,
   DEFAULT_SCORING_CONFIG,
+} from './scoring/ContextScoringEngine';
+
+export type {
+  ConfidenceResult,
 } from './scoring/ContextScoringEngine';
 
 export {
   ContextExplanationEngine,
-  ExplanationConfig,
   DEFAULT_EXPLANATION_CONFIG,
+} from './explanation/ContextExplanationEngine';
+
+export type {
+  ExplanationConfig,
 } from './explanation/ContextExplanationEngine';
 
 export {

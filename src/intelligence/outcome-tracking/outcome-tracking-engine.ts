@@ -25,6 +25,9 @@ import {
   type OutcomeAggregationQuery,
   type OutcomeAggregation,
   type OutcomeAnalytics,
+  type OutcomeEventId,
+  type PredictionId,
+  type AccuracyMetrics,
   type LearningSignal,
   type CareerDecisionOutcome,
   type EducationOutcome,
@@ -36,7 +39,6 @@ import {
   type TimelineEntry,
   type IOutcomeStore,
   type IOutcomeEventEngine,
-  type IOutcomeTracker,
   type OutcomeTrackingConfig,
   DEFAULT_OUTCOME_TRACKING_CONFIG,
 } from './outcome-types.js';
@@ -80,7 +82,6 @@ import {
 import {
   ComparisonEngine,
   createComparisonEngine,
-  type AccuracyMetrics,
   type BiasAnalysis,
   type CalibrationAnalysis,
 } from './outcome-comparison-engine.js';
@@ -192,7 +193,7 @@ class LearningSignalEngine {
       targetEngine: 'RECOMMENDATION',
       payload: {
         studentId: event.studentId,
-        predictionId: payload.predictionId,
+        predictionId: payload.predictionId as PredictionId,
         expectedOutcome: payload.predictedValue,
         actualOutcome: payload.actualValue,
         errorMagnitude: Math.abs(payload.predictedValue - payload.actualValue),
@@ -214,6 +215,7 @@ class LearningSignalEngine {
       payload: {
         studentId: event.studentId,
         outcomeType: payload.outcomeType,
+        expectedOutcome: null,
         actualOutcome: payload.outcomeData,
         errorMagnitude: 0,
       },
@@ -236,6 +238,7 @@ class LearningSignalEngine {
       payload: {
         studentId: event.studentId,
         patternDetected: `significant_${payload.change > 0 ? 'improvement' : 'decline'}_${payload.dimension}`,
+        expectedOutcome: null,
         actualOutcome: payload.change,
         errorMagnitude: 0,
       },
@@ -399,7 +402,7 @@ export class OutcomeTrackingEngine {
   private config: OutcomeTrackingConfig;
   private store: IOutcomeStore;
   private eventEngine: IOutcomeEventEngine;
-  private tracker: IOutcomeTracker;
+  private tracker: OutcomeTracker;
   private timelineEngine: TimelineEngine;
   private comparisonEngine: ComparisonEngine;
   private qualityEngine: QualityEngine;
@@ -462,42 +465,42 @@ export class OutcomeTrackingEngine {
     recordId: OutcomeRecordId,
     outcome: CareerDecisionOutcome
   ): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordCareerDecisionOutcome(recordId, outcome);
+    await this.tracker.recordCareerDecisionOutcome(recordId, outcome);
   }
 
   /**
    * Record education outcome
    */
   async recordEducation(recordId: OutcomeRecordId, outcome: EducationOutcome): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordEducationOutcome(recordId, outcome);
+    await this.tracker.recordEducationOutcome(recordId, outcome);
   }
 
   /**
    * Record skill outcome
    */
   async recordSkill(recordId: OutcomeRecordId, outcome: SkillOutcome): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordSkillOutcome(recordId, outcome);
+    await this.tracker.recordSkillOutcome(recordId, outcome);
   }
 
   /**
    * Record internship outcome
    */
   async recordInternship(recordId: OutcomeRecordId, outcome: InternshipOutcome): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordInternshipOutcome(recordId, outcome);
+    await this.tracker.recordInternshipOutcome(recordId, outcome);
   }
 
   /**
    * Record job outcome
    */
   async recordJob(recordId: OutcomeRecordId, outcome: JobOutcome): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordJobOutcome(recordId, outcome);
+    await this.tracker.recordJobOutcome(recordId, outcome);
   }
 
   /**
    * Record exploration outcome
    */
   async recordExploration(recordId: OutcomeRecordId, outcome: ExplorationOutcome): Promise<void> {
-    await (this.tracker as OutcomeTracker).recordExplorationOutcome(recordId, outcome);
+    await this.tracker.recordExplorationOutcome(recordId, outcome);
   }
 
   /**
@@ -531,7 +534,7 @@ export class OutcomeTrackingEngine {
 
     // Emit prediction validated event for learning signal generation
     this.eventEngine.emit({
-      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` as OutcomeEventId,
       type: 'PREDICTION_VALIDATED',
       timestamp: Date.now(),
       studentId: record.studentId,
@@ -556,7 +559,7 @@ export class OutcomeTrackingEngine {
     if (!record) throw new Error(`Record not found: ${recordId}`);
 
     const snapshot = this.growthEngine.createSnapshot(record.studentId, scores);
-    await (this.tracker as OutcomeTracker).measureGrowth(recordId, snapshot);
+    await this.tracker.measureGrowth(recordId, snapshot);
   }
 
   /**

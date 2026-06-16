@@ -298,7 +298,7 @@ export class RiskEngine {
     }
 
     // Check personality factors
-    const resilience = input.dimensionScores.get('resilience')?.percentileScore ?? 50;
+    const resilience = input.dimensionScores.get('resilience')?.score ?? 50;
     if (resilience < 40) {
       probability += 15;
     }

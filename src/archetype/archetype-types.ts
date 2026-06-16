@@ -110,6 +110,71 @@ export interface ArchetypeSignalCollection {
   readonly signalCountBySource: Record<SignalSource, number>;
 }
 
+export interface ArchetypeAssessmentScore {
+  readonly score: number;
+}
+
+export interface CognitiveAssessmentResult {
+  readonly analyticalReasoning?: ArchetypeAssessmentScore;
+  readonly problemSolving?: ArchetypeAssessmentScore;
+  readonly abstractReasoning?: ArchetypeAssessmentScore;
+  readonly creativeThinking?: ArchetypeAssessmentScore;
+  readonly attentionToDetail?: ArchetypeAssessmentScore;
+}
+
+export interface InterestAssessmentResult {
+  readonly interestInThings?: ArchetypeAssessmentScore;
+  readonly interestInTechnical?: number;
+  readonly interestInInvestigation?: ArchetypeAssessmentScore;
+  readonly interestInArtistic?: ArchetypeAssessmentScore;
+  readonly interestInEnterprising?: ArchetypeAssessmentScore;
+  readonly interestInRealistic?: ArchetypeAssessmentScore;
+  readonly interestInSocial?: ArchetypeAssessmentScore;
+  readonly interestInConventional?: ArchetypeAssessmentScore;
+}
+
+export interface ValuesAssessmentResult {
+  readonly autonomy?: ArchetypeAssessmentScore;
+  readonly achievement?: ArchetypeAssessmentScore;
+  readonly knowledge?: ArchetypeAssessmentScore;
+  readonly security?: ArchetypeAssessmentScore;
+  readonly influence?: ArchetypeAssessmentScore;
+  readonly recognition?: ArchetypeAssessmentScore;
+  readonly altruism?: ArchetypeAssessmentScore;
+  readonly challenge?: ArchetypeAssessmentScore;
+  readonly variety?: ArchetypeAssessmentScore;
+  readonly mastery?: ArchetypeAssessmentScore;
+}
+
+export interface BehavioralAssessmentResult {
+  readonly riskTolerance?: ArchetypeAssessmentScore;
+  readonly conscientiousness?: ArchetypeAssessmentScore;
+  readonly extraversion?: ArchetypeAssessmentScore;
+  readonly openness?: ArchetypeAssessmentScore;
+  readonly agreeableness?: ArchetypeAssessmentScore;
+}
+
+export interface ArchetypeProfileInsights {
+  readonly keyInsights?: readonly string[];
+}
+
+export interface ArchetypeStudentLifeProfile {
+  readonly workStyle?: {
+    readonly preferenceForAutonomy: number;
+    readonly preferenceForFlexibility: number;
+    readonly preferenceForCreative: number;
+    readonly preferenceForAnalytical: number;
+  };
+  readonly socialProfile?: {
+    readonly socialPreference: number;
+  };
+  readonly personalPreferences?: {
+    readonly financialStabilityPriority: number;
+    readonly impactPriority: number;
+    readonly growthPriority: number;
+  };
+}
+
 /**
  * Archetype scoring configuration.
  *
@@ -169,22 +234,22 @@ export interface ArchetypeDetectionInput {
   /**
    * Student life profile data.
    */
-  readonly studentProfile: import('@/types/student-profile').StudentLifeProfile;
+  readonly studentProfile: ArchetypeStudentLifeProfile;
 
   /**
    * Assessment results.
    */
   readonly assessments?: {
-    readonly cognitive?: import('@/assessment-intelligence/assessment-types').CognitiveAssessmentResult;
-    readonly interest?: import('@/assessment-intelligence/assessment-types').InterestAssessmentResult;
-    readonly values?: import('@/assessment-intelligence/assessment-types').ValuesAssessmentResult;
-    readonly behavioral?: import('@/assessment-intelligence/assessment-types').BehavioralAssessmentResult;
+    readonly cognitive?: CognitiveAssessmentResult;
+    readonly interest?: InterestAssessmentResult;
+    readonly values?: ValuesAssessmentResult;
+    readonly behavioral?: BehavioralAssessmentResult;
   };
 
   /**
    * Profile insights.
    */
-  readonly profileInsights?: import('@/profile-generator/profile-types').ProfileInsights;
+  readonly profileInsights?: ArchetypeProfileInsights;
 
   /**
    * Explicit preferences stated by student.

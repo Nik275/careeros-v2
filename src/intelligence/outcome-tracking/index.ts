@@ -135,6 +135,8 @@ export {
   createValidatedStore,
   createEncryptedStore,
   createDefaultStore,
+  isLocalOutcomeBrowserPersistenceAllowed,
+  isDemoOutcomeEncryptionAllowed,
   migrateStore,
   exportStore,
   importStore,

@@ -410,9 +410,7 @@ export class SimilarityExplanationEngine {
       parts.push(startingPoint.location.tier.toLowerCase().replace('_', ' '));
     }
 
-    if (startingPoint.familyBackground.economicStatus) {
-      parts.push(startingPoint.familyBackground.economicStatus.toLowerCase().replace('_', ' '));
-    }
+    parts.push(startingPoint.economicContext.familyIncomeLevel.toLowerCase().replace('_', ' '));
 
     return parts.length > 0 ? parts.join(', ') : 'a similar background';
   }
@@ -662,7 +660,7 @@ export class SimilarityExplanationEngine {
     steps.push('Review the top 3 most similar journeys in detail');
     steps.push('Identify 2-3 key lessons from each journey');
 
-    if (student.decisionContext) {
+    if (results.some((result) => result.dimensionScores.some((score) => score.dimension === 'DECISION_CONTEXT'))) {
       steps.push('Focus on journeys with similar decision contexts');
     }
 

@@ -28,6 +28,7 @@ import {
   TradeoffAnalysis,
   DecisionReversibility,
   ScenarioComparison,
+  ExperimentSuggestion,
 } from './decision-types';
 import { DEFAULT_DECISION_ENGINE_CONFIG, calculateAggregateProjectionScore } from './decision-model';
 import { TradeoffEngine, createTradeoffEngine } from './tradeoff-engine';
@@ -36,6 +37,41 @@ import { OptionalityEngine, createOptionalityEngine } from './optionality-engine
 import { ReversibilityEngine, createReversibilityEngine } from './reversibility-engine';
 import { RiskEngine, createRiskEngine } from './risk-engine';
 import { ScenarioEngine, createScenarioEngine } from './scenario-engine';
+
+export type DecisionInputValidationCode = 'EMPTY_DECISION_OPTIONS';
+
+export interface DecisionInputValidationDetails {
+  field: 'options';
+  decisionId?: DecisionId;
+  studentId?: string;
+  optionCount: number;
+}
+
+export class DecisionInputValidationError extends Error {
+  readonly code: DecisionInputValidationCode;
+  readonly details: DecisionInputValidationDetails;
+
+  constructor(message: string, details: DecisionInputValidationDetails) {
+    super(message);
+    this.name = 'DecisionInputValidationError';
+    this.code = 'EMPTY_DECISION_OPTIONS';
+    this.details = details;
+  }
+}
+
+type NonEmptyArray<T> = [T, ...T[]];
+
+type ValidatedDecisionInput = DecisionInput & {
+  options: NonEmptyArray<DecisionOption>;
+};
+
+type DecisionOptionAnalysis = {
+  option: DecisionOption;
+  optionality: OptionalityAnalysis;
+  reversibility: DecisionReversibility;
+  risks: RiskProfile;
+  scenarios: ScenarioComparison;
+};
 
 /**
  * Decision Intelligence Engine
@@ -64,6 +100,8 @@ export class DecisionIntelligenceEngine {
    * Perform complete decision analysis
    */
   analyze(input: DecisionInput): DecisionAnalysis {
+    this.validateDecisionInput(input);
+
     const startTime = Date.now();
     const analysisId = this.generateAnalysisId();
 
@@ -77,7 +115,7 @@ export class DecisionIntelligenceEngine {
       reversibility: this.reversibilityEngine.assessReversibility(input, option),
       risks: this.riskEngine.calculateRiskProfile(input, option),
       scenarios: this.scenarioEngine.generateScenarios(input, option),
-    }));
+    })) as NonEmptyArray<DecisionOptionAnalysis>;
 
     // Calculate regret for the decision as a whole
     const regret = this.regretEngine.calculateRegretProfile(input);
@@ -100,6 +138,13 @@ export class DecisionIntelligenceEngine {
     const studentExplanation = this.generateStudentExplanation(
       input,
       primaryRecommendation,
+      tradeoffs,
+      regret
+    );
+    const mentorGuidance = this.generateMentorGuidance(
+      input,
+      primaryRecommendation,
+      decisionReadiness,
       tradeoffs,
       regret
     );
@@ -135,6 +180,7 @@ export class DecisionIntelligenceEngine {
         : 'MODERATE',
       summary,
       detailedExplanation,
+      mentorGuidance,
       studentExplanation,
       nextSteps: this.generateNextSteps(decisionReadiness, pathRecommendations),
       informationGaps: decisionReadiness.missingInformation,
@@ -185,6 +231,8 @@ export class DecisionIntelligenceEngine {
     keyTradeoff: string | null;
     riskLevel: string;
   } {
+    this.validateDecisionInput(input);
+
     const tradeoffs = this.tradeoffEngine.analyzeTradeoffs(input);
     
     // Quick option scoring
@@ -217,33 +265,20 @@ export class DecisionIntelligenceEngine {
    */
   private generatePathRecommendations(
     input: DecisionInput,
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      optionality: OptionalityAnalysis;
-      reversibility: DecisionReversibility;
-      risks: RiskProfile;
-      scenarios: ScenarioComparison;
-    }>
-  ): PathRecommendation[] {
-    const recommendations: PathRecommendation[] = [];
-
-    // Handle empty options
-    if (optionAnalyses.length === 0) {
-      return recommendations;
-    }
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): NonEmptyArray<PathRecommendation> {
 
     // Recommended path (balanced)
     const balanced = this.findBalancedOption(optionAnalyses);
-    if (!balanced) return recommendations;
-    
-    recommendations.push({
+    const primaryRecommendation: PathRecommendation = {
       pathType: 'RECOMMENDED',
       optionId: balanced.option.id,
       optionLabel: balanced.option.label,
       confidence: this.calculatePathConfidence(balanced),
       rationale: `Balanced across risk, optionality, and fit.`,
       fitScore: balanced.scenarios.mostLikely.projections.studentFit,
-    });
+    };
+    const recommendations: NonEmptyArray<PathRecommendation> = [primaryRecommendation];
 
     // Best long-term outcome
     const bestLongTerm = this.findBestLongTerm(optionAnalyses);
@@ -307,15 +342,8 @@ export class DecisionIntelligenceEngine {
    * Find balanced option
    */
   private findBalancedOption(
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      optionality: OptionalityAnalysis;
-      reversibility: DecisionReversibility;
-      risks: RiskProfile;
-      scenarios: ScenarioComparison;
-    }>
-  ) {
-    if (optionAnalyses.length === 0) return null;
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): DecisionOptionAnalysis {
     return optionAnalyses.reduce((best, current) => {
       const bestScore = this.calculateBalancedScore(best);
       const currentScore = this.calculateBalancedScore(current);
@@ -346,14 +374,8 @@ export class DecisionIntelligenceEngine {
    * Find best long-term option
    */
   private findBestLongTerm(
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      optionality: OptionalityAnalysis;
-      reversibility: DecisionReversibility;
-      risks: RiskProfile;
-      scenarios: ScenarioComparison;
-    }>
-  ) {
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): DecisionOptionAnalysis {
     return optionAnalyses.reduce((best, current) => {
       const bestScore = calculateAggregateProjectionScore(best.scenarios.mostLikely.projections);
       const currentScore = calculateAggregateProjectionScore(current.scenarios.mostLikely.projections);
@@ -365,11 +387,8 @@ export class DecisionIntelligenceEngine {
    * Find highest optionality
    */
   private findHighestOptionality(
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      optionality: OptionalityAnalysis;
-    }>
-  ) {
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): DecisionOptionAnalysis {
     return optionAnalyses.reduce((best, current) =>
       current.optionality.score > best.optionality.score ? current : best
     );
@@ -379,11 +398,8 @@ export class DecisionIntelligenceEngine {
    * Find lowest regret
    */
   private findLowestRegret(
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      scenarios: ScenarioComparison;
-    }>
-  ) {
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): DecisionOptionAnalysis {
     return optionAnalyses.reduce((best, current) =>
       current.scenarios.mostLikely.projections.regretRisk <
       best.scenarios.mostLikely.projections.regretRisk
@@ -396,11 +412,8 @@ export class DecisionIntelligenceEngine {
    * Find safest option
    */
   private findSafest(
-    optionAnalyses: Array<{
-      option: DecisionOption;
-      risks: RiskProfile;
-    }>
-  ) {
+    optionAnalyses: NonEmptyArray<DecisionOptionAnalysis>
+  ): DecisionOptionAnalysis {
     return optionAnalyses.reduce((best, current) =>
       current.risks.overallRisk < best.risks.overallRisk ? current : best
     );
@@ -569,6 +582,39 @@ export class DecisionIntelligenceEngine {
   }
 
   /**
+   * Generate mentor-facing guidance for discussion and support.
+   */
+  private generateMentorGuidance(
+    input: DecisionInput,
+    primary: PathRecommendation,
+    readiness: DecisionReadiness,
+    tradeoffs: TradeoffAnalysis,
+    regret: RegretProfile
+  ): string {
+    const guidance: string[] = [
+      `Discuss the ${primary.optionLabel} recommendation for this ${input.type} decision and verify whether the student agrees with the ${primary.confidence}% confidence level.`,
+    ];
+
+    if (readiness.missingInformation.length > 0) {
+      guidance.push(
+        `Prioritize missing information: ${readiness.missingInformation.join(', ')}.`
+      );
+    }
+
+    if (tradeoffs.primaryConflict) {
+      guidance.push(
+        `Explore the tradeoff between ${tradeoffs.primaryConflict.dimensionA} and ${tradeoffs.primaryConflict.dimensionB}; the student's awareness is ${tradeoffs.studentAwareness.toLowerCase().replace('_', ' ')}.`
+      );
+    }
+
+    guidance.push(
+      `Monitor regret risk around ${regret.strongestCategory.toLowerCase().replace('_', ' ')} and help the student define a small experiment before committing.`
+    );
+
+    return guidance.join(' ');
+  }
+
+  /**
    * Generate next steps
    */
   private generateNextSteps(
@@ -599,7 +645,7 @@ export class DecisionIntelligenceEngine {
   private generateExperiments(
     input: DecisionInput,
     recommendations: PathRecommendation[]
-  ) {
+  ): ExperimentSuggestion[] {
     return [
       {
         name: 'Shadow Day',
@@ -671,9 +717,8 @@ export class DecisionIntelligenceEngine {
    * Select best optionality analysis
    */
   private selectBestOptionality(
-    optionAnalyses: Array<{ optionality: OptionalityAnalysis }>
-  ): OptionalityAnalysis | null {
-    if (optionAnalyses.length === 0) return null;
+    optionAnalyses: NonEmptyArray<{ optionality: OptionalityAnalysis }>
+  ): OptionalityAnalysis {
     return optionAnalyses.reduce((best, current) =>
       current.optionality.score > best.optionality.score ? current : best
     ).optionality;
@@ -683,9 +728,8 @@ export class DecisionIntelligenceEngine {
    * Select best reversibility
    */
   private selectBestReversibility(
-    optionAnalyses: Array<{ reversibility: DecisionReversibility }>
-  ): DecisionReversibility | null {
-    if (optionAnalyses.length === 0) return null;
+    optionAnalyses: NonEmptyArray<{ reversibility: DecisionReversibility }>
+  ): DecisionReversibility {
     return optionAnalyses.reduce((best, current) =>
       current.reversibility.score > best.reversibility.score ? current : best
     ).reversibility;
@@ -695,9 +739,8 @@ export class DecisionIntelligenceEngine {
    * Select best risks
    */
   private selectBestRisks(
-    optionAnalyses: Array<{ risks: RiskProfile }>
-  ): RiskProfile | null {
-    if (optionAnalyses.length === 0) return null;
+    optionAnalyses: NonEmptyArray<{ risks: RiskProfile }>
+  ): RiskProfile {
     return optionAnalyses.reduce((best, current) =>
       current.risks.overallRisk < best.risks.overallRisk ? current : best
     ).risks;
@@ -707,9 +750,8 @@ export class DecisionIntelligenceEngine {
    * Select best scenarios
    */
   private selectBestScenarios(
-    optionAnalyses: Array<{ scenarios: ScenarioComparison }>
-  ): ScenarioComparison | null {
-    if (optionAnalyses.length === 0) return null;
+    optionAnalyses: NonEmptyArray<{ scenarios: ScenarioComparison }>
+  ): ScenarioComparison {
     return optionAnalyses.reduce((best, current) => {
       const bestScore = calculateAggregateProjectionScore(best.scenarios.mostLikely.projections);
       const currentScore = calculateAggregateProjectionScore(
@@ -729,6 +771,22 @@ export class DecisionIntelligenceEngine {
     score += (input.contradictions?.length ?? 0) * 10;
     score += input.constraints.length * 3;
     return Math.min(100, score);
+  }
+
+  private validateDecisionInput(input: DecisionInput): asserts input is ValidatedDecisionInput {
+    const optionCount = Array.isArray(input.options) ? input.options.length : 0;
+
+    if (optionCount === 0) {
+      throw new DecisionInputValidationError(
+        'Decision intelligence analysis requires at least one decision option.',
+        {
+          field: 'options',
+          decisionId: input.id,
+          studentId: input.studentId,
+          optionCount,
+        }
+      );
+    }
   }
 
   /**

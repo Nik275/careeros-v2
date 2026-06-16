@@ -161,17 +161,19 @@ export class ProviderRegistry {
 
     // Filter by geography
     if (query.geography) {
+      const geography = query.geography;
       results = results.filter(
         (r) =>
-          r.provider.metadata.geographicCoverage === query.geography ||
-          r.provider.metadata.regions?.includes(query.geography)
+          r.provider.metadata.geographicCoverage === geography ||
+          r.provider.metadata.regions?.includes(geography)
       );
     }
 
     // Filter by signal type
     if (query.signalType) {
+      const signalType = query.signalType;
       results = results.filter((r) =>
-        r.provider.metadata.signalTypes.includes(query.signalType)
+        r.provider.metadata.signalTypes.includes(signalType)
       );
     }
 
@@ -182,8 +184,9 @@ export class ProviderRegistry {
 
     // Filter by minimum reliability
     if (query.minReliability) {
+      const minReliability = query.minReliability;
       results = results.filter(
-        (r) => r.provider.metadata.reliabilityScore >= query.minReliability
+        (r) => r.provider.metadata.reliabilityScore >= minReliability
       );
     }
 
@@ -314,8 +317,13 @@ export class ProviderRegistry {
       issues.push(`High latency (${health.averageLatencyMs}ms)`);
     }
 
-    if (health.successRate < 80) {
-      issues.push(`Low success rate (${health.successRate}%)`);
+    const successRate =
+      health.totalFetches > 0
+        ? Math.round((health.successfulFetches / health.totalFetches) * 100)
+        : 100;
+
+    if (successRate < 80) {
+      issues.push(`Low success rate (${successRate}%)`);
     }
 
     const result: HealthCheckResult = {

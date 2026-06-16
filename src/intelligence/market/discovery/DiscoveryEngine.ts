@@ -19,7 +19,7 @@ import type { EmergingCareer } from './models/EmergingCareer';
 import type { EmergingSkill } from './models/EmergingSkill';
 import type { EmergingIndustry } from './models/EmergingIndustry';
 import type { DecliningCareer } from './models/DecliningCareer';
-import type { DecliningSkill } from './models/DecliningSkill';
+import type { DecliningSkill } from './DecliningSkillEngine';
 import type { DiscoveryAnalysis } from './models/DiscoveryAnalysis';
 import { CareerDiscoveryEngine, createCareerDiscoveryEngine } from './CareerDiscoveryEngine';
 import { SkillDiscoveryEngine, createSkillDiscoveryEngine } from './SkillDiscoveryEngine';

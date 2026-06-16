@@ -368,16 +368,15 @@ export class DecisionConfidenceEngine {
    * @param source - Assessment source data
    * @returns Completeness score 0-100
    */
-  private calculateAssessmentCompleteness(source: {
-    dimensionScores: Record<string, number>;
-    confidence: { overall: number };
-  }): number {
+  private calculateAssessmentCompleteness(source: GeneratedProfile['source']): number {
     const expectedDimensions = 12; // Based on typical assessment dimensions
-    const actualDimensions = Object.keys(source.dimensionScores).length;
+    const actualDimensions = source.dimensionScores instanceof Map
+      ? source.dimensionScores.size
+      : Object.keys(source.dimensionScores).length;
     const coverageScore = Math.min((actualDimensions / expectedDimensions) * 100, 100);
 
     // Weight coverage with overall confidence
-    return Math.round((coverageScore * 0.6) + (source.confidence.overall * 0.4));
+    return Math.round((coverageScore * 0.6) + (source.confidence.score * 0.4));
   }
 
   /**

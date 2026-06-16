@@ -19,6 +19,7 @@
 import type {
   NormalizedMarketSignal,
   AggregatedMarketSignal,
+  NormalizedSignalType,
   SignalFreshnessStatus,
   FreshnessPolicy,
   Timestamp,
@@ -62,8 +63,9 @@ export class FreshnessEngine {
   ): SignalFreshnessStatus {
     const now = Date.now();
     const policy = this.getPolicy(signal.signalType);
+    const signalTimestamp = this.getSignalTimestamp(signal);
 
-    const ageMs = now - signal.timestamp;
+    const ageMs = now - signalTimestamp;
     const freshnessScore = this.calculateFreshnessScore(ageMs, policy);
     const status = this.determineStatus(ageMs, policy);
 
@@ -73,8 +75,8 @@ export class FreshnessEngine {
       maxAgeMs: policy.expireThresholdMs,
       freshnessScore,
       status,
-      expiresAt: signal.timestamp + policy.expireThresholdMs,
-      recommendedRefreshAt: signal.timestamp + policy.recommendedRefreshMs,
+      expiresAt: signalTimestamp + policy.expireThresholdMs,
+      recommendedRefreshAt: signalTimestamp + policy.recommendedRefreshMs,
     };
 
     // Cache result
@@ -146,11 +148,15 @@ export class FreshnessEngine {
    */
   private getDefaultPolicy(): FreshnessPolicy {
     return {
-      signalType: 'default',
+      signalType: 'demand',
       staleThresholdMs: 30 * 24 * 60 * 60 * 1000, // 30 days
       expireThresholdMs: 90 * 24 * 60 * 60 * 1000, // 90 days
       recommendedRefreshMs: 14 * 24 * 60 * 60 * 1000, // 14 days
     };
+  }
+
+  private getSignalTimestamp(signal: NormalizedMarketSignal | AggregatedMarketSignal): Timestamp {
+    return 'timestamp' in signal ? signal.timestamp : signal.aggregatedAt;
   }
 
   /**
@@ -399,7 +405,7 @@ export function quickFreshnessCheck(
  * Create freshness policy.
  */
 export function createFreshnessPolicy(
-  signalType: string,
+  signalType: NormalizedSignalType,
   staleDays: number,
   expireDays: number,
   recommendedRefreshDays: number

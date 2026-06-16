@@ -235,7 +235,7 @@ export class StudentBeliefBuilder {
         this.processLifestyleAnswer(answer);
         break;
       default:
-        console.warn(`Unknown assessment category: ${answer.category}`);
+        console.warn('Unknown assessment category received safely.');
     }
   }
 

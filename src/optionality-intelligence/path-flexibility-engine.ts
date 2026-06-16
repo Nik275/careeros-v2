@@ -18,6 +18,7 @@ import type {
   PivotBarrier,
   OptionalityIntelligenceConfig,
 } from './optionality-types';
+import { DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG } from './optionality-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
 
@@ -421,7 +422,7 @@ export function createPathFlexibilityEngine(
   config?: Partial<OptionalityIntelligenceConfig>
 ): PathFlexibilityEngine {
   const fullConfig: OptionalityIntelligenceConfig = {
-    ...import('./optionality-types').DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG,
+    ...DEFAULT_OPTIONALITY_INTELLIGENCE_CONFIG,
     ...config,
   };
 

@@ -109,35 +109,32 @@ export class ActiveLearningEngine {
     priority: OutcomePriority;
   } {
     // Calculate uncertainty
-    const uncertainty = this.uncertaintyEngine.calculateUncertainty(studentId, {
-      modelConfidence: context?.modelConfidence,
-      decisionConfidence: context?.decisionConfidence,
-    });
+    const uncertainty = this.uncertaintyEngine.calculateUncertainty(
+      this.buildUncertaintyInput(studentId, context)
+    );
+
+    const studentProfile = this.buildStudentProfile(studentId, context?.studentProfile);
+
+    // Calculate learning value
+    const learningValue = this.learningValueEngine.calculateLearningValue(
+      this.buildLearningValueInput(studentProfile, uncertainty, context)
+    );
 
     // Detect boundaries
-    const boundaries = this.decisionBoundaryEngine.detectBoundaries(studentId, context?.studentProfile);
+    const boundaryStudent = this.decisionBoundaryEngine.detectBoundaries(
+      studentProfile,
+      learningValue,
+      uncertainty
+    );
+    const boundaries = boundaryStudent?.boundaries ?? [];
     const primaryBoundary = boundaries.length > 0
-      ? boundaries.reduce((max, b) => b.learningValue > max.learningValue ? b : max)
+      ? boundaries.reduce((max, b) => (b.learningValue ?? 0) > (max.learningValue ?? 0) ? b : max)
       : undefined;
 
     // Get evidence gaps
     const gaps = context?.fillsEvidenceGap
       ? this.evidenceGapEngine.getStudentGaps(studentId)
       : [];
-    const evidenceGapScore = gaps.length > 0
-      ? Math.max(...gaps.map(g => 100 - g.coverage))
-      : 0;
-
-    // Calculate learning value
-    const learningValue = this.learningValueEngine.calculateLearningValue(studentId, {
-      uncertaintyProfile: uncertainty,
-      isRare: context?.isRare,
-      rarityScore: context?.rarityScore,
-      isNovel: context?.isNovel,
-      noveltyScore: context?.noveltyScore,
-      boundaryProximity: primaryBoundary?.learningValue,
-      evidenceGapScore,
-    });
 
     // Calculate priority
     const priority = this.outcomePriorityEngine.calculatePriority(studentId, {
@@ -145,7 +142,7 @@ export class ActiveLearningEngine {
       daysSinceLastContact: context?.daysSinceLastContact,
       hasMadeDecision: context?.hasMadeDecision,
       decisionConfidence: context?.decisionConfidence,
-      isNearBoundary: boundaries.some(b => b.learningValue > 50),
+      isNearBoundary: boundaries.some(b => (b.learningValue ?? 0) > 50),
       fillsEvidenceGap: context?.fillsEvidenceGap,
     });
 
@@ -166,6 +163,94 @@ export class ActiveLearningEngine {
       learningValue,
       boundaries,
       priority,
+    };
+  }
+
+  private buildStudentProfile(
+    studentId: StudentId,
+    profile?: NonNullable<Parameters<ActiveLearningEngine['analyzeStudent']>[1]>['studentProfile']
+  ): Parameters<LearningValueEngine['calculateLearningValue']>[0]['studentProfile'] {
+    return {
+      id: studentId,
+      studentId,
+      skills: [],
+      interests: [],
+      values: [],
+      careerPathways: [],
+      metadata: profile ? { ...profile } : {},
+    } as Parameters<LearningValueEngine['calculateLearningValue']>[0]['studentProfile'];
+  }
+
+  private buildLearningValueInput(
+    studentProfile: Parameters<LearningValueEngine['calculateLearningValue']>[0]['studentProfile'],
+    uncertainty: UncertaintyProfile,
+    context?: Parameters<ActiveLearningEngine['analyzeStudent']>[1]
+  ): Parameters<LearningValueEngine['calculateLearningValue']>[0] {
+    return {
+      studentProfile,
+      uncertaintyProfile: uncertainty,
+      historicalRecommendations: [],
+      similarStudents: context?.isRare ? [] : ['synthetic-similar-student'],
+      careerPathways: [],
+      outcomeHistory: [],
+      dataPoints: context?.isNovel ? 1 : 10,
+      existingTrainingDataSize: context?.rarityScore ?? 100,
+    };
+  }
+
+  private buildUncertaintyInput(
+    studentId: StudentId,
+    context?: Parameters<ActiveLearningEngine['analyzeStudent']>[1]
+  ): Parameters<UncertaintyEngine['calculateUncertainty']>[0] {
+    const modelConfidence = context?.modelConfidence ?? 0.5;
+    const decisionConfidence = context?.decisionConfidence ?? 0.5;
+
+    return {
+      studentId,
+      studentProfile: {
+        id: studentId,
+        studentId,
+      } as Parameters<UncertaintyEngine['calculateUncertainty']>[0]['studentProfile'],
+      modelPredictionData: {
+        ensemblePredictions: [[modelConfidence, 1 - modelConfidence]],
+        trainingDataSize: 100,
+        featureCoverage: modelConfidence,
+        modelAge: 30,
+        validationAccuracy: modelConfidence,
+      },
+      decisionContext: {
+        availableOptions: ['primary', 'alternative'],
+        optionScores: [decisionConfidence, 1 - decisionConfidence],
+        preferenceData: {
+          confidence: decisionConfidence,
+        },
+        temporalStability: decisionConfidence,
+        informationCompleteness: decisionConfidence,
+      },
+      outcomeContext: {
+        predictedProbability: decisionConfidence,
+        probabilityDistribution: [decisionConfidence, 1 - decisionConfidence],
+        historicalAccuracy: modelConfidence,
+        sampleSize: 100,
+        timeHorizon: 12,
+        externalFactors: [],
+      },
+      recommendationContext: {
+        recommendation: {
+          id: 'active-learning-synthetic-recommendation',
+          rank: 1,
+          score: decisionConfidence,
+          explanation: {
+            factors: ['synthetic active-learning uncertainty baseline'],
+          },
+        } as Parameters<UncertaintyEngine['calculateUncertainty']>[0]['recommendationContext']['recommendation'],
+        historicalRecommendations: [],
+        studentFeedback: [],
+        modelVersions: ['active-learning-baseline'],
+        featureImportance: {
+          confidence: modelConfidence,
+        },
+      },
     };
   }
 
@@ -270,12 +355,23 @@ export class ActiveLearningEngine {
     const periodStart = now - 30 * 24 * 60 * 60 * 1000; // Last 30 days
 
     // High value students
-    const highValueStudents = this.learningValueEngine.getHighValueStudents(20).map(score => ({
-      studentId: score.studentId,
-      learningValue: score.totalScore,
-      primaryReason: score.components[0]?.explanation || 'High learning potential',
-      recommendedAction: score.recommendedActions[0] || 'Schedule follow-up',
-    }));
+    const highValueStudents = this.learningValueEngine.getHighValueStudents(20).map(score => {
+      const components = Array.isArray(score.components)
+        ? score.components
+        : Object.values(score.components);
+      const recommendedAction = score.recommendedActions[0];
+
+      return {
+        studentId: score.studentId,
+        learningValue: score.totalScore,
+        primaryReason: typeof components[0] === 'object' && components[0] !== null
+          ? components[0].explanation
+          : 'High learning potential',
+        recommendedAction: typeof recommendedAction === 'string'
+          ? recommendedAction
+          : recommendedAction?.description || 'Schedule follow-up',
+      };
+    });
 
     // Active boundaries
     const activeBoundaries = this.decisionBoundaryEngine.findBoundaryZones().map(zone => ({
@@ -434,9 +530,12 @@ export class ActiveLearningEngine {
     const boundaryStats = this.decisionBoundaryEngine.getStats();
     const gapStats = this.evidenceGapEngine.getStats();
 
+    const totalStudentsAnalyzed = uncertaintyStats.totalStudentsProcessed ?? uncertaintyStats.totalStudents ?? 0;
+    const highValueStudents = (learningValueStats.criticalCount ?? 0) + (learningValueStats.highCount ?? 0);
+
     return {
-      totalStudentsAnalyzed: uncertaintyStats.totalStudents,
-      highValueStudents: learningValueStats.criticalCount + learningValueStats.highCount,
+      totalStudentsAnalyzed,
+      highValueStudents,
       activeQueries: this.getAllPendingQueries().length + this.getSentQueries().length,
       responseRate: this.analytics.totalQueriesSent > 0
         ? (this.analytics.totalResponses / this.analytics.totalQueriesSent) * 100
@@ -444,6 +543,15 @@ export class ActiveLearningEngine {
       averageLearningGain: this.analytics.totalResponses > 0
         ? this.analytics.totalLearningGains / this.analytics.totalResponses
         : 0,
+      totalStudentsProcessed: totalStudentsAnalyzed,
+      averageLearningValue: learningValueStats.averageLearningValue,
+      highValueStudentPercentage: totalStudentsAnalyzed > 0
+        ? highValueStudents / totalStudentsAnalyzed
+        : 0,
+      boundaryDetectionRate: boundaryStats.boundaryDetectionRate,
+      evidenceGapClosureRate: gapStats.averageCoverage,
+      modelImprovementRate: learningValueStats.modelImprovementRate,
+      informationGainPerStudent: learningValueStats.informationGainPerStudent,
       evidenceGapCoverage: {
         RARE_CAREER: gapStats.averageCoverage,
         EMERGING_CAREER: gapStats.averageCoverage,

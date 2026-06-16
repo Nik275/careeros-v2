@@ -207,7 +207,7 @@ export interface EngineAgreement {
   strength: ConfidenceScore;
 
   /** Individual engine confidences */
-  engineConfidences: Record<EngineSource, ConfidenceScore>;
+  engineConfidences: Partial<Record<EngineSource, ConfidenceScore>>;
 
   /** Explanation of the agreement */
   explanation: string;
@@ -386,7 +386,7 @@ export interface EngineConflict {
   subject: string;
 
   /** Conflicting positions */
-  positions: Record<EngineSource, number | string | boolean>;
+  positions: Partial<Record<EngineSource, number | string | boolean>>;
 
   /** Severity of conflict */
   severity: ViolationSeverity;
@@ -539,7 +539,7 @@ export interface ConsistencyRule {
   applicableEngines: EngineSource[];
 
   /** Validation function */
-  validate: (results: IntelligenceResults) => ConsistencyViolation | null;
+  validate: (results: IntelligenceResults, config?: ConsistencyEngineConfig) => ConsistencyViolation | null;
 
   /** Default severity if violation found */
   defaultSeverity: ViolationSeverity;

@@ -71,7 +71,7 @@ export interface DiscoveryQueueEntry {
   /** Signal count */
   signalCount: number;
 
-  **Submitted at */
+  /** Submitted at */
   submittedAt: Date;
 
   /** Reviewer assigned */

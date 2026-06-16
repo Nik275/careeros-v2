@@ -18,6 +18,7 @@ import {
   ValidationReport,
   ValidationSummary,
   CalibrationReport,
+  CalibrationBin,
   StabilityReport,
   ConsistencyReport,
   UncertaintyAssessment,
@@ -28,7 +29,7 @@ import {
   ValidationStatus,
 } from './validation-types';
 
-import { ConfidenceCalibrationEngine, CalibrationBin } from './confidence-calibration-engine';
+import { ConfidenceCalibrationEngine } from './confidence-calibration-engine';
 import { RecommendationStabilityEngine, RecommendationSnapshot } from './recommendation-stability-engine';
 import { RecommendationConsistencyEngine, PathwayResult, ComponentDefinition } from './recommendation-consistency-engine';
 import { UncertaintyEngine, UncertaintyInput } from './uncertainty-engine';
@@ -245,7 +246,9 @@ export class IntelligenceValidationEngine {
     const summary = this.generateSummary(results as ValidationReport['results']);
 
     // Check gates
-    const gates = options?.skipGates ? { passed: true, failed: [] as string[] } : this.checkGates(results as ValidationReport['results']);
+    const gates = options?.skipGates
+      ? { passed: true, failed: [] as string[], warnings: [] as string[] }
+      : this.checkGates(results as ValidationReport['results']);
 
     // Generate recommendations
     const recommendations = this.generateRecommendations(
@@ -310,11 +313,17 @@ export class IntelligenceValidationEngine {
     const pass = confidence >= this.config.gateThresholds.minConfidence && issues.length <= 2;
 
     // Create minimal report for history tracking
-    const report = {
+    const report: ValidationReport = {
       reportId: `quick-${studentId}-${Date.now()}`,
       generatedAt: Date.now(),
       studentId,
       status: pass ? 'passed' : 'failed',
+      results: {},
+      gates: {
+        passed: pass,
+        failed: pass ? [] : ['confidence'],
+        warnings: [],
+      },
       overallStatus: {
         valid: pass,
         confidence,
@@ -322,7 +331,12 @@ export class IntelligenceValidationEngine {
         warnings: [],
       },
       summary: {
+        overallScore: confidence,
+        overallStatus: pass ? 'passed' : 'failed',
         confidenceScore: confidence,
+        trustworthinessScore: confidence,
+        individualScores: { confidence },
+        statusBreakdown: { confidence: pass ? 'passed' : 'failed' },
         recommendationCount: 1,
         issueCount: issues.length,
         engineResults: {
@@ -357,7 +371,7 @@ export class IntelligenceValidationEngine {
       },
     };
 
-    this.addToHistory(report as ValidationReport);
+    this.addToHistory(report);
 
     return {
       pass,
@@ -688,11 +702,11 @@ export class IntelligenceValidationEngine {
       recommendations.push('Escalate to human expert due to high uncertainty');
     }
 
-    if (results.stability?.driftMetrics.recommendationDrift.mean > 20) {
+    if ((results.stability?.driftMetrics.recommendationDrift.mean ?? 0) > 20) {
       recommendations.push('Recommendations show high drift - consider averaging across multiple runs');
     }
 
-    if (results.calibration?.overallCalibration.overconfidence > 10) {
+    if ((results.calibration?.overallCalibration.overconfidence ?? 0) > 10) {
       recommendations.push('System is overconfident - reduce confidence scores by 10-15%');
     }
 

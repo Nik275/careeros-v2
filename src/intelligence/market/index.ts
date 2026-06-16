@@ -30,12 +30,15 @@ export type {
 export {
   MarketTrendDirection,
   MarketTrendMomentum,
+  DEFAULT_TREND_THRESHOLDS,
+} from './models/MarketTrend';
+
+export type {
   MarketTrendType,
   MarketTrend,
   CareerTrendAnalysis,
   TrendChangeDetection,
   TrendThresholds,
-  DEFAULT_TREND_THRESHOLDS,
 } from './models/MarketTrend';
 
 export type {
@@ -45,12 +48,15 @@ export type {
   CareerMarketProfileComparison,
   CareerMarketProfileUpdate,
   CareerMarketProfileComponents,
-  MarketOutlook,
 } from './models/CareerMarketProfile';
 
 export {
-  EmergingCareerStage,
+  MarketOutlook,
+} from './models/CareerMarketProfile';
+
+export type {
   EmergingCareer,
+  EmergingCareerStage,
   EmergingCareerEvidence,
 } from './models/EmergingCareer';
 
@@ -151,48 +157,66 @@ export {
 
 export {
   MarketSignalEngine,
-  MarketSignalEngineConfig,
-  SignalValidationResult,
-  SignalProcessingResult,
   DEFAULT_MARKET_SIGNAL_ENGINE_CONFIG,
   createMarketSignalEngine,
 } from './MarketSignalEngine';
 
+export type {
+  MarketSignalEngineConfig,
+  SignalValidationResult,
+  SignalProcessingResult,
+} from './MarketSignalEngine';
+
 export {
   MarketConfidenceEngine,
-  ConfidenceContext,
-  ConfidenceBreakdown,
-  ConfidenceRequirements,
   DEFAULT_CONFIDENCE_REQUIREMENTS,
   createMarketConfidenceEngine,
 } from './MarketConfidenceEngine';
 
+export type {
+  ConfidenceContext,
+  ConfidenceBreakdown,
+  ConfidenceRequirements,
+} from './MarketConfidenceEngine';
+
 export {
   MarketTrendEngine,
-  MarketTrendEngineConfig,
   DEFAULT_MARKET_TREND_ENGINE_CONFIG,
   createMarketTrendEngine,
 } from './MarketTrendEngine';
 
+export type {
+  MarketTrendEngineConfig,
+} from './MarketTrendEngine';
+
 export {
   CareerMarketProfileEngine,
-  CareerMarketProfileEngineConfig,
-  ProfileGenerationInput,
   DEFAULT_CAREER_MARKET_PROFILE_ENGINE_CONFIG,
   createCareerMarketProfileEngine,
 } from './CareerMarketProfileEngine';
 
+export type {
+  CareerMarketProfileEngineConfig,
+  ProfileGenerationInput,
+} from './CareerMarketProfileEngine';
+
 export {
   EmergingCareerEngine,
-  EmergingCareerEngineConfig,
   DEFAULT_EMERGING_CAREER_ENGINE_CONFIG,
   createEmergingCareerEngine,
 } from './EmergingCareerEngine';
 
+export type {
+  EmergingCareerEngineConfig,
+} from './EmergingCareerEngine';
+
 export {
   MarketIntelligenceEngine,
-  MarketIntelligenceEngineConfig,
-  EngineInitOptions,
   DEFAULT_MARKET_INTELLIGENCE_ENGINE_CONFIG,
   createMarketIntelligenceEngine,
+} from './MarketIntelligenceEngine';
+
+export type {
+  MarketIntelligenceEngineConfig,
+  EngineInitOptions,
 } from './MarketIntelligenceEngine';

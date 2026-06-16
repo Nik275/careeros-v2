@@ -9,21 +9,11 @@
 import type {
   CareerId,
   CareerSlug,
-  CareerV2,
   CareerCategory,
-  PsychologyProfile,
-  WorkStyleProfile,
-  RewardProfile,
-  RiskProfile,
-  OptionalityProfile,
-  EducationProfile,
-  IndiaRealityProfile,
-  FutureOutlook,
-  LifestyleProfile,
 } from '../ontology/career-ontology';
+export type { CareerCategory } from '../ontology/career-ontology';
 
 import type { CareerEvidence, EvidenceCollection, EvidenceId } from '../ontology/career-evidence';
-import type { TransitionEdge } from '../intelligence/career-transition-graph';
 
 // ============================================================================
 // FRAMEWORK CONSTANTS
@@ -73,6 +63,129 @@ export type AuditId = string & { __brand: 'AuditId' };
 
 /** Builder session identifier */
 export type BuilderSessionId = string & { __brand: 'BuilderSessionId' };
+
+// ============================================================================
+// AUTHORING CAREER TYPES
+// ============================================================================
+
+/** Authoring profile schema used by the career authoring workflow. */
+export interface CareerV2 {
+  id: string;
+  slug: string;
+  name: string;
+  category: CareerCategory;
+  description: string;
+  version: string;
+  lastUpdated: number;
+  psychology: PsychologyProfile;
+  workStyle: WorkStyleProfile;
+  reward: RewardProfile;
+  risk: RiskProfile;
+  optionality: OptionalityProfile;
+  education: EducationProfile;
+  indiaReality: IndiaRealityProfile;
+  futureOutlook: FutureOutlook;
+  lifestyle: LifestyleProfile;
+}
+
+export interface PsychologyProfile {
+  analyticalThinking: number;
+  creativity: number;
+  socialOrientation: number;
+  leadership: number;
+  detailOrientation: number;
+  curiosity?: number;
+  competitiveness?: number;
+  riskTolerance?: number;
+}
+
+export interface WorkStyleProfile {
+  workEnvironment?: 'office' | 'remote' | 'hybrid' | string;
+  teamSize?: 'small' | 'medium' | 'large' | string;
+  autonomyLevel?: number;
+  travelRequirement: 'minimal' | 'moderate' | 'high' | string | number;
+  remoteWork: 'none' | 'possible' | 'preferred' | string | number;
+  officeWork?: boolean | number;
+  fieldWork?: boolean | number;
+  teamOrientation?: string | number;
+  soloOrientation?: boolean | number;
+  structuredEnvironment?: boolean | number;
+  unstructuredEnvironment?: boolean | number;
+  workSchedule?: 'fixed' | 'flexible' | 'shift' | string;
+  physicalDemand?: 'low' | 'medium' | 'high' | string;
+}
+
+export interface RewardProfile {
+  incomePotential: number;
+  statusPotential: number;
+  impactPotential: number;
+  freedomPotential: number;
+  stabilityPotential?: number;
+}
+
+export interface RiskProfile {
+  burnoutRisk: number;
+  automationRisk: number;
+  competitionLevel: number;
+  incomeVolatility?: number;
+}
+
+export interface OptionalityProfile {
+  exitOptions: string[];
+  adjacentCareers: string[];
+  pivotDifficulty?: number;
+  transferabilityScore?: number;
+  careerFlexibility?: number;
+  transferableSkills?: number;
+  entrepreneurshipPotential?: number;
+}
+
+export interface EducationProfile {
+  requiredDegrees?: string[];
+  preferredDegrees?: string[];
+  minimumEducation?: string;
+  commonDegrees?: string[];
+  certifications: string[];
+  exams?: string[];
+  alternativeRoutes?: string[];
+  continuousLearning?: number;
+}
+
+export interface IndiaRealityProfile {
+  coachingDependency: number;
+  englishDependency: number;
+  urbanAdvantage: number;
+  familyAcceptance: number;
+  migrationRequirement?: boolean | number;
+  reservationSensitivity?: boolean | number;
+  casteDynamics?: 'positive' | 'neutral' | 'negative' | string;
+  genderConsiderations?: 'positive' | 'neutral' | 'negative' | string;
+}
+
+export interface FutureOutlook {
+  aiImpact?: 'positive' | 'neutral' | 'negative' | string;
+  growthTrajectory?: 'declining' | 'stable' | 'growing' | string;
+  indiaDemand?: number;
+  aiDisruptionRisk?: number;
+  futureDemand?: number;
+  industryGrowth?: number;
+  globalMobility?: number;
+  emergingSpecializations?: string[];
+  skillObsolescenceRisk?: number;
+}
+
+export interface LifestyleProfile {
+  workLifeBalance: number;
+  stressLevel: number;
+  flexibility?: number;
+  scheduleFlexibility?: number;
+  geographicFreedom?: number;
+}
+
+export interface TransitionEdge {
+  from: CareerId | string;
+  to: CareerId | string;
+}
 
 // ============================================================================
 // VALIDATION TYPES
@@ -188,7 +301,7 @@ export interface MissingIntelligence {
 /** Complete quality audit report */
 export interface QualityAuditReport {
   auditId: AuditId;
-  careerId: CareerId;
+  careerId: string;
   qualityScore: number;
   confidenceScore: number;
   dimensions: QualityDimension[];
@@ -918,8 +1031,16 @@ export class CareerValidationEngine {
     return issues;
   }
 
-  private getFieldValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((o, p) => (o as Record<string, unknown>)?.[p], obj);
+  private getFieldValue(obj: object, path: string): unknown {
+    return path
+      .split('.')
+      .reduce<unknown>(
+        (current, part) =>
+          typeof current === 'object' && current !== null
+            ? (current as Record<string, unknown>)[part]
+            : undefined,
+        obj
+      );
   }
 
   private applyRule(rule: ValidationRule, value: unknown, fieldPath: string): ValidationIssue[] {
@@ -1163,7 +1284,7 @@ export class CareerCompletenessScorer {
 
   // Private helper methods
 
-  private calculateDomainScore(domain: string, data: Record<string, unknown> | undefined): DomainCompleteness {
+  private calculateDomainScore(domain: string, data: object | undefined): DomainCompleteness {
     if (!data) {
       return {
         domain,
@@ -1174,15 +1295,16 @@ export class CareerCompletenessScorer {
       };
     }
 
-    const fields = Object.keys(data);
+    const values = data as Record<string, unknown>;
+    const fields = Object.keys(values);
     const filledFields = fields.filter(f => {
-      const value = data[f];
+      const value = values[f];
       return value !== undefined && value !== null;
     });
 
     const totalFields = this.domainFieldCounts[domain] || fields.length;
     const missingFields = fields.filter(f => {
-      const value = data[f];
+      const value = values[f];
       return value === undefined || value === null;
     });
 
@@ -1297,7 +1419,7 @@ export class CareerQualityAudit {
    * Compare two career audits
    */
   compareAudits(auditA: QualityAuditReport, auditB: QualityAuditReport): {
-    betterQuality: CareerId;
+    betterQuality: string;
     qualityDifference: number;
     confidenceDifference: number;
     recommendations: string[];
@@ -1438,4 +1560,3 @@ export class CareerQualityAudit {
     return recommendations;
   }
 }
-

@@ -94,6 +94,8 @@ export interface ArchetypeConfidenceDetails {
  */
 export type EvidenceQuality = 'STRONG' | 'MODERATE' | 'WEAK' | 'ANECDOTAL';
 
+export type ConfidenceLevel = 'VERY_HIGH' | 'HIGH' | 'MEDIUM' | 'LOW' | 'VERY_LOW';
+
 /**
  * Individual evidence item.
  *

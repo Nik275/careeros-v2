@@ -15,6 +15,11 @@ export type TrendEntityType = 'career' | 'skill' | 'industry' | 'region';
 export type TrendFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
 
 /**
+ * Backward-compatible alias for trend snapshot frequency.
+ */
+export type SnapshotFrequency = TrendFrequency;
+
+/**
  * Types of metrics that can be tracked over time.
  */
 export type TrendMetricType =
@@ -26,7 +31,11 @@ export type TrendMetricType =
   | 'job_postings'
   | 'skill_demand'
   | 'investment'
-  | 'confidence';
+  | 'confidence'
+  | 'expansion'
+  | 'hiring'
+  | 'remote_opportunity'
+  | 'startup_activity';
 
 /**
  * Single temporal data point.

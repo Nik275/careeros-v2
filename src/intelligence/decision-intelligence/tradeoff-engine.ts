@@ -28,9 +28,9 @@ import {
   TradeoffEngineConfig,
   DecisionInput,
   Contradiction,
-  TradeoffFramework,
   DecisionOption,
 } from './decision-types';
+import type { TradeoffFramework } from './decision-types';
 import { TRADEOFF_PATTERNS } from './decision-model';
 
 /**
@@ -527,6 +527,16 @@ export class TradeoffEngine {
  */
 export function createTradeoffEngine(config?: Partial<TradeoffEngineConfig>): TradeoffEngine {
   return new TradeoffEngine(config);
+}
+
+/**
+ * Resolve a tradeoff using the canonical TradeoffEngine implementation.
+ */
+export function resolveTradeoff(
+  input: DecisionInput,
+  tradeoff: Parameters<TradeoffEngine['resolveTradeoff']>[1]
+): ReturnType<TradeoffEngine['resolveTradeoff']> {
+  return createTradeoffEngine().resolveTradeoff(input, tradeoff);
 }
 
 /**

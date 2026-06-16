@@ -45,7 +45,14 @@ export type EvidenceType =
   | 'careerExperiment'
   | 'behavior';
 
-// BANNED: ConfidenceLevel enum removed - use Confidence type from @/intelligence/confidence
+/**
+ * Local Bayesian belief confidence category.
+ *
+ * This is a type-only compatibility surface for the existing belief confidence
+ * output shape. It is not a runtime enum and does not replace ConfidenceAuthority.
+ */
+export type BeliefConfidenceLevel = 'low' | 'moderate' | 'high' | 'veryHigh';
+export type ConfidenceLevel = BeliefConfidenceLevel;
 
 /**
  * Belief stability level.
@@ -234,8 +241,8 @@ export interface BeliefConfidence {
   /** Current confidence level */
   currentConfidence: number;
 
-  /** Constitutional confidence (0.0-1.0) - use Confidence Authority for evaluation */
-  confidenceLevel: number;
+  /** Local Bayesian confidence category for narrative grouping */
+  confidenceLevel: BeliefConfidenceLevel;
 
   /** Confidence history */
   history: Array<{

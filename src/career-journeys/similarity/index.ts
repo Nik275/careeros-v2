@@ -13,6 +13,11 @@
 // ============================================================================
 
 export {
+  DEFAULT_SIMILARITY_WEIGHTS,
+  DEFAULT_SIMILARITY_CONFIG,
+} from './journey-similarity-types';
+
+export type {
   // Core Types
   SimilarityResultId,
   SimilarityScore,
@@ -23,7 +28,6 @@ export {
   SimilarityDimension,
   DimensionSimilarity,
   SimilarityWeights,
-  DEFAULT_SIMILARITY_WEIGHTS,
   
   // Factor Types
   SimilarityFactor,
@@ -56,15 +60,15 @@ export {
   MatchCandidate,
   MatchRanking,
   MatchQuality,
-  DiversityOptions,
   
   // Configuration Types
   SimilarityEngineConfig,
-  DEFAULT_SIMILARITY_CONFIG,
   CalculateSimilarityInput,
   CalculateSimilarityOutput,
   BatchSimilarityInput,
   BatchSimilarityOutput,
+  DistanceResult,
+  FeatureVector,
 } from './journey-similarity-types';
 
 // ============================================================================
@@ -73,22 +77,30 @@ export {
 
 export {
   JourneySimilarityEngine,
-  JourneySimilarityEngineConfig,
   DEFAULT_ENGINE_CONFIG,
-  ValidationResult,
   createJourneySimilarityEngine,
+} from './journey-similarity-engine';
+
+export type {
+  JourneySimilarityEngineConfig,
+  ValidationResult,
 } from './journey-similarity-engine';
 
 export {
   SimilarityCalculator,
+} from './similarity-calculator';
+
+export type {
   DimensionCalculator,
-  DistanceResult,
-  FeatureVector,
 } from './similarity-calculator';
 
 export {
   JourneyMatcher,
+} from './journey-matcher';
+
+export type {
   JourneyRepository,
+  DiversityOptions,
 } from './journey-matcher';
 
 export {

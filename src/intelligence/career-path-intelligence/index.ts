@@ -162,6 +162,9 @@
 export {
   CareerPathIntelligenceEngine,
   createCareerPathIntelligenceEngine,
+} from './CareerPathIntelligenceEngine';
+
+export type {
   CareerPathIntelligenceEngineConfig,
 } from './CareerPathIntelligenceEngine';
 
@@ -169,42 +172,63 @@ export {
 export {
   PathDiscoveryEngine,
   createPathDiscoveryEngine,
+} from './engines/PathDiscoveryEngine';
+
+export type {
   PathDiscoveryEngineConfig,
 } from './engines/PathDiscoveryEngine';
 
 export {
   PathValidationEngine,
   createPathValidationEngine,
+} from './engines/PathValidationEngine';
+
+export type {
   PathValidationEngineConfig,
 } from './engines/PathValidationEngine';
 
 export {
   MilestoneEngine,
   createMilestoneEngine,
+} from './engines/MilestoneEngine';
+
+export type {
   MilestoneEngineConfig,
 } from './engines/MilestoneEngine';
 
 export {
   AlternativePathEngine,
   createAlternativePathEngine,
+} from './engines/AlternativePathEngine';
+
+export type {
   AlternativePathEngineConfig,
 } from './engines/AlternativePathEngine';
 
 export {
   FailureRecoveryEngine,
   createFailureRecoveryEngine,
+} from './engines/FailureRecoveryEngine';
+
+export type {
   FailureRecoveryEngineConfig,
 } from './engines/FailureRecoveryEngine';
 
 export {
   PathComparisonEngine,
   createPathComparisonEngine,
+} from './engines/PathComparisonEngine';
+
+export type {
   PathComparisonEngineConfig,
 } from './engines/PathComparisonEngine';
 
 export {
   PathExplanationEngine,
   createPathExplanationEngine,
+} from './engines/PathExplanationEngine';
+
+export type {
   PathExplanationEngineConfig,
 } from './engines/PathExplanationEngine';
 

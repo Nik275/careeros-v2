@@ -22,12 +22,16 @@ import type {
   MetaDecisionAnalysis,
   MetaDecisionInput,
   MetaDecisionConfig,
-  DEFAULT_META_DECISION_CONFIG,
 } from './types';
+import { DEFAULT_META_DECISION_CONFIG, DecisionState } from './types';
 
 // Wave 2.3 - Import Decision Authority for delegation
 import type { IDecisionAuthority } from '../decision/IDecisionAuthority';
 import { createDecisionAuthority } from '../decision/DecisionAuthority';
+import type {
+  MetaDecisionAnalysis as AuthorityMetaDecisionAnalysis,
+  MetaDecisionInput as AuthorityMetaDecisionInput,
+} from '../decision/meta/MetaDecisionAuthority';
 
 /**
  * Main Meta-Decision Engine.
@@ -80,11 +84,13 @@ export class MetaDecisionEngine {
     );
 
     try {
-      const result = await this.authority.analyzeMetaDecision(input);
-      return result;
-    } catch (error) {
+      const result = await this.authority.analyzeMetaDecision(
+        this.toAuthorityInput(input)
+      );
+      return this.fromAuthorityAnalysis(result);
+    } catch {
       // Fallback to legacy implementation during transition
-      console.warn('Decision Authority delegation failed, falling back to legacy implementation:', error);
+      console.warn('Decision Authority delegation failed safely; falling back to legacy implementation.');
       return this.analyzeLegacy(input);
     }
   }
@@ -142,11 +148,7 @@ export class MetaDecisionEngine {
     const analysis: Omit<MetaDecisionAnalysis, 'id' | 'timestamp' | 'narrative'> = {
       studentId: input.studentId,
       decisionId: input.decisionId,
-      context: input.context || {
-        careerOptions: [],
-        decisionType: 'initial',
-        timePressure: 'none',
-      },
+      context: this.normalizeInputContext(input.context),
       readiness,
       quality,
       timing,
@@ -154,7 +156,6 @@ export class MetaDecisionEngine {
       fragility,
       robustness,
       recommendedAction,
-      narrative: { summary: '', qualityExplanation: [], readinessExplanation: [], recommendationExplanation: [] },
       overallConfidence,
     };
 
@@ -163,6 +164,12 @@ export class MetaDecisionEngine {
       id: this.generateId(),
       timestamp: Date.now(),
       ...analysis,
+      narrative: {
+        summary: '',
+        qualityExplanation: [],
+        readinessExplanation: [],
+        recommendationExplanation: [],
+      },
     };
 
     fullAnalysis.narrative = this.narrativeEngine.generateNarrative(fullAnalysis);
@@ -311,7 +318,11 @@ export class MetaDecisionEngine {
       '[DEPRECATED] MetaDecisionEngine.shouldDecideNow() is deprecated. ' +
       'Use DecisionAuthority.shouldDecideNow() instead.'
     );
-    return this.authority.shouldDecideNow(analysis);
+    return (
+      (analysis.readiness.state === 'READY' ||
+        analysis.readiness.state === 'HIGH_CONFIDENCE_READY') &&
+      analysis.quality.overallQuality >= 60
+    );
   }
 
   /**
@@ -324,7 +335,11 @@ export class MetaDecisionEngine {
       '[DEPRECATED] MetaDecisionEngine.shouldDelay() is deprecated. ' +
       'Use DecisionAuthority.shouldDelayDecision() instead.'
     );
-    return this.authority.shouldDelayDecision(analysis);
+    return (
+      analysis.readiness.state === 'NOT_READY' ||
+      analysis.readiness.state === 'EXPLORING' ||
+      analysis.quality.overallQuality < 50
+    );
   }
 
   /**
@@ -379,6 +394,192 @@ export class MetaDecisionEngine {
   private generateId(): string {
     return `meta-decision-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
+
+  private toAuthorityInput(input: MetaDecisionInput): AuthorityMetaDecisionInput {
+    return {
+      studentId: input.studentId,
+      decisionId: input.decisionId,
+      context: input.context
+        ? {
+            studentId: input.studentId,
+            sessionId: `meta-${input.decisionId}`,
+            timestamp: new Date(),
+            ...input.context,
+          }
+        : undefined,
+      studentBeliefs: input.studentBeliefs,
+      utilityConfidence: input.utilityConfidence,
+      uncertainty: input.uncertainty,
+      biasProfile: input.biasProfile,
+      informationCompleteness: input.informationCompleteness,
+      decisionIntelligence: {
+        ...input.decisionIntelligence,
+        confidence: this.toConfidence(input.decisionIntelligence.confidence),
+      },
+    };
+  }
+
+  private fromAuthorityAnalysis(
+    analysis: AuthorityMetaDecisionAnalysis
+  ): MetaDecisionAnalysis {
+    return {
+      id: analysis.id,
+      timestamp: analysis.timestamp,
+      studentId: analysis.studentId,
+      decisionId: analysis.decisionId,
+      context: {
+        careerOptions: this.getCareerOptions(analysis),
+        decisionType: this.getDecisionType(analysis),
+        timePressure: this.getTimePressure(analysis),
+      },
+      readiness: {
+        ...analysis.readiness,
+        state: this.toLocalDecisionState(analysis.readiness.state),
+        confidence: this.fromConfidence(analysis.readiness.confidence),
+      },
+      quality: {
+        overallQuality: analysis.quality.overallQuality,
+        qualityLevel: analysis.quality.qualityLevel,
+        components: analysis.quality.components,
+        informationQuality: {
+          relevance: analysis.quality.components.informationQuality,
+          completeness: analysis.quality.components.informationQuality,
+          accuracy: analysis.quality.components.informationQuality,
+          timeliness: analysis.quality.components.informationQuality,
+        },
+        reasoningQuality: {
+          logicalConsistency: analysis.quality.components.reasoningQuality,
+          evidenceAlignment: analysis.quality.components.reasoningQuality,
+          alternativesConsidered: analysis.quality.components.reasoningQuality,
+          tradeoffsEvaluated: analysis.quality.components.reasoningQuality,
+        },
+        evidenceQuality: {
+          sourceReliability: analysis.quality.components.evidenceQuality,
+          sampleSize: analysis.quality.components.evidenceQuality,
+          recency: analysis.quality.components.evidenceQuality,
+          diversity: analysis.quality.components.evidenceQuality,
+        },
+        explanation: analysis.quality.explanation,
+      },
+      timing: {
+        ...analysis.timing,
+        confidence: this.fromConfidence(analysis.timing.confidence),
+        supportingFactors: {
+          decideNow: [],
+          delay: [],
+          explore: [],
+          experiment: [],
+          gatherEvidence: [],
+        },
+      },
+      commitment: {
+        ...analysis.commitment,
+        confidence: this.fromConfidence(analysis.commitment.confidence),
+        risks: {
+          reversalCost: 0,
+          regretProbability: 0,
+          opportunityCost: 0,
+        },
+        prerequisites: [],
+      },
+      fragility: {
+        ...analysis.fragility,
+        informationSensitivity: {
+          score: analysis.fragility.fragilityScore,
+          highImpactAreas: analysis.fragility.keyUncertainties.map(
+            (uncertainty) => uncertainty.factor
+          ),
+        },
+        valueSensitivity: {
+          score: 0,
+          unstableValues: [],
+        },
+        marketSensitivity: {
+          score: 0,
+          vulnerableAreas: [],
+        },
+      },
+      robustness: {
+        ...analysis.robustness,
+        scenarioResults: [],
+        crossScenarioStability: {
+          consistency: analysis.robustness.robustnessScore,
+          bestCaseOutcome: analysis.robustness.robustnessScore,
+          worstCaseOutcome: analysis.robustness.robustnessScore,
+          expectedOutcome: analysis.robustness.robustnessScore,
+        },
+        stressTests: [],
+      },
+      recommendedAction: analysis.recommendedAction,
+      narrative: analysis.narrative,
+      overallConfidence: this.fromConfidence(analysis.overallConfidence),
+    };
+  }
+
+  private toConfidence(value: number): number {
+    return value > 1 ? Math.max(0, Math.min(1, value / 100)) : value;
+  }
+
+  private fromConfidence(value: number): number {
+    return value <= 1 ? Math.round(value * 100) : value;
+  }
+
+  private getCareerOptions(analysis: AuthorityMetaDecisionAnalysis): string[] {
+    const options = analysis.context.careerOptions;
+    return Array.isArray(options)
+      ? options.filter((option): option is string => typeof option === 'string')
+      : [];
+  }
+
+  private normalizeInputContext(
+    context: MetaDecisionInput['context']
+  ): MetaDecisionAnalysis['context'] {
+    return {
+      careerOptions: context?.careerOptions ?? [],
+      decisionType: context?.decisionType ?? 'initial',
+      timePressure: context?.timePressure ?? 'none',
+    };
+  }
+
+  private toLocalDecisionState(state: AuthorityMetaDecisionAnalysis['readiness']['state']) {
+    switch (state) {
+      case 'HIGH_CONFIDENCE_READY':
+        return DecisionState.HIGH_CONFIDENCE_READY;
+      case 'READY':
+        return DecisionState.READY;
+      case 'PARTIALLY_READY':
+        return DecisionState.PARTIALLY_READY;
+      case 'EXPLORING':
+        return DecisionState.EXPLORING;
+      case 'NOT_READY':
+      default:
+        return DecisionState.NOT_READY;
+    }
+  }
+
+  private getDecisionType(
+    analysis: AuthorityMetaDecisionAnalysis
+  ): MetaDecisionAnalysis['context']['decisionType'] {
+    const decisionType = analysis.context.decisionType;
+    return decisionType === 'initial' ||
+      decisionType === 'transition' ||
+      decisionType === 'specialization' ||
+      decisionType === 'commitment'
+      ? decisionType
+      : 'initial';
+  }
+
+  private getTimePressure(
+    analysis: AuthorityMetaDecisionAnalysis
+  ): MetaDecisionAnalysis['context']['timePressure'] {
+    const timePressure = analysis.context.timePressure;
+    return timePressure === 'none' ||
+      timePressure === 'low' ||
+      timePressure === 'moderate' ||
+      timePressure === 'high'
+      ? timePressure
+      : 'none';
+  }
 }
 
 /**
@@ -396,7 +597,7 @@ export function createMetaDecisionEngine(
 export function analyzeDecisionQuality(
   input: MetaDecisionInput,
   config?: Partial<MetaDecisionConfig>
-): MetaDecisionAnalysis {
+): Promise<MetaDecisionAnalysis> {
   const engine = new MetaDecisionEngine(config);
   return engine.analyze(input);
 }

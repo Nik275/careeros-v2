@@ -12,8 +12,18 @@ import {
   SimilarityEngines,
   DEFAULT_WEIGHTS,
 } from '../CareerSimilarityEngine';
-import type { Career, PsychologyProfile, WorkStyleProfile, EducationProfile } from '../../../domains/career/Career';
-import type { CareerCategory } from '../../../ontology/career-ontology';
+import type {
+  Career,
+  PsychologicalProfile as PsychologyProfile,
+  WorkStyleProfile,
+  EducationRequirements as EducationProfile,
+} from '../../../domains/career/Career';
+import {
+  CareerCategory,
+  CertificationType,
+  DegreeType,
+  EducationLevel,
+} from '../../../domains/career/Career';
 
 // ============================================================================
 // TEST FIXTURES
@@ -23,14 +33,37 @@ const createMockCareer = (
   id: string,
   name: string,
   category: CareerCategory,
-  overrides: Partial<Career> = {}
-): Career => ({
+  overrides: Partial<
+    Omit<Career, 'psychologicalProfile' | 'workStyle' | 'rewardProfile' | 'riskProfile' | 'education' | 'indiaReality'>
+  > & {
+    psychology?: Partial<PsychologyProfile>;
+    psychologicalProfile?: Partial<PsychologyProfile>;
+    workStyle?: Partial<WorkStyleProfile>;
+    rewardProfile?: Partial<Career['rewardProfile']>;
+    riskProfile?: Partial<Career['riskProfile']>;
+    education?: Partial<EducationProfile>;
+    indiaReality?: Partial<Career['indiaReality']>;
+  } = {}
+): Career => {
+  const {
+    psychology,
+    psychologicalProfile,
+    workStyle,
+    rewardProfile,
+    riskProfile,
+    education,
+    indiaReality,
+    ...careerOverrides
+  } = overrides;
+
+  return {
   id: id as any,
   name,
+  slug: id,
   category,
   description: `Description for ${name}`,
   tagline: `${name} tagline`,
-  psychology: {
+  psychologicalProfile: {
     analyticalThinking: 0.7,
     creativity: 0.5,
     socialOrientation: 0.6,
@@ -39,80 +72,75 @@ const createMockCareer = (
     curiosity: 0.6,
     competitiveness: 0.5,
     riskTolerance: 0.4,
-    ...(overrides.psychology || {}),
-  } as PsychologyProfile,
+    ...psychology,
+    ...psychologicalProfile,
+  },
   workStyle: {
-    remoteWork: 'hybrid',
-    officeWork: true,
-    fieldWork: false,
-    travelRequirement: 'occasional',
-    teamOrientation: 'medium-team',
-    soloOrientation: true,
-    structuredEnvironment: true,
-    unstructuredEnvironment: false,
-    ...(overrides.workStyle || {}),
-  } as WorkStyleProfile,
-  reward: {
+    remoteWork: 0.5,
+    officeWork: 0.6,
+    fieldWork: 0,
+    travelRequirement: 0.25,
+    teamOrientation: 0.5,
+    soloOrientation: 0.5,
+    structuredEnvironment: 0.7,
+    unstructuredEnvironment: 0.3,
+    ...workStyle,
+  },
+  rewardProfile: {
     incomePotential: 0.7,
     statusPotential: 0.6,
     impactPotential: 0.6,
     freedomPotential: 0.5,
     stabilityPotential: 0.6,
+    ...rewardProfile,
   },
-  risk: {
-    burnoutRisk: 'moderate',
-    automationRisk: 'low',
-    competitionLevel: 'moderate',
-    incomeVolatility: 'low',
+  riskProfile: {
+    burnoutRisk: 0.5,
+    automationRisk: 0.3,
+    competitionLevel: 0.5,
+    incomeVolatility: 0.3,
+    ...riskProfile,
   },
   optionality: {
     careerFlexibility: 0.6,
-    transferableSkills: 8,
+    transferableSkills: 0.8,
     entrepreneurshipPotential: 0.4,
   },
   education: {
-    minimumEducation: 'bachelor',
-    typicalDegrees: ['B.Tech', 'B.E.'],
+    minimumLevel: EducationLevel.BACHELORS,
+    typicalDegrees: [DegreeType.BTECH],
     certifications: [],
-    examRequirements: {
-      type: 'entrance',
-      exams: ['JEE'],
-      difficulty: 'high',
-      preparationMonths: 12,
-    },
-    yearsOfStudy: 4,
-    educationCostRange: { min: 200000, max: 1000000, typical: 500000 },
-    ...(overrides.education || {}),
-  } as EducationProfile,
+    ...education,
+  },
   indiaReality: {
-    coachingDependency: 'moderate',
-    englishDependency: 'important',
-    urbanAdvantage: 'significant',
-    migrationRequirement: false,
-    reservationSensitivity: true,
-    familyAcceptance: 'high',
-    socioEconomicBarriers: 'moderate',
+    coachingDependency: 0.5,
+    englishDependency: 0.6,
+    urbanAdvantage: 0.6,
+    migrationRequirement: 0.3,
+    reservationApplicable: false,
+    ...indiaReality,
   },
-  future: {
-    aiDisruptionRisk: 'low',
-    futureDemand: 'growing',
-    globalMobility: 0.7,
-    industryGrowth: 'rapid',
+  evolution: {
+    adjacentCareers: [],
+    futureCareerPaths: [],
   },
-  lifestyle: {
-    workLifeBalance: 'good',
-    stressLevel: 'moderate',
-    scheduleFlexibility: 0.6,
-    geographicFreedom: 0.5,
+  salary: {
+    entrySalaryIndia: { min: 400000, max: 1500000, median: 800000 },
+    midCareerSalaryIndia: { min: 1200000, max: 4000000, median: 2500000 },
+    seniorSalaryIndia: { min: 3000000, max: 10000000, median: 6000000 },
   },
-  ...overrides,
-} as Career);
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  schemaVersion: 1,
+  ...careerOverrides,
+  };
+};
 
 // Test careers
 const softwareEngineer = createMockCareer(
   'career-software-engineer',
   'Software Engineer',
-  'technology',
+  CareerCategory.TECHNOLOGY,
   {
     psychology: {
       analyticalThinking: 0.9,
@@ -126,18 +154,18 @@ const softwareEngineer = createMockCareer(
     },
     optionality: {
       careerFlexibility: 0.8,
-      transferableSkills: 12,
+      transferableSkills: 1,
       entrepreneurshipPotential: 0.6,
     },
     workStyle: {
-      remoteWork: 'fully-remote',
-      officeWork: true,
-      fieldWork: false,
-      travelRequirement: 'none',
-      teamOrientation: 'small-team',
-      soloOrientation: true,
-      structuredEnvironment: false,
-      unstructuredEnvironment: true,
+      remoteWork: 0.75,
+      officeWork: 0.4,
+      fieldWork: 0,
+      travelRequirement: 0,
+      teamOrientation: 0.25,
+      soloOrientation: 0.8,
+      structuredEnvironment: 0.3,
+      unstructuredEnvironment: 0.8,
     },
   }
 );
@@ -145,7 +173,7 @@ const softwareEngineer = createMockCareer(
 const aiEngineer = createMockCareer(
   'career-ai-engineer',
   'AI Engineer',
-  'technology',
+  CareerCategory.TECHNOLOGY,
   {
     psychology: {
       analyticalThinking: 0.95,
@@ -159,31 +187,23 @@ const aiEngineer = createMockCareer(
     },
     optionality: {
       careerFlexibility: 0.75,
-      transferableSkills: 10,
+      transferableSkills: 0.9,
       entrepreneurshipPotential: 0.5,
     },
     workStyle: {
-      remoteWork: 'fully-remote',
-      officeWork: true,
-      fieldWork: false,
-      travelRequirement: 'none',
-      teamOrientation: 'small-team',
-      soloOrientation: true,
-      structuredEnvironment: false,
-      unstructuredEnvironment: true,
+      remoteWork: 0.75,
+      officeWork: 0.4,
+      fieldWork: 0,
+      travelRequirement: 0,
+      teamOrientation: 0.25,
+      soloOrientation: 0.8,
+      structuredEnvironment: 0.3,
+      unstructuredEnvironment: 0.8,
     },
     education: {
-      minimumEducation: 'master',
-      typicalDegrees: ['B.Tech', 'M.Tech', 'MS'],
+      minimumLevel: EducationLevel.MASTERS,
+      typicalDegrees: [DegreeType.BTECH, DegreeType.MTECH],
       certifications: [],
-      examRequirements: {
-        type: 'entrance',
-        exams: ['GATE', 'GRE'],
-        difficulty: 'high',
-        preparationMonths: 18,
-      },
-      yearsOfStudy: 6,
-      educationCostRange: { min: 500000, max: 3000000, typical: 1500000 },
     },
   }
 );
@@ -191,7 +211,7 @@ const aiEngineer = createMockCareer(
 const doctor = createMockCareer(
   'career-doctor',
   'Doctor',
-  'healthcare',
+  CareerCategory.HEALTHCARE,
   {
     psychology: {
       analyticalThinking: 0.8,
@@ -205,37 +225,23 @@ const doctor = createMockCareer(
     },
     optionality: {
       careerFlexibility: 0.3,
-      transferableSkills: 6,
+      transferableSkills: 0.6,
       entrepreneurshipPotential: 0.3,
     },
     workStyle: {
-      remoteWork: 'none',
-      officeWork: true,
-      fieldWork: false,
-      travelRequirement: 'occasional',
-      teamOrientation: 'large-team',
-      soloOrientation: false,
-      structuredEnvironment: true,
-      unstructuredEnvironment: false,
+      remoteWork: 0,
+      officeWork: 0.9,
+      fieldWork: 0,
+      travelRequirement: 0.25,
+      teamOrientation: 0.75,
+      soloOrientation: 0.2,
+      structuredEnvironment: 0.8,
+      unstructuredEnvironment: 0.2,
     },
     education: {
-      minimumEducation: 'professional-degree',
-      typicalDegrees: ['MBBS', 'MD'],
-      certifications: ['Medical License'],
-      examRequirements: {
-        type: 'entrance+licensing',
-        exams: ['NEET', 'FMGE'],
-        difficulty: 'severe',
-        preparationMonths: 24,
-      },
-      yearsOfStudy: 10,
-      educationCostRange: { min: 2000000, max: 10000000, typical: 5000000 },
-    },
-    future: {
-      aiDisruptionRisk: 'low',
-      futureDemand: 'high-growth',
-      globalMobility: 0.8,
-      industryGrowth: 'moderate',
+      minimumLevel: EducationLevel.PROFESSIONAL_DEGREE,
+      typicalDegrees: [DegreeType.MBBS, DegreeType.MD],
+      certifications: [],
     },
   }
 );
@@ -243,7 +249,7 @@ const doctor = createMockCareer(
 const investmentBanker = createMockCareer(
   'career-investment-banker',
   'Investment Banker',
-  'finance',
+  CareerCategory.FINANCE,
   {
     psychology: {
       analyticalThinking: 0.85,
@@ -257,37 +263,23 @@ const investmentBanker = createMockCareer(
     },
     optionality: {
       careerFlexibility: 0.5,
-      transferableSkills: 7,
+      transferableSkills: 0.7,
       entrepreneurshipPotential: 0.5,
     },
     workStyle: {
-      remoteWork: 'limited',
-      officeWork: true,
-      fieldWork: false,
-      travelRequirement: 'frequent',
-      teamOrientation: 'medium-team',
-      soloOrientation: false,
-      structuredEnvironment: true,
-      unstructuredEnvironment: false,
+      remoteWork: 0.25,
+      officeWork: 0.9,
+      fieldWork: 0,
+      travelRequirement: 0.5,
+      teamOrientation: 0.5,
+      soloOrientation: 0.2,
+      structuredEnvironment: 0.8,
+      unstructuredEnvironment: 0.2,
     },
     education: {
-      minimumEducation: 'master',
-      typicalDegrees: ['MBA', 'B.Com'],
-      certifications: ['CFA'],
-      examRequirements: {
-        type: 'certification',
-        exams: ['CAT', 'CFA'],
-        difficulty: 'high',
-        preparationMonths: 12,
-      },
-      yearsOfStudy: 5,
-      educationCostRange: { min: 1000000, max: 5000000, typical: 2500000 },
-    },
-    future: {
-      aiDisruptionRisk: 'moderate',
-      futureDemand: 'stable',
-      globalMobility: 0.9,
-      industryGrowth: 'moderate',
+      minimumLevel: EducationLevel.MASTERS,
+      typicalDegrees: [DegreeType.MBA, DegreeType.BCOM],
+      certifications: [CertificationType.FRM],
     },
   }
 );
@@ -592,11 +584,7 @@ describe('CareerSimilarityEngine', () => {
 
   describe('edge cases', () => {
     it('should handle careers with minimal data', () => {
-      const minimalCareer = {
-        id: 'minimal',
-        name: 'Minimal',
-        category: 'other',
-      } as Career;
+      const minimalCareer = createMockCareer('minimal', 'Minimal', CareerCategory.BUSINESS);
 
       const result = engine.calculateSimilarity(minimalCareer, softwareEngineer);
       expect(result.overallScore).toBeGreaterThanOrEqual(0);

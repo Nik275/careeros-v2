@@ -181,6 +181,9 @@ export interface RecommendationConfidence {
 
   /** Confidence level */
   level: 'HIGH' | 'MEDIUM' | 'LOW';
+
+  /** Constitutional confidence score (0-1) */
+  constitutionalConfidence?: number;
 }
 
 /**

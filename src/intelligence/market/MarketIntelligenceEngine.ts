@@ -6,8 +6,10 @@
  */
 
 import type { MarketSignal } from './models/MarketSignal';
-import type { MarketTrend, CareerTrendAnalysis } from './models/MarketTrend';
+import type { MarketTrend, CareerTrendAnalysis, MarketTrendType } from './models/MarketTrend';
+import { MarketTrendDirection } from './models/MarketTrend';
 import type { CareerMarketProfile } from './models/CareerMarketProfile';
+import { MarketOutlook } from './models/CareerMarketProfile';
 import type { MarketSnapshot } from './models/MarketSnapshot';
 import type { EmergingCareer } from './models/EmergingCareer';
 import type { MarketRepository } from './repositories/MarketRepository';
@@ -65,6 +67,28 @@ export const DEFAULT_MARKET_INTELLIGENCE_ENGINE_CONFIG: MarketIntelligenceEngine
   enableTrendDetection: true,
   enableEmergingDetection: true,
 };
+
+const MARKET_TREND_TYPES: readonly MarketTrendType[] = [
+  'demand',
+  'salary',
+  'growth',
+  'competition',
+  'automation_risk',
+  'skill_demand',
+  'hiring_rate',
+];
+
+function isMarketTrendType(value: string): value is MarketTrendType {
+  return MARKET_TREND_TYPES.includes(value as MarketTrendType);
+}
+
+const MARKET_OUTLOOK_ORDER: readonly CareerMarketProfile['outlook'][] = [
+  MarketOutlook.EXCELLENT,
+  MarketOutlook.GOOD,
+  MarketOutlook.NEUTRAL,
+  MarketOutlook.CAUTION,
+  MarketOutlook.POOR,
+];
 
 /**
  * Engine initialization options.
@@ -192,7 +216,7 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
     if (!trends) return null;
 
     if (trendType) {
-      return trends.trends[trendType] ?? null;
+      return isMarketTrendType(trendType) ? trends.trends[trendType] ?? null : null;
     }
 
     // Return overall trend as generic trend
@@ -249,11 +273,11 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
     const allProfiles = await this.careerRepository.getAllProfiles();
 
     const byOutlook: Record<CareerMarketProfile['outlook'], number> = {
-      excellent: 0,
-      good: 0,
-      neutral: 0,
-      caution: 0,
-      poor: 0,
+      [MarketOutlook.EXCELLENT]: 0,
+      [MarketOutlook.GOOD]: 0,
+      [MarketOutlook.NEUTRAL]: 0,
+      [MarketOutlook.CAUTION]: 0,
+      [MarketOutlook.POOR]: 0,
     };
 
     for (const profile of allProfiles) {
@@ -261,8 +285,8 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
     }
 
     // Calculate overall direction
-    const positiveCount = byOutlook.excellent + byOutlook.good;
-    const negativeCount = byOutlook.caution + byOutlook.poor;
+    const positiveCount = byOutlook[MarketOutlook.EXCELLENT] + byOutlook[MarketOutlook.GOOD];
+    const negativeCount = byOutlook[MarketOutlook.CAUTION] + byOutlook[MarketOutlook.POOR];
     const overallDirection: MarketOutlookSummary['overallDirection'] =
       positiveCount > negativeCount * 1.5
         ? 'expanding'
@@ -277,16 +301,26 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
       .map((p) => ({
         careerId: p.careerId,
         score: p.demandScore,
-        trend: p.growthScore > 60 ? 'growth' : p.growthScore < 40 ? 'declining' : 'stable',
+        trend:
+          p.growthScore > 60
+            ? MarketTrendDirection.GROWTH
+            : p.growthScore < 40
+              ? MarketTrendDirection.DECLINING
+              : MarketTrendDirection.STABLE,
       }));
 
     // Get careers requiring attention
     const requiringAttention = allProfiles
-      .filter((p) => p.outlook === 'poor' || p.outlook === 'caution' || p.automationRiskScore > 70)
+      .filter(
+        (p) =>
+          p.outlook === MarketOutlook.POOR ||
+          p.outlook === MarketOutlook.CAUTION ||
+          p.automationRiskScore > 70
+      )
       .map((p) => ({
         careerId: p.careerId,
         concern: p.automationRiskScore > 70 ? 'High automation risk' : 'Poor market outlook',
-        severity: p.outlook === 'poor' ? 'high' : 'medium',
+        severity: p.outlook === MarketOutlook.POOR ? 'high' as const : 'medium' as const,
       }));
 
     const marketConfidence = allProfiles.length > 0
@@ -349,14 +383,13 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
     minOutlook?: CareerMarketProfile['outlook'];
     limit?: number;
   }): Promise<CareerMarketProfile[]> {
-    const minOutlook = options?.minOutlook ?? 'good';
+    const minOutlook = options?.minOutlook ?? MarketOutlook.GOOD;
     const allProfiles = await this.careerRepository.getAllProfiles();
 
-    const outlookOrder = ['excellent', 'good', 'neutral', 'caution', 'poor'];
-    const minIndex = outlookOrder.indexOf(minOutlook);
+    const minIndex = MARKET_OUTLOOK_ORDER.indexOf(minOutlook);
 
     const filtered = allProfiles.filter((p) => {
-      const index = outlookOrder.indexOf(p.outlook);
+      const index = MARKET_OUTLOOK_ORDER.indexOf(p.outlook);
       return index <= minIndex;
     });
 
@@ -377,8 +410,8 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
     for (const profile of allProfiles) {
       const concerns: string[] = [];
 
-      if (profile.outlook === 'poor') concerns.push('Poor market outlook');
-      if (profile.outlook === 'caution') concerns.push('Cautious outlook');
+      if (profile.outlook === MarketOutlook.POOR) concerns.push('Poor market outlook');
+      if (profile.outlook === MarketOutlook.CAUTION) concerns.push('Cautious outlook');
       if (profile.automationRiskScore > 70) concerns.push('High automation risk');
       if (profile.demandScore < 30) concerns.push('Low demand');
       if (profile.growthScore < 30) concerns.push('Declining growth');
@@ -620,8 +653,7 @@ export class MarketIntelligenceEngine implements MarketIntelligenceProvider {
       (a, b) => a.automationRiskScore - b.automationRiskScore
     );
     const sortedByOutlook = [...profiles].sort((a, b) => {
-      const outlookOrder = ['excellent', 'good', 'neutral', 'caution', 'poor'];
-      return outlookOrder.indexOf(a.outlook) - outlookOrder.indexOf(b.outlook);
+      return MARKET_OUTLOOK_ORDER.indexOf(a.outlook) - MARKET_OUTLOOK_ORDER.indexOf(b.outlook);
     });
 
     return {

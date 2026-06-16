@@ -8,6 +8,12 @@ import { describe, it, expect } from 'vitest';
 import {
   // Types
   type CareerRelationship,
+  type CareerToSkillMetadata,
+  type CareerToDegreeMetadata,
+  type CareerToExamMetadata,
+  type CareerToIndustryMetadata,
+  type CareerToCertificationMetadata,
+  type CareerToRoleMetadata,
 
   // Functions
   strengthToScore,
@@ -324,7 +330,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('skill-js')
         .withRelation('required')
         .withStrength('very-strong')
-        .withMetadata({
+        .withMetadata<CareerToSkillMetadata>({
           importance: 9,
           proficiencyLevel: 'expert',
         })
@@ -345,7 +351,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('degree-mbbs')
         .withRelation('mandatory')
         .withStrength('very-strong')
-        .withMetadata({
+        .withMetadata<CareerToDegreeMetadata>({
           relevance: 10,
           prevalence: 0.95,
         })
@@ -366,7 +372,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('exam-ca-final')
         .withRelation('required')
         .withStrength('very-strong')
-        .withMetadata({
+        .withMetadata<CareerToExamMetadata>({
           difficulty: 9,
           passRate: 0.15,
           prepTime: 36,
@@ -388,7 +394,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('industry-finance')
         .withRelation('primary')
         .withStrength('very-strong')
-        .withMetadata({
+        .withMetadata<CareerToIndustryMetadata>({
           relevance: 10,
           marketSize: 'large',
           growthTrajectory: 'stable',
@@ -410,7 +416,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('cert-pmp')
         .withRelation('required')
         .withStrength('strong')
-        .withMetadata({
+        .withMetadata<CareerToCertificationMetadata>({
           value: 8,
           recognition: 'industry-standard',
           validityPeriod: 3,
@@ -432,7 +438,7 @@ describe('RelationshipBuilder', () => {
         .withTarget('role-staff-eng')
         .withRelation('senior')
         .withStrength('strong')
-        .withMetadata({
+        .withMetadata<CareerToRoleMetadata>({
           yearsExperience: 8,
           compensationLevel: 'very-high',
         })
@@ -842,7 +848,7 @@ describe('Integration', () => {
         .withTarget('skill-x')
         .withRelation('required')
         .withStrength('very-strong')
-        .withMetadata({ confidence: 0.95, importance: 9 })
+        .withMetadata<CareerToSkillMetadata>({ confidence: 0.95, importance: 9 })
         .buildCareerToSkill(),
       builder
         .withId('rel-3')

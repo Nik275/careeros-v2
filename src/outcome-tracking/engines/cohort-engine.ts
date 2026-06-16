@@ -771,7 +771,7 @@ export class CohortEngineImpl implements CohortEngine {
         type: 'LEVERAGE',
         recommendation: `Apply insight: ${insight.title}`,
         expectedImpact: 'Improve recommendations using cohort-specific patterns',
-        implementationApproach: insight.recommendations[0] || 'Integrate into recommendation engine',
+        implementationApproach: insight.recommendations?.[0] || 'Integrate into recommendation engine',
         priority: typeof insight.confidence === 'number' && insight.confidence > 85 ? 'HIGH' : 'MEDIUM',
       });
     }

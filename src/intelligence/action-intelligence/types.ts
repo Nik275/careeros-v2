@@ -28,6 +28,8 @@ import type {
   Milestone,
 } from '../career-path-intelligence/types';
 
+export type { Milestone };
+
 // =============================================================================
 // CORE ENUMS
 // =============================================================================
@@ -140,16 +142,16 @@ export interface Action {
   description: string;
 
   /** Type of action */
-  type: ActionType;
+  type: ActionType | keyof typeof ActionType;
 
   /** Priority level */
-  priority: ActionPriority;
+  priority: ActionPriority | keyof typeof ActionPriority;
 
   /** Current status */
-  status: ActionStatus;
+  status: ActionStatus | keyof typeof ActionStatus;
 
   /** Time horizon this action belongs to */
-  timeHorizon: TimeHorizon;
+  timeHorizon: TimeHorizon | keyof typeof TimeHorizon;
 
   /** Estimated duration to complete (hours) */
   estimatedDuration: number;
@@ -198,7 +200,7 @@ export interface Action {
  * Resource requirement for an action
  */
 export interface ResourceRequirement {
-  type: ResourceType;
+  type: ResourceType | keyof typeof ResourceType;
   amount: number;
   unit: string;
   description?: string;
@@ -412,6 +414,36 @@ export interface Opportunity {
 }
 
 /**
+ * Location metadata for an opportunity.
+ */
+export interface OpportunityLocation {
+  type: 'ONLINE' | 'ONSITE' | 'HYBRID';
+  city?: string;
+  country?: string;
+  url?: string;
+}
+
+/**
+ * Availability of resources for action execution.
+ */
+export interface ResourceAvailability {
+  resource: ResourceType | keyof typeof ResourceType;
+  available: boolean;
+  amount?: number;
+  notes?: string;
+}
+
+/**
+ * Constraint analysis summary for action feasibility.
+ */
+export interface ConstraintAnalysis {
+  feasible: boolean;
+  blockingConstraints: string[];
+  mitigations: string[];
+  confidence: ConfidenceScore;
+}
+
+/**
  * Collection of opportunities by category
  */
 export interface OpportunityBundle {
@@ -468,15 +500,20 @@ export interface MonthlyPlan {
  * Milestone with execution details
  */
 export interface PlannedMilestone {
-  milestoneId: string;
+  id?: EntityId;
+  milestoneId?: string;
   name: string;
   description: string;
   targetDate: BeliefTimestamp;
   successCriteria: string[];
-  requiredActions: string[]; // Action IDs
-  dependencies: string[]; // Milestone IDs
-  riskFactors: string[];
+  requiredActions?: string[]; // Action IDs
+  associatedActions?: EntityId[]; // Action IDs
+  dependencies?: string[]; // Milestone IDs
+  riskFactors?: string[];
   contingencyPlan?: string;
+  estimatedEffort?: number;
+  priority?: ActionPriority;
+  timeHorizon?: TimeHorizon;
   status: ActionStatus;
 }
 
@@ -580,34 +617,73 @@ export interface ActionExplanation {
   actionId: EntityId;
 
   /** Why this action matters */
-  whyItMatters: string;
+  whyItMatters?: string;
+
+  /** Why this action matters in generated action plans */
+  whyThisMatters?: string;
 
   /** How it contributes to goals */
-  goalContribution: string;
+  goalContribution?: string;
+
+  /** How this action fits into the plan */
+  howItFits?: string;
 
   /** Why it has this priority */
-  priorityRationale: string;
+  priorityRationale?: string;
 
   /** Expected outcomes */
-  expectedOutcomes: string[];
+  expectedOutcomes?: string[];
+
+  /** Expected outcome summary */
+  expectedOutcome?: string;
 
   /** What success looks like */
-  successDescription: string;
+  successDescription?: string;
 
   /** Consequences of not doing it */
-  consequencesOfInaction: string;
+  consequencesOfInaction?: string;
+
+  /** Consequences if the action is skipped */
+  ifNotDone?: string;
 
   /** How it relates to other actions */
-  relationshipToOtherActions: string;
+  relationshipToOtherActions?: string;
 
   /** Tips for execution */
-  executionTips: string[];
+  executionTips?: string[];
 
   /** Common pitfalls to avoid */
-  commonPitfalls: string[];
+  commonPitfalls?: string[];
 
   /** Resources to help */
-  helpfulResources: string[];
+  helpfulResources?: string[];
+
+  /** Expected return on action */
+  roi?: ActionImpact;
+
+  /** Personalized context for the action */
+  personalContext?: string;
+
+  /** Alternative approaches */
+  alternativeApproaches?: string[];
+}
+
+/**
+ * Expected impact of an action across time horizons.
+ */
+export interface ActionImpact {
+  shortTerm: ActionImpactWindow;
+  mediumTerm: ActionImpactWindow;
+  longTerm: ActionImpactWindow;
+  careerTrajectory: string;
+  confidence: ConfidenceScore;
+  supportingEvidence: string[];
+}
+
+export interface ActionImpactWindow {
+  description: string;
+  timeframe: string;
+  value: number;
 }
 
 /**
@@ -791,6 +867,22 @@ export interface ProgressTracker {
 // =============================================================================
 
 /**
+ * Configuration for Action Intelligence generation.
+ */
+export interface ActionIntelligenceConfig {
+  generateExplanations: boolean;
+  includeContingencyPlans: boolean;
+  includeResourceAnalysis: boolean;
+  autoAdjustForConstraints: boolean;
+  maxActionsPerHorizon: number;
+  minActionPriority: ActionPriority | keyof typeof ActionPriority;
+  explanationDetailLevel: 'brief' | 'standard' | 'detailed';
+  defaultTimeHorizon: TimeHorizon;
+  includeWeeklyPlans: boolean;
+  includeMonthlyPlans: boolean;
+}
+
+/**
  * Input to the Action Intelligence Engine
  */
 export interface ActionIntelligenceInput {
@@ -845,6 +937,7 @@ export interface ActionIntelligenceInput {
   /** Current context */
   currentContext?: {
     currentEducationLevel: string;
+    currentRole?: string;
     currentSkills: string[];
     currentCommitments: string[];
     availableHoursPerWeek: number;
@@ -852,6 +945,36 @@ export interface ActionIntelligenceInput {
 
   /** When this input was created */
   timestamp: BeliefTimestamp;
+}
+
+/**
+ * Complete output from the Action Intelligence Engine.
+ */
+export interface ActionOutput {
+  immediateActions: PrioritizedAction[];
+  weeklyPlan?: Partial<WeeklyPlan> & { weeklyPlans?: WeeklyPlan[] };
+  monthlyPlan?: Partial<MonthlyPlan>;
+  prioritizedActions: {
+    critical: PrioritizedAction[];
+    high: PrioritizedAction[];
+    medium: PrioritizedAction[];
+    low: PrioritizedAction[];
+    optional?: PrioritizedAction[];
+  };
+  allActions: PrioritizedAction[];
+  topActions: PrioritizedAction[];
+  milestones: PlannedMilestone[];
+  milestonesByTimeHorizon: Partial<Record<TimeHorizon, PlannedMilestone[]>>;
+  skillGapAnalysis?: SkillGapAnalysis;
+  skillDevelopmentPlan?: SkillDevelopmentPlan;
+  opportunities: OpportunityBundle[];
+  executionPlan?: ExecutionPlan;
+  explanations?: ActionExplanation[];
+  summary?: string;
+  generatedAt: BeliefTimestamp;
+  targetCareer: string;
+  estimatedCompletionTime: string;
+  nextReviewDate: BeliefTimestamp;
 }
 
 /**
@@ -890,8 +1013,8 @@ export function getTimeHorizonLabel(horizon: TimeHorizon): string {
 /**
  * Get priority score weight
  */
-export function getPriorityWeight(priority: ActionPriority): number {
-  const weights: Record<ActionPriority, number> = {
+export function getPriorityWeight(priority: ActionPriority | keyof typeof ActionPriority): number {
+  const weights: Record<ActionPriority | keyof typeof ActionPriority, number> = {
     [ActionPriority.CRITICAL]: 5,
     [ActionPriority.HIGH]: 4,
     [ActionPriority.MEDIUM]: 3,
@@ -899,6 +1022,47 @@ export function getPriorityWeight(priority: ActionPriority): number {
     [ActionPriority.OPTIONAL]: 1,
   };
   return weights[priority];
+}
+
+/**
+ * Get time horizon ordering weight.
+ */
+export function getHorizonWeight(horizon: TimeHorizon | keyof typeof TimeHorizon): number {
+  const weights: Record<TimeHorizon | keyof typeof TimeHorizon, number> = {
+    [TimeHorizon.NEXT_7_DAYS]: 5,
+    [TimeHorizon.NEXT_30_DAYS]: 4,
+    [TimeHorizon.NEXT_90_DAYS]: 3,
+    [TimeHorizon.NEXT_1_YEAR]: 2,
+    [TimeHorizon.NEXT_3_YEARS]: 1,
+  };
+  return weights[horizon];
+}
+
+/**
+ * Validate that an object has the required action fields.
+ */
+export function isValidAction(action: Partial<Action> | undefined): action is Action {
+  return Boolean(
+    action?.id &&
+    action.title &&
+    action.description &&
+    action.type &&
+    action.priority &&
+    action.status &&
+    action.timeHorizon
+  );
+}
+
+/**
+ * Validate that an action includes execution-ready details.
+ */
+export function isCompleteAction(action: Partial<Action> | undefined): action is Action {
+  return Boolean(
+    isValidAction(action) &&
+    action.estimatedDuration !== undefined &&
+    action.expectedOutcome &&
+    action.successCriteria?.length
+  );
 }
 
 /**

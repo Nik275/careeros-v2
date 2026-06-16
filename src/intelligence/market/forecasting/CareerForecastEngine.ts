@@ -16,12 +16,11 @@
  * - Chartered Accountant
  */
 
-import type { Forecast } from './models/Forecast';
+import type { Forecast, ForecastHorizon, ForecastSignal } from './models/Forecast';
 import { createForecast, calculateExpectedValues } from './models/Forecast';
 import type { ForecastScenario } from './models/ForecastScenario';
 import type { ForecastConfidence } from './models/ForecastConfidence';
 import type { ForecastEvidence } from './models/ForecastEvidence';
-import type { ForecastHorizon } from './models/Forecast';
 import { ScenarioGenerator, createScenarioGenerator } from './ScenarioGenerator';
 import { ConfidenceForecastEngine, createConfidenceForecastEngine } from './ConfidenceForecastEngine';
 
@@ -45,12 +44,7 @@ export interface CareerForecastInputs {
   growthTrend: Array<{ timestamp: Date; value: number }>;
 
   /** Market signals */
-  signals: Array<{
-    timestamp: Date;
-    type: string;
-    strength: number;
-    direction: 'positive' | 'negative' | 'neutral';
-  }>;
+  signals: ForecastSignal[];
 
   /** Supporting evidence */
   evidence: ForecastEvidence[];
@@ -214,9 +208,6 @@ export class CareerForecastEngine {
       scenarioProbabilities: probabilities,
       expectedValue: calculateExpectedValues(scenarios, probabilities),
       status: 'ready',
-      generatedAt: new Date(),
-      expiresAt: this.calculateExpiry(horizon),
-      version: 1,
       inputs: {
         dataPoints: inputs.historicalDemand.length,
         timeRange: {
@@ -369,9 +360,6 @@ export class CareerForecastEngine {
       scenarioProbabilities: { optimistic: 0.25, baseline: 0.5, pessimistic: 0.25 },
       expectedValue: calculateExpectedValues(scenarios, { optimistic: 0.25, baseline: 0.5, pessimistic: 0.25 }),
       status: 'ready',
-      generatedAt: new Date(),
-      expiresAt: this.calculateExpiry(horizon),
-      version: 1,
       inputs: {
         dataPoints: inputs.historicalDemand.length,
         timeRange: { start: new Date(), end: new Date() },

@@ -159,7 +159,38 @@ export class RegionTrendEngine {
     for (const metricType of this.config.trackedMetrics) {
       const metricSnapshots = regionSnapshots.filter((s) => s.metricType === metricType);
       if (metricSnapshots.length >= 3) {
-        metrics[metricType] = this.analyzeMetric(metricSnapshots);
+        const metric = this.analyzeMetric(metricSnapshots);
+
+        switch (metricType) {
+          case 'demand':
+            metrics.demand = {
+              classification: metric.classification,
+              level: metric.level,
+              growth: metric.growth,
+            };
+            break;
+          case 'growth':
+            metrics.growth = {
+              classification: metric.classification,
+              rate: metric.growth,
+              momentum: metric.momentum,
+            };
+            break;
+          case 'remote_opportunity':
+            metrics.remote_opportunity = {
+              classification: metric.classification,
+              level: metric.level,
+              growth: metric.growth,
+            };
+            break;
+          case 'startup_activity':
+            metrics.startup_activity = {
+              classification: metric.classification,
+              level: metric.level,
+              growth: metric.growth,
+            };
+            break;
+        }
       }
     }
 
@@ -359,8 +390,7 @@ export class RegionTrendEngine {
     classification: TrendClassification;
     level: number;
     growth: number;
-    momentum?: number;
-    rate?: number;
+    momentum: number;
   } {
     const sorted = [...snapshots].sort(
       (a, b) => a.timestamp.getTime() - b.timestamp.getTime()

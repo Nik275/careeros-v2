@@ -339,7 +339,7 @@ export class PsychologyWeightEngine {
       { data: Object.keys(profile.emotionalProfile), minItems: 2 },
     ];
 
-    const completenessScores = components.map(component => {
+    const completenessScores: number[] = components.map(component => {
       if (component.data.length >= component.minItems) return 1.0;
       if (component.data.length >= component.minItems / 2) return 0.7;
       if (component.data.length > 0) return 0.4;

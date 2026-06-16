@@ -19,6 +19,7 @@ import type {
   UtilityIntelligenceConfig,
   SubDimensionScore,
 } from './utility-types';
+import { DEFAULT_UTILITY_INTELLIGENCE_CONFIG } from './utility-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 
 /**
@@ -678,7 +679,7 @@ export function createUtilityExplanationEngine(
   config?: Partial<UtilityIntelligenceConfig>
 ): UtilityExplanationEngine {
   const fullConfig: UtilityIntelligenceConfig = {
-    ...import('./utility-types').DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
+    ...DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
     ...config,
   };
 

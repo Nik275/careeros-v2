@@ -359,11 +359,11 @@ export class DecisionNarrativeGenerator {
     // Calculate market influence
     const boosted = recommendations.filter(r => r.opportunityBoost?.wasBoosted).length;
     const penalized = recommendations.filter(r => r.riskAdjustment?.wasAdjusted).length;
-    const protected = recommendations.filter(r => r.overrideProtection.isProtected).length;
+    const protectedCount = recommendations.filter(r => r.overrideProtection.isProtected).length;
 
     let marketInfluence = `Market adjustments: ${boosted} boosted, ${penalized} penalized`;
-    if (protected > 0) {
-      marketInfluence += `, ${protected} protected from trend chasing`;
+    if (protectedCount > 0) {
+      marketInfluence += `, ${protectedCount} protected from trend chasing`;
     }
 
     return {

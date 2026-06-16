@@ -134,7 +134,7 @@ export class BiasImpactAnalysis {
     const signalCount = signals.length;
 
     // More signals = higher impact (diminishing returns)
-    const countFactor = Math.min(1 + signalCount * 0.1, 1.5);\n
+    const countFactor = Math.min(1 + signalCount * 0.1, 1.5);
     // Calculate final impact
     const impact = Math.round(avgStrength * countFactor * 100);
 

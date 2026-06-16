@@ -1,0 +1,86 @@
+/**
+ * @fileoverview Response validation for Phase 6.3 deployed staging shadow.
+ */
+
+import type { DeployedRouteShadowResponse, DeployedRouteShadowResponseValidation, DeployedRouteShadowVerdict } from './DeployedRouteShadowTypes';
+
+export function validateDeployedRouteShadowResponse(response: DeployedRouteShadowResponse): DeployedRouteShadowResponseValidation {
+  const reasons: string[] = [];
+  const body = isRecord(response.body) ? response.body : {};
+  const serialized = safeStringify(response.body);
+  const jsonSafe = response.jsonSafe && canRoundTripJson(response.body);
+  const responseShapeValid =
+    typeof body.status === 'string' &&
+    typeof body.verdict === 'string' &&
+    typeof body.flow === 'string' &&
+    typeof body.hookReached === 'boolean' &&
+    typeof body.matched === 'boolean' &&
+    typeof body.driftDetected === 'boolean' &&
+    typeof body.failure === 'boolean' &&
+    typeof body.rollback === 'boolean' &&
+    isRecord(body.auditSummary) &&
+    body.productionOutputPreserved === true &&
+    body.liveRoutingEnabled === false;
+  const httpStatusValid = [200, 400, 401, 403, 404, 500].includes(response.httpStatus);
+  const rawPayloadLeakDetected =
+    /"(rawStudentData|realStudentData)"\s*:\s*true/i.test(serialized) ||
+    /"(studentEmail|studentPhone|studentAddress|ssn|rawPayload|studentAnswers)"\s*:/i.test(serialized) ||
+    /blocked@example\.com/i.test(serialized);
+  const stackTraceLeakDetected = /(^|\n)\s*at\s+\S+|stack(trace)?|Error:\s.+/i.test(serialized);
+  const internalSecretLeakDetected = /(SECRET|TOKEN|API_KEY|DATABASE_URL|CLERK_|SVIX_|node_modules|webpack-internal|\.next[\\/])/i.test(serialized);
+  const productionMutationDetected =
+    body.productionMutated === true ||
+    body.productionMutation === true ||
+    body.productionOutputReplaced === true ||
+    /"production(Output)?(Mutated|Replaced)"\s*:\s*true/i.test(serialized);
+
+  if (!httpStatusValid) reasons.push('HTTP status is not allowed for deployed route shadow.');
+  if (!jsonSafe) reasons.push('Response is not JSON-safe.');
+  if (!responseShapeValid) reasons.push('Response shape is missing required deployed route-shadow fields.');
+  if (body.liveRoutingEnabled !== false) reasons.push('liveRoutingEnabled must remain false.');
+  if (body.productionOutputPreserved !== true) reasons.push('productionOutputPreserved must remain true.');
+  if (rawPayloadLeakDetected) reasons.push('Response leaks raw payload or student data markers.');
+  if (stackTraceLeakDetected) reasons.push('Response leaks a stack trace.');
+  if (internalSecretLeakDetected) reasons.push('Response leaks internal implementation or secret markers.');
+  if (productionMutationDetected) reasons.push('Response indicates production mutation or output replacement.');
+
+  const valid = reasons.length === 0;
+  return Object.freeze({
+    valid,
+    verdict: validationVerdict(valid, body),
+    httpStatusValid,
+    jsonSafe,
+    responseShapeValid,
+    liveRoutingDisabled: body.liveRoutingEnabled === false,
+    productionOutputPreserved: body.productionOutputPreserved === true,
+    hookReached: body.hookReached === true,
+    matched: body.matched === true,
+    driftDetected: body.driftDetected === true,
+    failure: body.failure === true,
+    rollback: body.rollback === true,
+    rawPayloadLeakDetected,
+    stackTraceLeakDetected,
+    internalSecretLeakDetected,
+    productionMutationDetected,
+    reasons: Object.freeze(reasons.length > 0 ? reasons : ['Deployed route-shadow response is JSON-safe and production-safe.']),
+  });
+}
+
+function validationVerdict(valid: boolean, body: Record<string, unknown>): DeployedRouteShadowVerdict {
+  if (!valid) return 'FAIL';
+  if (body.verdict === 'BLOCKED') return 'BLOCKED';
+  if (body.verdict === 'FAIL') return 'FAIL';
+  if (body.verdict === 'PASS_WITH_WARNINGS') return 'PASS_WITH_WARNINGS';
+  return 'PASS';
+}
+
+function canRoundTripJson(value: unknown): boolean {
+  try { JSON.parse(JSON.stringify(value)); return true; } catch { return false; }
+}
+function safeStringify(value: unknown): string {
+  try { return JSON.stringify(value) ?? ''; } catch { return '[unserializable]'; }
+}
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+

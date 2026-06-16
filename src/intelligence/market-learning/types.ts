@@ -27,11 +27,17 @@ import type {
   MarketTrend,
   MarketOpportunity,
   MarketRisk,
-  NormalizedEntityType,
   EntityId,
   Timestamp,
   ConfidenceScore,
 } from '@/intelligence/market-signal-intelligence/types.js';
+import type { NormalizedEntityType } from '@/market-data-ingestion/types.js';
+
+export type {
+  EntityId,
+  NormalizedEntityType,
+  Timestamp,
+};
 
 // ============================================================================
 // CORE IDENTIFIERS

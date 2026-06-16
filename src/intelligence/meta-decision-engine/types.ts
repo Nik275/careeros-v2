@@ -404,6 +404,9 @@ export interface MetaDecisionInput {
   /** Decision ID */
   decisionId: string;
 
+  /** Decision context */
+  context?: Partial<MetaDecisionAnalysis['context']>;
+
   /** Student beliefs */
   studentBeliefs: {
     identityStability: number;

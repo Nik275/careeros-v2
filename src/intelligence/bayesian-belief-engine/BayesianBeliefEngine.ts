@@ -10,6 +10,7 @@ import { PosteriorCalculator } from './PosteriorCalculator';
 import { BeliefConfidenceEngine } from './BeliefConfidenceEngine';
 import { ContradictionDetector } from './ContradictionDetector';
 import { BeliefNarrativeEngine } from './BeliefNarrativeEngine';
+import { DEFAULT_BAYESIAN_CONFIG } from './types';
 
 import type {
   BeliefUpdateId,
@@ -17,11 +18,11 @@ import type {
   EvidenceEvent,
   BeliefUpdate,
   BeliefHistory,
+  Contradiction,
   UpdatedStudentBelief,
   BeliefUpdateInput,
   ProcessEvidenceInput,
   BayesianBeliefConfig,
-  DEFAULT_BAYESIAN_CONFIG,
 } from './types';
 
 /**

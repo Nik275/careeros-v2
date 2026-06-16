@@ -27,6 +27,30 @@ export type PerturbationId = string & { readonly __brand: 'PerturbationId' };
 /** Unique identifier for a consensus calculation */
 export type ConsensusId = string & { readonly __brand: 'ConsensusId' };
 
+/** Severity vocabulary for profile or recommendation-stability contradictions */
+export type ContradictionSeverity = 'LOW' | 'MEDIUM' | 'HIGH';
+
+/**
+ * A profile or value-dimension contradiction used by recommendation stability
+ * and downstream decision-intelligence tradeoff/regret analysis.
+ */
+export interface Contradiction {
+  /** First conflicting dimension or value */
+  dimensionA: string;
+
+  /** Second conflicting dimension or value */
+  dimensionB: string;
+
+  /** Severity level used by stability confidence and uncertainty scoring */
+  severity: ContradictionSeverity;
+
+  /** Human-readable explanation of the contradiction */
+  description: string;
+
+  /** Optional observation timestamp */
+  timestamp?: Date;
+}
+
 // ============================================================================
 // PERTURBATION ENGINE TYPES
 // ============================================================================
@@ -811,11 +835,9 @@ export interface StabilityAnalysisInput {
   };
   
   /** Known contradictions in profile */
-  contradictions?: Array<{
-    dimensionA: string;
-    dimensionB: string;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
-  }>;
+  contradictions?: Array<
+    Pick<Contradiction, 'severity'> & Partial<Omit<Contradiction, 'severity'>>
+  >;
   
   /** Historical stability data (if available) */
   historicalData?: {
@@ -1008,7 +1030,7 @@ export interface IConfidenceEngine {
     consensus: ConsensusResult,
     profile: DimensionScoreMap,
     weights: ConfidenceWeights,
-    contradictions?: Array<{ severity: 'LOW' | 'MEDIUM' | 'HIGH' }>
+    contradictions?: Array<{ severity: ContradictionSeverity }>
   ): ConfidenceResult;
 }
 
@@ -1047,7 +1069,7 @@ export interface IUncertaintyEngine {
     consensus: ConsensusResult,
     confidence: ConfidenceResult,
     profileCompleteness: number,
-    contradictions: Array<{ severity: 'LOW' | 'MEDIUM' | 'HIGH' }>
+    contradictions: Array<{ severity: ContradictionSeverity }>
   ): UncertaintyResult;
 }
 

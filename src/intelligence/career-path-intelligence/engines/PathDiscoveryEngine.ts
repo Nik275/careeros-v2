@@ -23,6 +23,8 @@ import {
   Milestone,
   MilestoneStatus,
   PathId,
+  PathTemplate,
+  MilestoneTemplate,
 } from '../types';
 
 /**
@@ -51,30 +53,6 @@ export const DEFAULT_PATH_DISCOVERY_CONFIG: PathDiscoveryEngineConfig = {
   includeEntrepreneurial: true,
   includeIndiaPaths: true,
 };
-
-/**
- * Path template for generating paths
- */
-interface PathTemplate {
-  name: string;
-  type: PathType;
-  milestones: MilestoneTemplate[];
-  difficulty: PathDifficulty;
-  risk: PathRisk;
-  costMultiplier: number;
-  durationMultiplier: number;
-}
-
-/**
- * Milestone template
- */
-interface MilestoneTemplate {
-  name: string;
-  description: string;
-  duration: number;
-  skills: string[];
-  credentials?: string[];
-}
 
 /**
  * Career database entry

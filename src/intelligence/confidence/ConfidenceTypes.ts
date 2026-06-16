@@ -296,6 +296,9 @@ export interface ReliabilityTrend {
   
   /** Periods analyzed */
   readonly periods: number;
+
+  /** Average reliability/confidence over the analyzed periods */
+  readonly average?: number;
 }
 
 // ============================================================================
@@ -373,6 +376,11 @@ export interface ConfidenceExplanation {
 export interface ConfidenceHistory {
   readonly systemId: string;
   readonly entries: ConfidenceHistoryEntry[];
+}
+
+export interface HistoryQueryOptions {
+  readonly timeWindowMs?: number;
+  readonly limit?: number;
 }
 
 export interface ConfidenceHistoryEntry {
@@ -459,7 +467,7 @@ export function migrateLegacyConfidence(legacy: unknown): Confidence {
     if (mapped !== undefined) {
       return mapped;
     }
-    console.warn(`Unknown confidence enum value: ${legacy}`);
+    console.warn('Unknown confidence enum value received safely.');
     return 0.50;
   }
   
@@ -473,7 +481,7 @@ export function migrateLegacyConfidence(legacy: unknown): Confidence {
     return Math.max(0, Math.min(1, legacy));
   }
   
-  console.warn(`Unknown confidence value type: ${typeof legacy}`);
+  console.warn('Unknown confidence value type received safely.');
   return 0.50;
 }
 

@@ -16,7 +16,7 @@ import {
   type GraphTraversalOptions,
   type ShortestPathOptions,
 } from '../index';
-import type { Career, PsychologicalProfile } from '../../../domains/career/Career';
+import { CareerCategory, type Career, type PsychologicalProfile } from '../../../domains/career/Career';
 
 // ============================================================================
 // MOCK DATA FACTORIES
@@ -705,8 +705,8 @@ describe('CareerTransitionGraphV1', () => {
   describe('Import Careers', () => {
     it('should import careers from domain objects', () => {
       const careers = [
-        createMockCareer({ id: 'se', name: 'Software Engineer', category: 'technology' }),
-        createMockCareer({ id: 'doctor', name: 'Doctor', category: 'healthcare' }),
+        createMockCareer({ id: 'se', name: 'Software Engineer', category: CareerCategory.TECHNOLOGY }),
+        createMockCareer({ id: 'doctor', name: 'Doctor', category: CareerCategory.HEALTHCARE }),
       ];
 
       graph.importCareers(careers);

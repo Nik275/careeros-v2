@@ -130,7 +130,7 @@ export class OpportunityGraphEngine implements IOpportunityGraphEngine {
       metadata: {
         totalPaths: paths.length,
         averageOptionality,
-        averageDifficulty: this.scoreToDifficulty(averageDifficulty),
+        averageDifficulty,
       },
     };
   }

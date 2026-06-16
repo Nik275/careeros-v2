@@ -180,10 +180,12 @@ export class InMemoryOutcomeStore implements IOutcomeStore {
 export class LocalStorageOutcomeStore implements IOutcomeStore {
   private readonly prefix: string;
   private readonly indexKey: string;
+  private readonly persistenceAllowed: boolean;
 
-  constructor(prefix = 'careeros:outcome:') {
+  constructor(prefix = 'careeros:outcome:', options: { allowPersistence?: boolean } = {}) {
     this.prefix = prefix;
     this.indexKey = `${prefix}index`;
+    this.persistenceAllowed = options.allowPersistence ?? isLocalOutcomeBrowserPersistenceAllowed();
   }
 
   /**
@@ -222,6 +224,9 @@ export class LocalStorageOutcomeStore implements IOutcomeStore {
    */
   async save(record: StudentOutcomeRecord): Promise<void> {
     if (typeof window === 'undefined') return;
+    if (!this.persistenceAllowed) {
+      throw new Error('Outcome localStorage persistence is disabled outside explicit local/test mode.');
+    }
 
     const key = this.getKey(record.id);
     localStorage.setItem(key, JSON.stringify(record));
@@ -581,10 +586,16 @@ export class ValidatedOutcomeStore implements IOutcomeStore {
 export class EncryptedOutcomeStore implements IOutcomeStore {
   private store: IOutcomeStore;
   private encryptionKey: string;
+  private demoEncryptionAllowed: boolean;
 
-  constructor(store: IOutcomeStore, encryptionKey: string) {
+  constructor(store: IOutcomeStore, encryptionKey: string, options: { allowDemoEncryption?: boolean } = {}) {
     this.store = store;
     this.encryptionKey = encryptionKey;
+    this.demoEncryptionAllowed = options.allowDemoEncryption ?? isDemoOutcomeEncryptionAllowed();
+
+    if (!this.demoEncryptionAllowed) {
+      throw new Error('Demo XOR outcome encryption is disabled outside explicit local/test mode.');
+    }
   }
 
   /**
@@ -660,7 +671,8 @@ export class EncryptedOutcomeStore implements IOutcomeStore {
    */
   async query(query: OutcomeAggregationQuery): Promise<StudentOutcomeRecord[]> {
     const records = await this.store.query(query);
-    return Promise.all(records.map(r => this.load(r.id)!));
+    const decryptedRecords = await Promise.all(records.map(r => this.load(r.id)));
+    return decryptedRecords.filter((record): record is StudentOutcomeRecord => record !== null);
   }
 
   /**
@@ -693,8 +705,8 @@ export function createInMemoryStore(): InMemoryOutcomeStore {
 /**
  * Create localStorage store
  */
-export function createLocalStorageStore(prefix?: string): LocalStorageOutcomeStore {
-  return new LocalStorageOutcomeStore(prefix);
+export function createLocalStorageStore(prefix?: string, options?: { allowPersistence?: boolean }): LocalStorageOutcomeStore {
+  return new LocalStorageOutcomeStore(prefix, options);
 }
 
 /**
@@ -714,8 +726,23 @@ export function createValidatedStore(store: IOutcomeStore): ValidatedOutcomeStor
 /**
  * Create encrypted store wrapper
  */
-export function createEncryptedStore(store: IOutcomeStore, encryptionKey: string): EncryptedOutcomeStore {
-  return new EncryptedOutcomeStore(store, encryptionKey);
+export function createEncryptedStore(
+  store: IOutcomeStore,
+  encryptionKey: string,
+  options?: { allowDemoEncryption?: boolean }
+): EncryptedOutcomeStore {
+  return new EncryptedOutcomeStore(store, encryptionKey, options);
+}
+
+export function isLocalOutcomeBrowserPersistenceAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
+  return (
+    env.NODE_ENV === 'test' ||
+    (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_CAREEROS_ENABLE_LOCAL_OUTCOME_STORAGE === 'true')
+  );
+}
+
+export function isDemoOutcomeEncryptionAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.NODE_ENV === 'test' || (env.NODE_ENV === 'development' && env.CAREEROS_ENABLE_DEMO_OUTCOME_XOR_ENCRYPTION === 'true');
 }
 
 /**
@@ -767,7 +794,7 @@ export async function migrateStore(
       migrated++;
     } catch (err) {
       errors++;
-      console.error(`Failed to migrate record ${record.id}:`, err);
+      console.error('Failed to migrate outcome record safely.');
     }
   }
 

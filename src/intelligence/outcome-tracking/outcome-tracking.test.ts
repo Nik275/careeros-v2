@@ -23,6 +23,7 @@ import {
   type StudentOutcomeRecord,
   type OutcomeRecordId,
   type StudentId,
+  type PredictionId,
   type Prediction,
   type CareerDecisionOutcome,
   type EducationOutcome,
@@ -123,9 +124,72 @@ function createMockBaseline() {
   };
 }
 
+const toPredictionId = (value: string): PredictionId => value as PredictionId;
+
+function createMockOutcomeRecord(overrides: Partial<StudentOutcomeRecord> = {}): StudentOutcomeRecord {
+  const studentId = overrides.studentId ?? ('student-1' as StudentId);
+
+  return {
+    id: 'rec-1' as OutcomeRecordId,
+    studentId,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    status: 'ACTIVE',
+    baseline: {
+      timestamp: Date.now(),
+      ...createMockBaseline(),
+    } as StudentOutcomeRecord['baseline'],
+    outcomes: {
+      careerDecisions: [],
+      education: [],
+      colleges: [],
+      skills: [],
+      internships: [],
+      jobs: [],
+      explorations: [],
+    },
+    psychological: {
+      confidence: {
+        baseline: 65,
+        measurements: [],
+        trend: 'STABLE',
+        growthRate: 0,
+        keyDrivers: [],
+        inhibitors: [],
+      },
+      clarity: {
+        baseline: 60,
+        measurements: [],
+        trend: 'STABLE',
+        growthRate: 0,
+        decisionClarity: 60,
+        pathClarity: 60,
+      },
+      wellbeing: {
+        baseline: 70,
+        measurements: [],
+        trend: 'STABLE',
+        stressEvents: [],
+        supportSystemEffectiveness: 70,
+      },
+    },
+    growth: {
+      profile: createInitialGrowthProfile(studentId),
+      snapshots: [],
+    },
+    timeline: [],
+    predictions: [],
+    comparisons: [],
+    recommendationAccuracy: [],
+    qualityAssessments: [],
+    metadata: { dataQuality: 100, completeness: 100, lastMeasurement: Date.now(), version: 1 },
+    ...overrides,
+  };
+}
+
 function createMockPrediction(overrides: Partial<Prediction> = {}): Prediction {
   return {
-    id: `pred-${Date.now()}`,
+    id: toPredictionId(`pred-${Date.now()}`),
     timestamp: Date.now(),
     predictionType: 'CAREER_SUCCESS',
     target: 'software-engineer',
@@ -700,31 +764,10 @@ describe('InMemoryOutcomeStore', () => {
 
   describe('CRUD Operations', () => {
     it('should save and load record', async () => {
-      const record = {
-        id: 'rec-1',
-        studentId: 'student-1',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        status: 'ACTIVE',
-        baseline: {} as any,
-        outcomes: {
-        careerDecisions: [],
-        education: [],
-        colleges: [],
-        skills: [],
-        internships: [],
-        jobs: [],
-        explorations: [],
-      } as any,
-        psychological: {} as any,
-        growth: {} as any,
-        timeline: [],
-        predictions: [],
-        comparisons: [],
-        recommendationAccuracy: [],
-        qualityAssessments: [],
-        metadata: { dataQuality: 100, completeness: 100, lastMeasurement: Date.now(), version: 1 },
-      } as StudentOutcomeRecord;
+      const record = createMockOutcomeRecord({
+        id: 'rec-1' as OutcomeRecordId,
+        studentId: 'student-1' as StudentId,
+      });
 
       await store.save(record);
       const loaded = await store.load('rec-1' as OutcomeRecordId);
@@ -734,23 +777,10 @@ describe('InMemoryOutcomeStore', () => {
     });
 
     it('should load by student ID', async () => {
-      const record = {
-        id: 'rec-2',
-        studentId: 'student-2',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        status: 'ACTIVE',
-        baseline: {} as any,
-        outcomes: {} as any,
-        psychological: {} as any,
-        growth: {} as any,
-        timeline: [],
-        predictions: [],
-        comparisons: [],
-        recommendationAccuracy: [],
-        qualityAssessments: [],
-        metadata: { dataQuality: 100, completeness: 100, lastMeasurement: Date.now(), version: 1 },
-      } as StudentOutcomeRecord;
+      const record = createMockOutcomeRecord({
+        id: 'rec-2' as OutcomeRecordId,
+        studentId: 'student-2' as StudentId,
+      });
 
       await store.save(record);
       const loaded = await store.loadByStudent('student-2' as StudentId);
@@ -764,23 +794,10 @@ describe('InMemoryOutcomeStore', () => {
     });
 
     it('should delete record', async () => {
-      const record = {
-        id: 'rec-3',
-        studentId: 'student-3',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        status: 'ACTIVE',
-        baseline: {} as any,
-        outcomes: {} as any,
-        psychological: {} as any,
-        growth: {} as any,
-        timeline: [],
-        predictions: [],
-        comparisons: [],
-        recommendationAccuracy: [],
-        qualityAssessments: [],
-        metadata: { dataQuality: 100, completeness: 100, lastMeasurement: Date.now(), version: 1 },
-      } as StudentOutcomeRecord;
+      const record = createMockOutcomeRecord({
+        id: 'rec-3' as OutcomeRecordId,
+        studentId: 'student-3' as StudentId,
+      });
 
       await store.save(record);
       await store.delete('rec-3' as OutcomeRecordId);
@@ -794,23 +811,12 @@ describe('InMemoryOutcomeStore', () => {
     beforeEach(async () => {
       // Add test records
       for (let i = 0; i < 5; i++) {
-        await store.save({
-          id: `rec-${i}`,
-          studentId: `student-${i}`,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
+        await store.save(createMockOutcomeRecord({
+          id: `rec-${i}` as OutcomeRecordId,
+          studentId: `student-${i}` as StudentId,
           status: i < 3 ? 'ACTIVE' : 'COMPLETED',
-          baseline: { recommendations: [{ careerId: 'career-1' }] } as any,
-          outcomes: {} as any,
-          psychological: {} as any,
-          growth: {} as any,
-          timeline: [],
-          predictions: [],
-          comparisons: [],
-          recommendationAccuracy: [],
-          qualityAssessments: [],
           metadata: { dataQuality: 80 + i, completeness: 100, lastMeasurement: Date.now(), version: 1 },
-        } as StudentOutcomeRecord);
+        }));
       }
     });
 

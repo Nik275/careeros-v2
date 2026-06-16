@@ -31,7 +31,7 @@ import {
   NON_FOUNDER_PATTERN_MAP, 
   NonFounderPattern,
   DIFFERENTIAL_FOUNDER_INDICATORS,
-  SignalPattern,
+  resolveDifferentialIndicatorDimension,
 } from './signals';
 
 /**
@@ -427,7 +427,7 @@ export class FalsePositiveProtectionEngineV2 {
             evidence.push({
               id: `counter_${profile}_${Date.now()}`,
               type: indicator.evidenceType,
-              dimension: indicator.dimension,
+              dimension: resolveDifferentialIndicatorDimension(indicator),
               strength: indicator.strength,
               description: `Counters ${getNonFounderProfileLabelV2(profile)}: ${indicator.description}`,
               source,

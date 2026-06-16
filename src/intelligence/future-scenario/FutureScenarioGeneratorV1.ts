@@ -21,12 +21,36 @@
 
 import type {
   StudentBeliefV3,
-  ExploredCareerPath,
-  PathType,
-  PathMetrics,
-  CareerNode,
-  CareerEdge,
 } from '../types/index.js';
+
+type PathType = any;
+type PathMetrics = any;
+interface CareerNode {
+  id: string;
+  name: string;
+  type?: string;
+  typicalDuration?: number;
+  typicalExperienceYears?: number;
+  skillsGained?: string[];
+  financialCost?: {
+    typical?: number;
+  };
+  outcomes?: {
+    averageSalary?: number;
+  };
+}
+
+interface CareerEdge {
+  fromNodeId: string;
+  toNodeId: string;
+  probability?: number;
+  probabilityOfSuccess?: number;
+  difficulty?: number;
+  transitionDifficulty?: number;
+  transitionType: string;
+  description: string;
+  prerequisites: Array<string | { name?: string; description?: string; requirement?: string; type?: string }>;
+}
 
 import type {
   OptionalityAnalysis,
@@ -420,6 +444,32 @@ function calculateSeniority(yearsInRole: number): CareerState['seniority'] {
   return 'leadership';
 }
 
+function getEdgeProbability(edge: CareerEdge): number {
+  return edge.probability ?? edge.probabilityOfSuccess ?? 0.5;
+}
+
+function getEdgeDifficulty(edge: CareerEdge): number {
+  if (edge.difficulty !== undefined) {
+    return edge.difficulty;
+  }
+
+  if (edge.transitionDifficulty !== undefined) {
+    return edge.transitionDifficulty > 1 ? edge.transitionDifficulty / 100 : edge.transitionDifficulty;
+  }
+
+  return 0.5;
+}
+
+function getEdgePrerequisites(edge: CareerEdge): string[] {
+  return edge.prerequisites.map((prerequisite) => {
+    if (typeof prerequisite === 'string') {
+      return prerequisite;
+    }
+
+    return prerequisite.description ?? prerequisite.name ?? prerequisite.requirement ?? prerequisite.type ?? 'Prerequisite';
+  });
+}
+
 /**
  * Calculate income based on node type, seniority, and scenario adjustments
  */
@@ -561,14 +611,14 @@ function generateRiskFactors(
   const baseProbability = config.riskAdjustments[scenarioType];
 
   // Transition risks
-  basePath.edges.forEach((edge, index) => {
+  basePath.edges?.forEach((edge, index) => {
     const risk: RiskFactor = {
       id: generateId('risk-transition'),
       name: `Transition Risk: ${edge.fromNodeId} → ${edge.toNodeId}`,
       description: `Risk of unsuccessful transition between career stages`,
       category: 'transition',
-      probability: Math.round(baseProbability * (1 - edge.probability) * 100),
-      impact: Math.round(edge.difficulty * 100),
+      probability: Math.round(baseProbability * (1 - getEdgeProbability(edge)) * 100),
+      impact: Math.round(getEdgeDifficulty(edge) * 100),
       riskScore: 0,
       isMitigated: scenarioType === 'conservative',
       mitigations: [
@@ -633,7 +683,7 @@ function generateRiskFactors(
   });
 
   // Calculate risk scores
-  risks.forEach(risk => {
+  risks.forEach((risk) => {
     risk.riskScore = Math.round((risk.probability * risk.impact) / 100);
   });
 
@@ -653,7 +703,7 @@ function generateMilestones(
   const achievementProbability = config.milestoneProbabilities[scenarioType];
 
   // Education milestones
-  basePath.nodes.forEach((node, index) => {
+  basePath.nodes?.forEach((node, index) => {
     if (node.type === 'exam' || node.type === 'degree') {
       const milestone: ScenarioMilestone = {
         id: generateId('milestone'),
@@ -674,7 +724,7 @@ function generateMilestones(
   });
 
   // Career transition milestones
-  basePath.edges.forEach((edge, index) => {
+  basePath.edges?.forEach((edge, index) => {
     const milestone: ScenarioMilestone = {
       id: generateId('milestone'),
       name: `Transition: ${edge.transitionType}`,
@@ -682,8 +732,8 @@ function generateMilestones(
       year: startYear + index + 1,
       type: 'transition',
       isAchieved: Math.random() < achievementProbability,
-      conditions: edge.prerequisites,
-      impact: edge.difficulty > 0.7 ? 'critical' : edge.difficulty > 0.4 ? 'major' : 'moderate',
+      conditions: getEdgePrerequisites(edge),
+      impact: getEdgeDifficulty(edge) > 0.7 ? 'critical' : getEdgeDifficulty(edge) > 0.4 ? 'major' : 'moderate',
     };
     milestones.push(milestone);
   });
@@ -713,6 +763,12 @@ function generateMilestones(
 // ============================================================================
 // MAIN GENERATOR CLASS
 // ============================================================================
+
+interface ExploredCareerPath {
+  id: string;
+  nodes: CareerNode[];
+  edges: CareerEdge[];
+}
 
 export class FutureScenarioGeneratorV1 {
   private config: ScenarioGeneratorConfig;
@@ -873,13 +929,13 @@ export class FutureScenarioGeneratorV1 {
     const states: CareerState[] = [];
     let currentYear = startYear;
 
-    basePath.nodes.forEach((node, index) => {
+    basePath.nodes?.forEach((node, index) => {
       const duration = node.typicalDuration || 1;
 
       const state: CareerState = {
         nodeId: node.id,
         name: node.name,
-        type: this.mapNodeType(node.type),
+        type: this.mapNodeType(node.type ?? 'career'),
         year: currentYear,
         duration,
         seniority: calculateSeniority(currentYear - startYear),
@@ -932,7 +988,7 @@ export class FutureScenarioGeneratorV1 {
     const states: EducationState[] = [];
     let currentYear = startYear;
 
-    basePath.nodes.forEach(node => {
+    basePath.nodes?.forEach((node) => {
       if (node.type === 'exam' || node.type === 'degree') {
         const duration = node.typicalDuration || 1;
         const cost = node.financialCost?.typical || 0;
@@ -1207,20 +1263,3 @@ export function generateFutureScenarios(
 // ============================================================================
 // EXPORTS
 // ============================================================================
-
-export type {
-  FutureScenario,
-  ScenarioType,
-  CareerState,
-  EducationState,
-  ScenarioMilestone,
-  IncomePoint,
-  FlexibilityPoint,
-  ScenarioMetrics,
-  ScenarioAssumptions,
-  RiskFactor,
-  ScenarioGenerationInput,
-  ScenarioGenerationResult,
-  ScenarioComparison,
-  ScenarioGeneratorConfig,
-};

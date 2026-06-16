@@ -5,13 +5,13 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+import * as CareerEvidenceModule from '../index';
 import {
   CareerEvidenceSystem,
   createEvidence,
   createEvidenceCollection,
   calculateAggregateConfidence,
   evidenceSourceToString,
-  confidenceLevelToString,
   validateEvidence,
   generateEvidenceId,
   generateCollectionId,
@@ -56,7 +56,7 @@ const createMockEvidence = (
   attributePath: overrides.attributePath ?? 'reward.incomePotential',
   value: overrides.value ?? 0.85,
   source: overrides.source ?? createMockSource(),
-  confidence: overrides.confidence ?? { score: 0.8, level: 'high', factors: ['Large sample size'] },
+  confidence: overrides.confidence ?? { score: 0.8, level: 0.8, factors: ['Large sample size'] },
   methodology: overrides.methodology ?? createMockMethodology(),
   notes: overrides.notes ?? 'Based on annual survey data',
   metadata: {
@@ -123,7 +123,7 @@ describe('Utility Functions', () => {
       );
 
       expect(evidence.confidence.score).toBe(0.5);
-      expect(evidence.confidence.level).toBe('moderate');
+      expect(evidence.confidence.level).toBe(0.5);
     });
 
     it('should accept custom confidence', () => {
@@ -133,19 +133,19 @@ describe('Utility Functions', () => {
         0.9,
         createMockSource(),
         createMockMethodology(),
-        { score: 0.9, level: 'very-high', factors: ['Expert consensus'] }
+        { score: 0.9, level: 0.9, factors: ['Expert consensus'] }
       );
 
       expect(evidence.confidence.score).toBe(0.9);
-      expect(evidence.confidence.level).toBe('very-high');
+      expect(evidence.confidence.level).toBe(0.9);
     });
   });
 
   describe('createEvidenceCollection', () => {
     it('should create collection from evidence items', () => {
       const items = [
-        createMockEvidence({ value: 0.8, confidence: { score: 0.7, level: 'high' } }),
-        createMockEvidence({ value: 0.85, confidence: { score: 0.8, level: 'high' } }),
+        createMockEvidence({ value: 0.8, confidence: { score: 0.7, level: 0.7 } }),
+        createMockEvidence({ value: 0.85, confidence: { score: 0.8, level: 0.8 } }),
       ];
 
       const collection = createEvidenceCollection(
@@ -164,18 +164,18 @@ describe('Utility Functions', () => {
   describe('calculateAggregateConfidence', () => {
     it('should return very-low for empty array', () => {
       const result = calculateAggregateConfidence([]);
-      expect(result.level).toBe('very-low');
+      expect(result.level).toBe(0);
       expect(result.score).toBe(0);
     });
 
     it('should calculate weighted average', () => {
       const items = [
         createMockEvidence({
-          confidence: { score: 0.9, level: 'very-high' },
+          confidence: { score: 0.9, level: 0.9 },
           source: createMockSource({ type: 'government-data' }), // High quality
         }),
         createMockEvidence({
-          confidence: { score: 0.5, level: 'moderate' },
+          confidence: { score: 0.5, level: 0.5 },
           source: createMockSource({ type: 'expert-opinion' }), // Lower quality
         }),
       ];
@@ -188,11 +188,11 @@ describe('Utility Functions', () => {
     it('should weight by source quality', () => {
       const items = [
         createMockEvidence({
-          confidence: { score: 0.7, level: 'high' },
+          confidence: { score: 0.7, level: 0.7 },
           source: createMockSource({ type: 'government-data' }),
         }),
         createMockEvidence({
-          confidence: { score: 0.7, level: 'high' },
+          confidence: { score: 0.7, level: 0.7 },
           source: createMockSource({ type: 'user-generated' }),
         }),
       ];
@@ -240,7 +240,7 @@ describe('Utility Functions', () => {
         value: 0.5,
         source: createMockSource(),
         methodology: createMockMethodology(),
-        confidence: { score: 1.5, level: 'high' },
+        confidence: { score: 1.5, level: 0.8 },
       } as Partial<CareerEvidence>);
       expect(result.isValid).toBe(false);
       expect(result.errors.some(e => e.field === 'confidence.score')).toBe(true);
@@ -266,11 +266,9 @@ describe('Utility Functions', () => {
     });
   });
 
-  describe('confidenceLevelToString', () => {
-    it('should convert confidence levels to readable strings', () => {
-      expect(confidenceLevelToString('very-high')).toBe('Very High');
-      expect(confidenceLevelToString('high')).toBe('High');
-      expect(confidenceLevelToString('moderate')).toBe('Moderate');
+  describe('confidence formatting ownership', () => {
+    it('should not export confidence formatting from evidence module', () => {
+      expect('confidenceLevelToString' in CareerEvidenceModule).toBe(false);
     });
   });
 });
@@ -362,14 +360,14 @@ describe('CareerEvidenceSystem', () => {
         careerId: 'career-1' as CareerId,
         attributePath: 'reward.incomePotential',
         source: createMockSource({ type: 'government-data' }),
-        confidence: { score: 0.9, level: 'very-high' },
+        confidence: { score: 0.9, level: 0.9 },
         metadata: { createdAt: Date.now(), lastUpdated: Date.now(), schemaVersion: EVIDENCE_SCHEMA_VERSION, isVerified: true, dataQuality: 'excellent' },
       }));
       system.addEvidence(createMockEvidence({
         careerId: 'career-2' as CareerId,
         attributePath: 'psychology.creativity',
         source: createMockSource({ type: 'expert-opinion' }),
-        confidence: { score: 0.5, level: 'moderate' },
+        confidence: { score: 0.5, level: 0.5 },
         metadata: { createdAt: Date.now(), lastUpdated: Date.now(), schemaVersion: EVIDENCE_SCHEMA_VERSION, isVerified: false, dataQuality: 'fair' },
       }));
     });
@@ -389,10 +387,10 @@ describe('CareerEvidenceSystem', () => {
     });
 
     it('should filter by confidence levels', () => {
-      const query: EvidenceQuery = { confidenceLevels: ['very-high'] };
+      const query: EvidenceQuery = { confidenceLevels: [0.9] };
       const results = system.queryEvidence(query);
       expect(results).toHaveLength(1);
-      expect(results[0].confidence.level).toBe('very-high');
+      expect(results[0].confidence.level).toBe(0.9);
     });
 
     it('should filter by verification status', () => {
@@ -415,13 +413,13 @@ describe('CareerEvidenceSystem', () => {
         careerId: 'career-1' as CareerId,
         attributePath: 'reward.incomePotential',
         value: 0.8,
-        confidence: { score: 0.7, level: 'high' },
+        confidence: { score: 0.7, level: 0.7 },
       }));
       system.addEvidence(createMockEvidence({
         careerId: 'career-1' as CareerId,
         attributePath: 'reward.incomePotential',
         value: 0.85,
-        confidence: { score: 0.8, level: 'high' },
+        confidence: { score: 0.8, level: 0.8 },
       }));
 
       const collection = system.createCollection('career-1' as CareerId, 'reward.incomePotential', 'weighted-average');
@@ -436,13 +434,13 @@ describe('CareerEvidenceSystem', () => {
         careerId: 'career-1' as CareerId,
         attributePath: 'reward.incomePotential',
         value: 0.8,
-        confidence: { score: 0.5, level: 'moderate' },
+        confidence: { score: 0.5, level: 0.5 },
       }));
       system.addEvidence(createMockEvidence({
         careerId: 'career-1' as CareerId,
         attributePath: 'reward.incomePotential',
         value: 0.9,
-        confidence: { score: 0.9, level: 'very-high' },
+        confidence: { score: 0.9, level: 0.9 },
       }));
 
       const collection = system.createCollection('career-1' as CareerId, 'reward.incomePotential', 'weighted-average');
@@ -456,13 +454,13 @@ describe('CareerEvidenceSystem', () => {
     it('should compare two evidence items', () => {
       const evidenceA = createMockEvidence({
         value: 0.9,
-        confidence: { score: 0.9, level: 'very-high' },
+        confidence: { score: 0.9, level: 0.9 },
         source: createMockSource({ type: 'government-data' }),
         metadata: { createdAt: Date.now(), lastUpdated: Date.now(), schemaVersion: EVIDENCE_SCHEMA_VERSION, isVerified: true, dataQuality: 'excellent' },
       });
       const evidenceB = createMockEvidence({
         value: 0.7,
-        confidence: { score: 0.5, level: 'moderate' },
+        confidence: { score: 0.5, level: 0.5 },
         source: createMockSource({ type: 'expert-opinion' }),
         metadata: { createdAt: Date.now() - 100000, lastUpdated: Date.now() - 100000, schemaVersion: EVIDENCE_SCHEMA_VERSION, isVerified: false, dataQuality: 'fair' },
       });
@@ -702,11 +700,11 @@ describe('Evidence Source Types', () => {
   it('should rank source quality correctly', () => {
     system.addEvidence(createMockEvidence({
       source: createMockSource({ type: 'government-data' }),
-      confidence: { score: 0.7, level: 'high' },
+      confidence: { score: 0.7, level: 0.7 },
     }));
     system.addEvidence(createMockEvidence({
       source: createMockSource({ type: 'user-generated' }),
-      confidence: { score: 0.7, level: 'high' },
+      confidence: { score: 0.7, level: 0.7 },
     }));
 
     const collection = system.createCollection('career-1' as CareerId, 'reward.incomePotential');

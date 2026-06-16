@@ -355,7 +355,7 @@ class LearningReportEngine implements ILearningReportEngine {
       recentAccuracy < previousAccuracy - 5 ? 'DECLINING' : 'STABLE';
 
     // Determine recommendations
-    const recommendations = this.generateRecommendations(insights, weakest);
+    const actionRecommendations = this.generateRecommendations(insights, weakest);
 
     return {
       reportId: `rep-${Date.now()}`,
@@ -390,7 +390,7 @@ class LearningReportEngine implements ILearningReportEngine {
         trend,
       },
       insights,
-      recommendations,
+      actions: actionRecommendations,
     };
   }
 

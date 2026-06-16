@@ -11,12 +11,11 @@
  * Purpose: Help users understand which skills will be valuable.
  */
 
-import type { Forecast } from './models/Forecast';
+import type { Forecast, ForecastHorizon, ForecastSignal } from './models/Forecast';
 import { createForecast, calculateExpectedValues } from './models/Forecast';
 import type { ForecastScenario } from './models/ForecastScenario';
 import type { ForecastConfidence } from './models/ForecastConfidence';
 import type { ForecastEvidence } from './models/ForecastEvidence';
-import type { ForecastHorizon } from './models/Forecast';
 import { ScenarioGenerator, createScenarioGenerator } from './ScenarioGenerator';
 import { ConfidenceForecastEngine, createConfidenceForecastEngine } from './ConfidenceForecastEngine';
 
@@ -37,18 +36,13 @@ export interface SkillForecastInputs {
   historicalDemand: Array<{ timestamp: Date; value: number }>;
 
   /** Adoption trend */
-  adoptionTrend: Array<{ timestamp: Date; value: number };
+  adoptionTrend: Array<{ timestamp: Date; value: number }>;
 
   /** Job posting mentions */
   jobMentions: Array<{ timestamp: Date; count: number }>;
 
   /** Market signals */
-  signals: Array<{
-    timestamp: Date;
-    type: string;
-    strength: number;
-    direction: 'positive' | 'negative' | 'neutral';
-  }>;
+  signals: ForecastSignal[];
 
   /** Supporting evidence */
   evidence: ForecastEvidence[];
@@ -222,9 +216,6 @@ export class SkillForecastEngine {
       scenarioProbabilities: probabilities,
       expectedValue: calculateExpectedValues(scenarios, probabilities),
       status: 'ready',
-      generatedAt: new Date(),
-      expiresAt: this.calculateExpiry(horizon),
-      version: 1,
       inputs: {
         dataPoints: inputs.historicalDemand.length,
         timeRange: {
@@ -380,9 +371,6 @@ export class SkillForecastEngine {
       scenarioProbabilities: { optimistic: 0.25, baseline: 0.5, pessimistic: 0.25 },
       expectedValue: calculateExpectedValues(scenarios, { optimistic: 0.25, baseline: 0.5, pessimistic: 0.25 }),
       status: 'ready',
-      generatedAt: new Date(),
-      expiresAt: this.calculateExpiry(horizon),
-      version: 1,
       inputs: {
         dataPoints: 0,
         timeRange: { start: new Date(), end: new Date() },

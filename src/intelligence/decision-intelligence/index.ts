@@ -21,7 +21,6 @@ export * from './decision-model';
 export {
   TradeoffEngine,
   createTradeoffEngine,
-  createDecisionMatrix,
   analyzeQuickTradeoff,
   resolveTradeoff,
 } from './tradeoff-engine';
@@ -59,14 +58,43 @@ export {
   generateQuickScenario,
 } from './scenario-engine';
 
+// Export legacy V1 synthesizer compatibility surface
+export {
+  DecisionIntelligenceEngineV1,
+  generateDecision,
+} from './DecisionIntelligenceEngineV1';
+
+export type {
+  DecisionIntelligenceId,
+  DecisionTier,
+  DecisionUrgency,
+  RecommendationStrength,
+  RecommendationCaveat,
+  DecisionRecommendation,
+  DecisionAlternative,
+  DecisionConfidence,
+  DecisionReasoning,
+  DecisionTradeoffs,
+  DecisionFactors,
+  PathDecisionScore,
+  DecisionIntelligenceOptions,
+  DecisionRecommendationOutput,
+} from './DecisionIntelligenceEngineV1';
+
 // Export master orchestrator
 export {
   DecisionIntelligenceEngine,
+  DecisionInputValidationError,
   createDecisionIntelligenceEngine,
   analyzeDecision,
   generateDecisionReport,
   quickDecisionCheck,
   isDecisionReady,
+} from './decision-intelligence-engine';
+
+export type {
+  DecisionInputValidationCode,
+  DecisionInputValidationDetails,
 } from './decision-intelligence-engine';
 
 // Default export

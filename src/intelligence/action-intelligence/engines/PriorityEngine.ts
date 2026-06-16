@@ -14,17 +14,17 @@
 
 import type {
   Action,
-  ActionPriority,
   PrioritizedAction,
   PriorityScore,
   PriorityRoadmap,
   ActionIntelligenceInput,
-  TimeHorizon,
 } from '../types';
 
 import {
+  ActionPriority,
   calculateOverallPriorityScore,
   getPriorityWeight,
+  TimeHorizon,
 } from '../types';
 
 /**

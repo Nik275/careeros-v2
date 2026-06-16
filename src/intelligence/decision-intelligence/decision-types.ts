@@ -10,10 +10,21 @@
  * @version 1.0.0
  */
 
-import type { DimensionScoreMap, PsychologyProfile } from '../../assessment/assessment-types';
+import type { DimensionScoreMap } from '../../assessment/assessment-types';
+import type { PsychologyProfile } from '../../domains/student/StudentProfile';
 import type { CareerRecommendation, RecommendationSet } from '../../recommendation/recommendation-types';
-import type { LongitudinalPattern } from '../../mentor/mentor-intelligence-types';
-import type { Contradiction, Lesson, Mistake } from '../recommendation-stability/recommendation-stability-types';
+import type {
+  ExtractedLesson as Lesson,
+  LongitudinalPattern,
+  MistakeAnalysis as Mistake,
+} from '../../mentor-intelligence/mentor-intelligence-types';
+import type { Contradiction } from '../recommendation-stability/recommendation-stability-types';
+
+export type { Contradiction } from '../recommendation-stability/recommendation-stability-types';
+export type {
+  ExtractedLesson as Lesson,
+  MistakeAnalysis as Mistake,
+} from '../../mentor-intelligence/mentor-intelligence-types';
 
 // ============================================================================
 // CORE DECISION TYPES
@@ -163,6 +174,9 @@ export interface ReversibilityEstimate {
  * Decision context
  */
 export interface DecisionContext {
+  decisionType?: string;
+  options?: string[];
+  constraints?: string[];
   familyExpectations: string[];
   peerInfluence: string[];
   culturalFactors: string[];
@@ -264,6 +278,28 @@ export interface TradeoffResolution {
   recommended: 'BALANCE' | 'PRIORITIZE_A' | 'PRIORITIZE_B' | 'INTEGRATE' | 'DEFER';
   rationale: string;
   conditions: string[];
+}
+
+/**
+ * Predefined framework metadata for resolving a common tradeoff dimension.
+ */
+export interface TradeoffFramework {
+  type: TradeoffDimension;
+  name: string;
+  description: string;
+  dimensionA: {
+    name: string;
+    description: string;
+    weight: number;
+  };
+  dimensionB: {
+    name: string;
+    description: string;
+    weight: number;
+  };
+  resolutionStrategies: string[];
+  commonScenarios: string[];
+  intensityIndicators: string[];
 }
 
 /**
@@ -558,6 +594,15 @@ export type PathType =
   | 'FASTEST_TO_IMPLEMENT'
   | 'MOST_ALIGNS_WITH_VALUES';
 
+export const DECISION_READINESS_STATUSES = [
+  'READY',
+  'NEEDS_MORE_INFO',
+  'NEEDS_TIME',
+  'NOT_READY',
+] as const;
+
+export type DecisionReadinessStatus = (typeof DECISION_READINESS_STATUSES)[number];
+
 /**
  * Complete decision analysis
  */
@@ -580,7 +625,7 @@ export interface DecisionAnalysis {
 
   // Overall assessment
   decisionConfidence: number; // 0-100
-  decisionReadiness: 'READY' | 'NEEDS_MORE_INFO' | 'NEEDS_TIME' | 'NOT_READY';
+  decisionReadiness: DecisionReadinessStatus;
   urgencyAssessment: DecisionUrgency;
 
   // Explanations
@@ -665,7 +710,7 @@ export interface DecisionSummary {
  * Decision readiness assessment
  */
 export interface DecisionReadiness {
-  status: 'READY' | 'NEEDS_INFO' | 'NEEDS_TIME' | 'NOT_READY';
+  status: DecisionReadinessStatus;
   missingInformation: string[];
   recommendedPreparation: string[];
   estimatedReadinessDate?: Date;

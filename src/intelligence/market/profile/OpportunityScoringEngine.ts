@@ -18,6 +18,19 @@ import type { OpportunityScoreBreakdown } from './models/MarketScoreBreakdown';
 import type { CareerMarketProfile } from './models/CareerMarketProfile';
 import type { OpportunityAnalysis, CareerStrength, CareerWeakness, CareerOpportunity, CareerRisk } from './models/OpportunityAnalysis';
 
+export type OpportunityScoreInput = Pick<
+  CareerMarketProfile,
+  | 'careerId'
+  | 'demandScore'
+  | 'salaryScore'
+  | 'growthScore'
+  | 'scarcityScore'
+  | 'automationRiskScore'
+  | 'futureResilienceScore'
+  | 'confidence'
+  | 'trendDirection'
+>;
+
 /**
  * Configuration for opportunity scoring.
  */
@@ -70,7 +83,7 @@ export class OpportunityScoringEngine {
   /**
    * Calculate opportunity score from career profile.
    */
-  calculateScore(profile: CareerMarketProfile): {
+  calculateScore(profile: OpportunityScoreInput): {
     score: number;
     breakdown: OpportunityScoreBreakdown;
   } {
@@ -208,7 +221,7 @@ export class OpportunityScoringEngine {
   /**
    * Calculate risk adjustment factor.
    */
-  private calculateRiskFactor(automationRisk: number, profile: CareerMarketProfile): number {
+  private calculateRiskFactor(automationRisk: number, profile: OpportunityScoreInput): number {
     // Automation risk reduces opportunity
     const automationFactor = 1 - (automationRisk / 200); // 0-50% reduction
 
@@ -224,7 +237,7 @@ export class OpportunityScoringEngine {
   /**
    * Assess market timing.
    */
-  private assessMarketTiming(profile: CareerMarketProfile): OpportunityScoreBreakdown['marketTiming'] {
+  private assessMarketTiming(profile: OpportunityScoreInput): OpportunityScoreBreakdown['marketTiming'] {
     const scores = [
       profile.demandScore,
       profile.salaryScore,
@@ -455,7 +468,7 @@ export class OpportunityScoringEngine {
    */
   private assessCompetitiveLandscape(profile: CareerMarketProfile): OpportunityAnalysis['competitiveLandscape'] {
     return {
-      barriersToEntry: profile.scarcityScore >= 60 ? 'low' : profile.skillPriorities.length > 5 ? 'high' : 'medium',
+      barriersToEntry: profile.scarcityScore >= 60 ? 'low' : (profile.skillPriorities?.length ?? 0) > 5 ? 'high' : 'medium',
       competitionIntensity: profile.demandScore >= 70 ? 'medium' : 'high',
       differentiationPotential: profile.futureResilienceScore >= 70 ? 'high' : 'medium',
     };

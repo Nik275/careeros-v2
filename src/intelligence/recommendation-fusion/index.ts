@@ -13,6 +13,10 @@
 // ============================================================================
 
 export {
+  DEFAULT_FUSION_CONFIG,
+} from './fusion-types';
+
+export type {
   // Core types
   EngineId,
   RecommendationId,
@@ -48,7 +52,6 @@ export {
 
   // Config
   FusionConfig,
-  DEFAULT_FUSION_CONFIG,
 
   // Events
   FusionEvent,
@@ -61,23 +64,32 @@ export {
 
 export {
   PsychologyWeightEngine,
-  PsychologyWeightConfig,
   DEFAULT_PSYCHOLOGY_CONFIG,
+} from './psychology-weight-engine';
+
+export type {
+  PsychologyWeightConfig,
   PsychologyProfile,
   CareerPsychologyFit,
 } from './psychology-weight-engine';
 
 export {
   CareerWeightEngine,
-  CareerWeightConfig,
   DEFAULT_CAREER_CONFIG,
+} from './career-weight-engine';
+
+export type {
+  CareerWeightConfig,
   CareerFactors,
 } from './career-weight-engine';
 
 export {
   MentorWeightEngine,
-  MentorWeightConfig,
   DEFAULT_MENTOR_CONFIG,
+} from './mentor-weight-engine';
+
+export type {
+  MentorWeightConfig,
   MentorProfile,
   CareerMentorFit,
   MentorPattern,
@@ -86,8 +98,11 @@ export {
 
 export {
   LearningWeightEngine,
-  LearningWeightConfig,
   DEFAULT_LEARNING_CONFIG,
+} from './learning-weight-engine';
+
+export type {
+  LearningWeightConfig,
   LearningLoopReport,
   CareerLearningFit,
   PopulationOutcome,
@@ -97,8 +112,11 @@ export {
 
 export {
   ContradictionWeightEngine,
-  ContradictionConfig,
   DEFAULT_CONTRADICTION_CONFIG,
+} from './contradiction-weight-engine';
+
+export type {
+  ContradictionConfig,
   ValueConflict,
   GoalConflict,
   IdentityConflict,
@@ -109,28 +127,40 @@ export {
 
 export {
   ConfidenceFusionEngine,
-  ConfidenceFusionConfig,
   DEFAULT_CONFIDENCE_CONFIG,
+} from './confidence-fusion-engine';
+
+export type {
+  ConfidenceFusionConfig,
   ConfidenceInputs,
 } from './confidence-fusion-engine';
 
 export {
   RecommendationRankingEngine,
-  RankingConfig,
   DEFAULT_RANKING_CONFIG,
+} from './recommendation-ranking-engine';
+
+export type {
+  RankingConfig,
   RankingInput,
   HistoricalRanking,
 } from './recommendation-ranking-engine';
 
 export {
   FusionExplanationEngine,
-  ExplanationConfig,
   DEFAULT_EXPLANATION_CONFIG,
+} from './fusion-explanation-engine';
+
+export type {
+  ExplanationConfig,
   ExplanationOutput,
 } from './fusion-explanation-engine';
 
 export {
   RecommendationFusionEngine,
+} from './recommendation-fusion-engine';
+
+export type {
   RecommendationFusionEngineConfig,
 } from './recommendation-fusion-engine';
 

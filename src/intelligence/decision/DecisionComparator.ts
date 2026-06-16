@@ -57,6 +57,19 @@ export interface IDecisionComparator {
   }>;
 
   /**
+   * Compare two pre-scored options synchronously.
+   */
+  comparePairwise<T = unknown>(
+    optionA: DecisionOption<T>,
+    optionB: DecisionOption<T>,
+    scoreFields?: ReadonlyArray<string>
+  ): {
+    winner: string | 'equal';
+    optionA: { id: string; score: number };
+    optionB: { id: string; score: number };
+  };
+
+  /**
    * Get comparator version.
    */
   getVersion(): string;
@@ -149,6 +162,25 @@ export class DecisionComparator implements IDecisionComparator {
       outcome,
       confidence,
       rationale,
+    };
+  }
+
+  comparePairwise<T = unknown>(
+    optionA: DecisionOption<T>,
+    optionB: DecisionOption<T>,
+    scoreFields: ReadonlyArray<string> = []
+  ): {
+    winner: string | 'equal';
+    optionA: { id: string; score: number };
+    optionB: { id: string; score: number };
+  } {
+    const scoreA = this.extractComparableScore(optionA, scoreFields);
+    const scoreB = this.extractComparableScore(optionB, scoreFields);
+
+    return {
+      winner: scoreA > scoreB ? optionA.id : scoreB > scoreA ? optionB.id : 'equal',
+      optionA: { id: optionA.id, score: scoreA },
+      optionB: { id: optionB.id, score: scoreB },
     };
   }
 
@@ -350,6 +382,22 @@ export class DecisionComparator implements IDecisionComparator {
    */
   private extractScore<T>(option: DecisionOption<T>): number {
     return option.metadata?.sourceConfidence ?? 0.5;
+  }
+
+  private extractComparableScore<T>(
+    option: DecisionOption<T>,
+    scoreFields: ReadonlyArray<string>
+  ): number {
+    const metadata = option.metadata;
+
+    for (const field of scoreFields) {
+      const value = metadata?.[field];
+      if (typeof value === 'number') {
+        return value;
+      }
+    }
+
+    return this.extractScore(option);
   }
 
   /**

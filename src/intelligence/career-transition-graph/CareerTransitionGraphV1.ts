@@ -26,7 +26,7 @@
  *   Lawyer → Judge
  */
 
-import type { Career, PsychologicalProfile, SkillProfile } from '../../domains/career/Career';
+import type { Career, PsychologicalProfile } from '../../domains/career/Career';
 
 // ============================================================================
 // CORE TYPES
@@ -1429,23 +1429,3 @@ export function getReachableCareersFrom(
 ): ReachableCareer[] {
   return graph.getReachableCareers(careerId, options);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  CareerNode,
-  CareerEdge,
-  CareerTransitionPath,
-  AdjacentCareer,
-  ReachableCareer,
-  GraphStatistics,
-  GraphTraversalOptions,
-  ShortestPathOptions,
-  TransitionType,
-  TransitionPrerequisite,
-  SkillCategory,
-  NodeId,
-  EdgeId,
-};

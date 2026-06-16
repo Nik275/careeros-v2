@@ -1,423 +1,234 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
-import { AmbientBlobs } from '@/components/background/AmbientBlobs';
-import { ActiveParticles } from '@/components/background/ActiveParticles';
-import { WhyCareerOS } from '@/components/sections/WhyCareerOS';
-import { WhyCareerOSDifferent } from '@/components/sections/WhyCareerOSDifferent';
-import { WhyCareerOSIsDifferent } from '@/components/sections/WhyCareerOSIsDifferent';
-import { HowCareerOSWorks } from '@/components/sections/HowCareerOSWorks';
-import { WhyCareerOSComparison } from '@/components/sections/WhyCareerOSComparison';
-import { WhatCareerOSDoes } from '@/components/sections/WhatCareerOSDoes';
-import { InsideCareerOS } from '@/components/sections/InsideCareerOS';
-import { ProblemReframe } from '@/components/sections/ProblemReframe';
-import { WhyStudentsTrust } from '@/components/sections/WhyStudentsTrust';
-import { FinalCTA } from '@/components/sections/FinalCTA';
-import { Footer } from '@/components/sections/Footer';
-import { ease, duration, stagger } from '@/lib/motion';
+import Link from 'next/link';
+import { CareerGlobeBackground } from '@/components/landing/CareerGlobeBackground';
+import { SignalNode } from '@/components/landing/SignalNode';
+import { DecisionModel } from '@/components/landing/DecisionModel';
+import { ProductPreviewPanel } from '@/components/landing/ProductPreviewPanel';
+import { HeroAssessmentButton } from '@/components/landing/HeroAssessmentButton';
 
 export default function WelcomePage() {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
-
-  // Unified container variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: stagger.relaxed,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: duration.slow,
-        ease: ease.luxury,
-      },
-    },
-  };
-
   return (
-    <>
-      {/* Fixed Background Layers - Behind all content */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      >
-        {/* Base Background */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: duration.normal, ease: ease.luxury }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: '#F8F5EE',
-          }}
-        />
+    <div className="min-h-screen bg-black text-white selection:bg-[#8052ff]/30 selection:text-white font-sans relative">
+      {/* 1. Deep Space Cosmic Background */}
+      <CareerGlobeBackground variant="landing" />
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 bg-black/80 backdrop-blur-md border-b border-white/[0.04]">
+        <div className="text-[17px] font-semibold tracking-tight">CareerOS</div>
+        <div className="hidden md:flex items-center gap-10 text-[12px] font-medium tracking-[0.15em] text-white/50">
+          <Link href="#how-it-works" className="hover:text-white transition-colors uppercase">How it works</Link>
+          <Link href="#intelligence" className="hover:text-white transition-colors uppercase">Intelligence</Link>
+        </div>
+        <Link href="/assessment">
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-6 py-3 md:py-2 rounded-full bg-[#8052ff] text-white text-[13px] font-semibold tracking-[0.05em] hover:bg-[#6c42db] transition-colors"
+          >
+            START
+          </motion.button>
+        </Link>
+      </nav>
 
-        {/* Blobs */}
-        <AmbientBlobs />
+      {/* Hero Section */}
+      <section className="relative min-h-[100svh] pt-32 md:pt-24 flex flex-col md:flex-row overflow-hidden border-b border-white/[0.04]">
+        {/* Left Content */}
+        <div className="w-full md:w-5/12 flex flex-col justify-center px-6 md:px-16 lg:px-24 z-20 py-20 md:py-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent md:bg-none">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="text-[#8052ff] text-[11px] font-semibold tracking-[0.2em] uppercase mb-8">
+              Career Intelligence for High-Stakes Decisions
+            </div>
+            <h1 className="text-[clamp(40px,10vw,72px)] font-light tracking-tight leading-[1.05] mb-8 text-white break-words">
+              You are not confused.<br className="hidden md:block" />
+              <span className="text-white/40">You are under-modeled.</span>
+            </h1>
+            <p className="text-[#9a9a9a] text-[17px] md:text-[20px] font-light leading-[1.6] max-w-[480px] mb-12">
+              CareerOS maps your psychology, constraints, ambition, and future options — then helps you choose the path with the strongest long-term life fit.
+            </p>
+            
+            <div className="flex flex-col items-start gap-4">
+              <HeroAssessmentButton />
+              <span className="text-[#9a9a9a] text-[12px] tracking-wide ml-4">
+                3 minutes • no signup required
+              </span>
+            </div>
+          </motion.div>
+        </div>
 
-        {/* Particles */}
-        <ActiveParticles />
+        {/* Right Visual (Removed Constellation, now global) */}
+        <div className="w-full md:w-7/12 h-[60vh] md:h-auto relative z-10 pointer-events-none">
+          
+          {/* Floating System Stats */}
+          <div className="absolute bottom-10 right-10 flex flex-col gap-2 pointer-events-none z-20 hidden md:flex">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#15846e] animate-pulse" />
+              <div className="text-[#9a9a9a] text-[10px] font-mono tracking-widest uppercase">MODEL SIGNALS: 42</div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#ffb829] animate-pulse" />
+              <div className="text-[#9a9a9a] text-[10px] font-mono tracking-widest uppercase">REGRET RISK: ANALYZING</div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#8052ff] animate-pulse" />
+              <div className="text-[#9a9a9a] text-[10px] font-mono tracking-widest uppercase">PATH FIT: CALIBRATING</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* Light Flow - refined ambient glow */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '85%',
-            height: '80%',
-            transform: 'translate(-50%, -50%)',
-            animation: 'lightFlow 12s ease-in-out infinite alternate',
-          }}
+      {/* Section 1: Signals */}
+      <section id="how-it-works" className="py-16 md:py-32 px-6 md:px-16 lg:px-24 border-b border-white/[0.04]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          className="max-w-[700px] mb-12 md:mb-16 relative z-10 bg-black/40 md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 -ml-4 md:ml-0"
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, rgba(252,250,245,0.04) 50%, transparent 80%)',
-              filter: 'blur(60px)',
-            }}
+          <h2 className="text-[clamp(32px,8vw,60px)] leading-[1.1] font-light tracking-tight mb-6">
+            Most students are not choosing careers.<br className="hidden md:block"/>
+            <span className="text-white/40">They are reacting.</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SignalNode 
+            index={0}
+            title="Parent expectations" 
+            description="The path is often chosen before the student understands themselves." 
+          />
+          <SignalNode 
+            index={1}
+            title="Marks-based identity" 
+            description="One exam score starts acting like a personality test." 
+          />
+          <SignalNode 
+            index={2}
+            title="Money pressure" 
+            description="Financial urgency changes what 'best career' actually means." 
+          />
+          <SignalNode 
+            index={3}
+            title="Too many options" 
+            description="More choices do not create clarity. They create decision paralysis." 
+          />
+          <SignalNode 
+            index={4}
+            title="College tier disadvantage" 
+            description="Brand, network, and access quietly shape outcomes." 
+          />
+          <SignalNode 
+            index={5}
+            title="Fear of choosing wrong" 
+            description="The real fear is losing years to a path that never fit." 
           />
         </div>
-      </div>
+      </section>
 
-      {/* Scrollable Content */}
-      <main style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
-        {/* Hero Section */}
-        <section
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 'clamp(24px, 6vh, 48px) 0 clamp(60px, 10vh, 100px)',
-            width: '100%',
-            maxWidth: '100%',
-          }}
+      {/* Section 2: Decision Model */}
+      <section id="intelligence" className="py-16 md:py-32 px-6 md:px-16 lg:px-24 border-b border-white/[0.04] relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(128,82,255,0.06)_0%,transparent_60%)] pointer-events-none" />
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          className="max-w-[800px] mb-8 relative z-10 bg-black/40 md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 -ml-4 md:ml-0"
         >
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            style={{
-              width: '100%',
-              maxWidth: '800px',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              padding: '0 20px',
-              margin: '0 auto',
-              boxSizing: 'border-box',
-            }}
-          >
-            {/* Logo Chip */}
-            <motion.div
-              variants={itemVariants}
-              style={{ marginBottom: 'clamp(22px, 4.5vh, 42px)' }}
+          <h2 className="text-[clamp(32px,8vw,60px)] leading-[1.1] font-light tracking-tight">
+            CareerOS turns uncertainty<br className="hidden md:block"/>
+            into a <span className="text-white">decision model</span>.
+          </h2>
+        </motion.div>
+        
+        <DecisionModel />
+      </section>
+
+      {/* Section 3: Product Previews */}
+      <section className="py-16 md:py-32 px-6 md:px-16 lg:px-24 border-b border-white/[0.04]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          className="max-w-[700px] mb-12 md:mb-20 relative z-10 bg-black/40 md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 -ml-4 md:ml-0"
+        >
+          <h2 className="text-[clamp(32px,8vw,60px)] leading-[1.1] font-light tracking-tight mb-6">
+            <span className="text-white/40">Not career advice.</span><br className="hidden md:block"/>
+            A career operating system.
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1100px] mx-auto">
+          <ProductPreviewPanel 
+            index={0}
+            title="Psychological Career Profile"
+            items={["Natural strengths", "Motivation pattern", "Work style", "Pressure response"]}
+          />
+          <ProductPreviewPanel 
+            index={1}
+            isHighlight={true}
+            title="Best-Fit Direction"
+            items={["Recommended path", "Why it fits", "Tradeoffs", "Confidence score"]}
+          />
+          <ProductPreviewPanel 
+            index={2}
+            title="Regret Risk Map"
+            items={["Low / medium / high risk indicators", "Late realization risk", "Money mismatch risk", "Identity mismatch risk"]}
+          />
+          <ProductPreviewPanel 
+            index={3}
+            title="12-Month Execution Roadmap"
+            items={["Next 30 days", "3 months horizon", "6 months horizon", "12 months target"]}
+          />
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="min-h-[100svh] pt-[120px] pb-[96px] md:py-48 px-6 flex flex-col items-center justify-end md:justify-center text-center relative overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(128,82,255,0.06)_0%,transparent_60%)] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          className="relative z-10 flex flex-col items-center max-w-[600px] pointer-events-auto mt-auto md:mt-0"
+        >
+          <div className="text-[#8052ff] text-[10px] font-mono tracking-[0.2em] uppercase mb-6">
+            READY FOR MODEL INITIALIZATION
+          </div>
+          <h2 className="text-[clamp(36px,9vw,60px)] leading-[1.1] font-light tracking-tight mb-8 text-white">
+            Stop guessing your future.
+          </h2>
+          <p className="text-[17px] text-[#9a9a9a] font-light leading-[1.6] mb-12">
+            Start with a 3-minute clarity assessment. CareerOS will begin building your career intelligence model immediately.
+          </p>
+          <Link href="/assessment" className="group">
+            <motion.button
+              whileHover={{ scale: 1.02, backgroundColor: '#6c42db' }}
+              whileTap={{ scale: 0.98 }}
+              className="px-10 py-5 rounded-full bg-[#8052ff] text-white text-[15px] font-medium tracking-[0.05em] shadow-[0_0_40px_rgba(128,82,255,0.2)] transition-colors flex items-center gap-3"
             >
-              <motion.div
-                whileHover={{ scale: 1.02, transition: { duration: duration.instant, ease: ease.snappy } }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  padding: '7px 14px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.52)',
-                  backdropFilter: 'blur(18px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(18px) saturate(150%)',
-                  borderRadius: '9999px',
-                  boxShadow: '0 2px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.4)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                }}
+              START CAREER CLARITY
+              <svg 
+                className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
               >
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  style={{ color: '#7D9C74' }}
-                >
-                  <path
-                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <span
-                  style={{
-                    color: '#171312',
-                    fontWeight: 600,
-                    fontSize: 'clamp(11px, 3vw, 13px)',
-                    letterSpacing: '-0.02em',
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                  }}
-                >
-                  CareerOS
-                </span>
-              </motion.div>
-            </motion.div>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </motion.button>
+          </Link>
+        </motion.div>
+      </section>
 
-            {/* Hero Headline */}
-            <motion.div
-              variants={itemVariants}
-              style={{ marginBottom: 'clamp(12px, 2.8vh, 24px)', width: '100%' }}
-            >
-              <h1
-                style={{
-                  fontFamily: 'Inter, "SF Pro Display", system-ui, sans-serif',
-                  fontSize: 'clamp(32px, 10vw, 80px)',
-                  fontWeight: 860,
-                  lineHeight: '0.95',
-                  letterSpacing: '-0.042em',
-                  color: '#1a1816',
-                  textAlign: 'center',
-                  maxWidth: '100%',
-                  margin: '0 auto',
-                  padding: '0 8px',
-                }}
-              >
-                <motion.span
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: duration.slow, delay: 0.22, ease: ease.luxury }}
-                  style={{ display: 'block', marginBottom: '0.015em' }}
-                >
-                  Figure out
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: duration.slow, delay: 0.36, ease: ease.luxury }}
-                  style={{ display: 'block', marginBottom: '0.015em' }}
-                >
-                  your future
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: duration.slow, delay: 0.5, ease: ease.luxury }}
-                  style={{ display: 'block' }}
-                >
-                  <span style={{ color: '#789c70' }}>intelligently</span>.
-                </motion.span>
-              </h1>
-            </motion.div>
-
-            {/* Subheadline */}
-            <motion.p
-              variants={itemVariants}
-              style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: 'clamp(15px, 4vw, 20px)',
-                fontWeight: 450,
-                lineHeight: '1.6',
-                maxWidth: 'min(85vw, 500px)',
-                width: '100%',
-                color: 'rgba(30, 30, 30, 0.68)',
-                marginBottom: 'clamp(22px, 4vh, 32px)',
-                textAlign: 'center',
-                letterSpacing: '-0.01em',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                padding: '0 16px',
-              }}
-            >
-              Career intelligence for ambitious students making high-stakes life decisions.
-            </motion.p>
-
-            {/* Premium CTA Button - refined interactions */}
-            <motion.div variants={itemVariants}>
-              <motion.button
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                onMouseDown={() => setIsPressed(true)}
-                onMouseUp={() => setIsPressed(false)}
-                whileHover={{
-                  y: -3,
-                  scale: 1.02,
-                  transition: { duration: duration.fast, ease: ease.luxury },
-                }}
-                whileTap={{
-                  scale: 0.97,
-                  transition: { duration: duration.instant, ease: ease.snappy },
-                }}
-                style={{
-                  position: 'relative',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 'clamp(52px, 11vw, 62px)',
-                  padding: '0 clamp(24px, 6.5vw, 36px)',
-                  width: 'fit-content',
-                  borderRadius: '999px',
-                  fontSize: 'clamp(15px, 4vw, 21px)',
-                  fontWeight: 650,
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                  color: 'white',
-                  background: isHovered
-                    ? 'linear-gradient(180deg, #759b6d 0%, #558050 100%)'
-                    : 'linear-gradient(180deg, #6d9165 0%, #4d7548 100%)',
-                  gap: 'clamp(4px, 1vw, 7px)',
-                  letterSpacing: '-0.018em',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  willChange: 'transform',
-                  boxShadow: isPressed
-                    ? '0 12px 30px rgba(109,145,101,0.25), 0 4px 12px rgba(0,0,0,0.08), inset 0 2px 4px rgba(0,0,0,0.1)'
-                    : isHovered
-                    ? '0 24px 60px rgba(109,145,101,0.38), 0 10px 24px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.25)'
-                    : '0 18px 45px rgba(109,145,101,0.28), 0 8px 18px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.2)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'background 0.4s ease, box-shadow 0.4s ease',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Ambient glow - refined */}
-                <motion.div
-                  animate={{
-                    opacity: isHovered ? 0.7 : 0.45,
-                    scale: isHovered ? 1.1 : 1,
-                  }}
-                  transition={{ duration: duration.fast, ease: ease.luxury }}
-                  style={{
-                    position: 'absolute',
-                    inset: '-30%',
-                    background: 'radial-gradient(circle, rgba(109,145,101,0.5) 0%, transparent 70%)',
-                    borderRadius: '9999px',
-                    filter: 'blur(30px)',
-                    zIndex: 0,
-                  }}
-                />
-
-                {/* Shimmer - refined timing */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '50%',
-                    height: '100%',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-                    transform: 'skewX(-20deg)',
-                    animation: 'buttonShimmer 12s ease-in-out infinite',
-                    zIndex: 1,
-                  }}
-                />
-
-                <span style={{ position: 'relative', zIndex: 2, whiteSpace: 'nowrap' }}>Get Career Clarity</span>
-                <motion.div
-                  animate={{ x: isHovered ? 4 : 0 }}
-                  transition={{ duration: duration.fast, ease: ease.luxury }}
-                  style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center' }}
-                >
-                  <ArrowRight strokeWidth={2.5} style={{ width: 'clamp(15px, 3.5vw, 19px)', height: 'clamp(15px, 3.5vw, 19px)', flexShrink: 0 }} />
-                </motion.div>
-              </motion.button>
-            </motion.div>
-
-            {/* Microcopy */}
-            <motion.p
-              variants={itemVariants}
-              style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: 'clamp(11px, 2.8vw, 13px)',
-                fontWeight: 400,
-                color: 'rgba(0, 0, 0, 0.38)',
-                marginTop: 'clamp(10px, 2vh, 13px)',
-                textAlign: 'center',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              3 minutes • No signup required
-            </motion.p>
-          </motion.div>
-        </section>
-
-        {/* Why CareerOS Section */}
-        <WhyCareerOS />
-
-        {/* How CareerOS Works Section */}
-        <WhyCareerOSDifferent />
-
-        {/* Why CareerOS Is Different Section */}
-        <WhyCareerOSIsDifferent />
-
-        {/* Why CareerOS Comparison Section */}
-        <WhyCareerOSComparison />
-
-        {/* What CareerOS Actually Does Section */}
-        <WhatCareerOSDoes />
-
-        {/* Inside CareerOS Section */}
-        <InsideCareerOS />
-
-        {/* Problem Reframe Section - Trust Building */}
-        <ProblemReframe />
-
-        {/* How CareerOS Actually Works - 4 Step Process */}
-        <HowCareerOSWorks />
-
-        {/* Why Students Trust CareerOS - Trust Building */}
-        <WhyStudentsTrust />
-
-        {/* Final CTA Section */}
-        <FinalCTA />
-
-        {/* Footer */}
-        <Footer />
-      </main>
-
-      <style jsx global>{`
-        @keyframes lightFlow {
-          0% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0.08;
-          }
-          100% {
-            transform: translate(-50%, -50%) scale(1.06);
-            opacity: 0.16;
-          }
-        }
-
-        @keyframes buttonShimmer {
-          0%, 85% { left: '-100%'; }
-          92% { left: '150%'; }
-          100% { left: '150%'; }
-        }
-
-        /* Smooth scrolling for the entire page */
-        html {
-          scroll-behavior: smooth;
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-      `}</style>
-    </>
+      {/* Simple Footer */}
+      <footer className="py-10 px-6 border-t border-white/[0.04] flex justify-center items-center text-center text-[#9a9a9a] text-[12px] tracking-wide bg-black">
+        © {new Date().getFullYear()} CareerOS. All rights reserved.
+      </footer>
+    </div>
   );
 }

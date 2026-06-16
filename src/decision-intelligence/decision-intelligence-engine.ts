@@ -283,7 +283,7 @@ export class DecisionIntelligenceEngine {
       const analyzedOptions = input.options.filter((opt) => analyses[opt.id]);
 
       // Perform comparison
-      const comparison = this.comparisonEngine.compareDecisions(
+      const comparison = await this.comparisonEngine.compareDecisions(
         input.comparisonId,
         analyzedOptions,
         analyses,

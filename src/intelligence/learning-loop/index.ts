@@ -12,6 +12,11 @@
 // ============================================================================
 
 export {
+  DEFAULT_LEARNING_CONFIG,
+  LearningEventType,
+} from './learning-loop-types';
+
+export type {
   // Core types
   RecommendationId,
   StudentId,
@@ -56,7 +61,6 @@ export {
   
   // Learning loop types
   LearningLoopConfig,
-  DEFAULT_LEARNING_CONFIG,
   LearningLoopReport,
   RecommendationAdjustment,
   ConfidenceShift,
@@ -73,7 +77,6 @@ export {
   
   // Event types
   LearningEvent,
-  LearningEventType,
   
   // Utility types
   TimeWindow,
@@ -87,34 +90,49 @@ export {
 
 export {
   OutcomeFeedbackEngine,
+  DEFAULT_OUTCOME_OPTIONS,
+} from './outcome-feedback-engine';
+
+export type {
   OutcomeRecord,
   OutcomeFeedbackEngineOptions,
-  DEFAULT_OUTCOME_OPTIONS,
 } from './outcome-feedback-engine';
 
 export {
   RecommendationLearningEngine,
+  DEFAULT_LEARNING_OPTIONS,
+} from './recommendation-learning-engine';
+
+export type {
   RecommendationInstance,
   LearningEngineOptions,
-  DEFAULT_LEARNING_OPTIONS,
 } from './recommendation-learning-engine';
 
 export {
   ConfidenceAdjustmentEngine,
+  DEFAULT_ADJUSTMENT_OPTIONS,
+} from './confidence-adjustment-engine';
+
+export type {
   AdjustmentContext,
   ConfidenceAdjustmentEngineOptions,
-  DEFAULT_ADJUSTMENT_OPTIONS,
 } from './confidence-adjustment-engine';
 
 export {
   PopulationLearningEngine,
+  DEFAULT_POPULATION_OPTIONS,
+} from './population-learning-engine';
+
+export type {
   PopulationDataPoint,
   PopulationLearningEngineOptions,
-  DEFAULT_POPULATION_OPTIONS,
 } from './population-learning-engine';
 
 export {
   LearningLoopEngine,
+} from './learning-loop-engine';
+
+export type {
   LearningLoopEngineOptions,
   RecommendationSet,
 } from './learning-loop-engine';

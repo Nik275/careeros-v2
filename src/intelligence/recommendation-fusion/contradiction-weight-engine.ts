@@ -186,8 +186,16 @@ export class ContradictionWeightEngine {
     requiresAttention: boolean;
     totalConflicts: number;
   } {
-    const resolved = [];
-    const flagged = [];
+    const resolved: Array<{
+      type: 'value' | 'goal' | 'identity' | 'family';
+      description: string;
+      resolution: string;
+    }> = [];
+    const flagged: Array<{
+      type: 'value' | 'goal' | 'identity' | 'family';
+      description: string;
+      requiresAttention: boolean;
+    }> = [];
 
     // Resolve value conflicts
     for (const conflict of input.valueConflicts) {

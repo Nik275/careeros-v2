@@ -6,9 +6,8 @@
 
 import type {
   ExploredCareerPath,
-  CareerNode,
-  CareerEdge,
 } from '../path-explorer';
+import type { CareerNode, CareerEdge } from '../career-transition-graph';
 
 import type {
   FutureScenario,
@@ -184,7 +183,7 @@ export class DecisionTreeGenerator {
         explanation: `Choose the ${this.formatPathType(pathType)} career trajectory`,
         action: {
           name: `Select ${this.formatPathType(pathType)} Path`,
-          description: path.explanation?.overview || '',
+          description: path.explanation?.summary || '',
           time: `${path.metrics?.totalYears || 5} years`,
         },
       };
@@ -328,16 +327,19 @@ export class DecisionTreeGenerator {
         const targetNode = this.findTargetNode(edge, path);
         if (!targetNode) continue;
 
+        const transitionName = targetNode.name || targetNode.id || 'New Career';
+        const transitionTime = `${edge.transitionTimeYears} years`;
+
         const transitionOutcome: DecisionTreeNode = {
           id: this.generateNodeId(),
           nodeType: 'outcome',
-          label: `Transition to ${targetNode.careerId || 'New Career'}`,
-          description: `Career change via ${edge.type || 'transition'}`,
+          label: `Transition to ${transitionName}`,
+          description: `Career change via ${edge.transitionType || 'transition'}`,
           data: {
             outcomeState: 'transition',
             metrics: {
-              totalDifficulty: edge.difficulty,
-              avgTransitionTime: edge.timeRequired,
+              totalDifficulty: edge.transitionDifficulty,
+              avgTransitionTime: edge.transitionTimeYears,
             },
           },
           depth: 3,
@@ -351,14 +353,14 @@ export class DecisionTreeGenerator {
           sourceId: transitionNode.id,
           targetId: transitionOutcome.id,
           edgeType: 'choice',
-          explanation: `Transition to ${targetNode.careerId || 'new career'}`,
+          explanation: `Transition to ${transitionName}`,
           action: {
             name: 'Execute Transition',
-            description: `Move to ${targetNode.careerId || 'new role'}`,
-            time: edge.timeRequired,
-            cost: edge.difficulty,
+            description: `Move to ${transitionName}`,
+            time: transitionTime,
+            cost: edge.transitionDifficulty,
           },
-          requirements: edge.prerequisites,
+          requirements: edge.prerequisites.map((prerequisite) => prerequisite.description),
         });
       }
     }
@@ -375,7 +377,7 @@ export class DecisionTreeGenerator {
 
     for (const path of paths) {
       const pathScenarios = scenarios.filter(
-        (s) => s.basePathId === path.id || s.basePathId === path.nodes[0]?.careerId
+        (s) => s.basePathId === path.id || s.basePathId === path.nodes[0]?.id
       );
       if (pathScenarios.length > 0) {
         grouped.set(path.id, pathScenarios);
@@ -406,7 +408,7 @@ export class DecisionTreeGenerator {
     edge: CareerEdge,
     path: ExploredCareerPath
   ): CareerNode | undefined {
-    return path.nodes.find((n) => n.id === edge.targetId);
+    return path.nodes.find((n) => n.id === edge.toNodeId);
   }
 
   /**

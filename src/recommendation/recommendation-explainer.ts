@@ -11,6 +11,7 @@
 
 import type { CareerRecommendation, RecommendationExplanation } from './recommendation-types';
 import type { CareerIntelligence } from '../career-intelligence/career-types';
+import type { CareerFitResult } from '../career-fit/career-fit-types';
 
 /**
  * Generates explanations for career recommendations.

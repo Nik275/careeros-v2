@@ -274,9 +274,9 @@ export class FutureSimulationEngine {
       },
       byDimension: {
         careerGrowth: career.careerAdvantages.careerMobility?.score ?? 50,
-        incomeGrowth: career.careerAdvantages.salaryGrowth?.score ?? 50,
-        skillDevelopment: career.careerAdvantages.skillDevelopment?.score ?? 50,
-        workLifeBalance: career.careerAdvantages.workLifeIntegration?.score ?? 50,
+        incomeGrowth: career.careerAdvantages.futureRelevance?.score ?? 50,
+        skillDevelopment: career.careerAdvantages.transferability?.score ?? 50,
+        workLifeBalance: career.careerAdvantages.optionality?.score ?? 50,
       },
     };
 

@@ -7,6 +7,8 @@
  * Everything must become MarketSignal before entering the intelligence system.
  */
 
+import type { DataSourceMetadata } from './types';
+
 // ============================================================================
 // CORE TYPES
 // ============================================================================

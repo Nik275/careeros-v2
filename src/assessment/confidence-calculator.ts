@@ -16,12 +16,11 @@ import type {
   AssessmentConfidenceLevel,
   AssessmentResponse,
   AssessmentSignal,
-  DEFAULT_ASSESSMENT_CONFIG,
   SupportedDimension,
-  SUPPORTED_DIMENSIONS,
 } from './assessment-types';
-import { getConfidenceAuthority } from '@/intelligence/confidence';
-import type { ConfidenceRequest } from '@/intelligence/confidence';
+import { DEFAULT_ASSESSMENT_CONFIG, SUPPORTED_DIMENSIONS } from './assessment-types';
+import { getConfidenceAuthority } from '../intelligence/confidence';
+import type { ConfidenceRequest } from '../intelligence/confidence';
 
 /**
  * Calculates assessment confidence metrics.
@@ -72,8 +71,9 @@ export class ConfidenceCalculator {
 
     return {
       score: overallScore,
+      confidence: constitutionalConfidence,
       constitutionalConfidence,
-      // level removed - no longer using enum
+      level: this.determineConfidenceLevel(overallScore),
       consistencyScore: Math.round(consistencyScore),
       questionCountScore: Math.round(questionCountScore),
       varianceScore: Math.round(varianceScore),

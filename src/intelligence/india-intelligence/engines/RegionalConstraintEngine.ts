@@ -18,6 +18,7 @@ import {
   ConstraintFactor,
   OpportunityLandscape,
   RegionalRecommendation,
+  FamilyPressureSource,
 } from '../types';
 
 /**
@@ -174,7 +175,7 @@ export class RegionalConstraintEngine {
     }
 
     // Marriage pressure
-    if (input.profile.familyPressureSources.includes('MARRIAGE_PRESSURE')) {
+    if (input.profile.familyPressureSources.includes(FamilyPressureSource.MARRIAGE_PRESSURE)) {
       constraints.push('Marriage prospects may be affected by long-distance relocation');
     }
 

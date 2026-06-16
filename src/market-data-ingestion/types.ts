@@ -337,6 +337,28 @@ export const NORMALIZED_SIGNAL_TYPES = [
 
 export type NormalizedSignalType = (typeof NORMALIZED_SIGNAL_TYPES)[number];
 
+export const SIGNAL_TYPES = NORMALIZED_SIGNAL_TYPES;
+
+export const SIGNAL_TYPE_LABELS: Record<NormalizedSignalType, string> = {
+  demand: 'Demand',
+  salary: 'Salary',
+  'salary-growth': 'Salary Growth',
+  competition: 'Competition',
+  growth: 'Growth',
+  'automation-risk': 'Automation Risk',
+  'skill-demand': 'Skill Demand',
+  'skill-growth': 'Skill Growth',
+  'skill-scarcity': 'Skill Scarcity',
+  'exam-difficulty': 'Exam Difficulty',
+  'exam-competition': 'Exam Competition',
+  'regional-opportunity': 'Regional Opportunity',
+  'job-availability': 'Job Availability',
+  'hiring-rate': 'Hiring Rate',
+  investment: 'Investment',
+};
+
+export const SIGNAL_SOURCE_TYPES = DATA_SOURCE_TYPES;
+
 /**
  * Signal quality metrics.
  */

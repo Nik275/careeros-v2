@@ -11,9 +11,9 @@
 import type {
   StudentId,
   RecommendationId,
-  CareerId,
 } from '../outcome-tracking/outcome-types.js';
 import type {
+  CareerId,
   OutcomePriority,
   PriorityLevel,
   PriorityAdjustment,
@@ -220,7 +220,7 @@ export class OutcomePriorityEngine {
       // Sort by urgency and next scheduled
       if (a.urgency === 'IMMEDIATE' && b.urgency !== 'IMMEDIATE') return -1;
       if (b.urgency === 'IMMEDIATE' && a.urgency !== 'IMMEDIATE') return 1;
-      return a.nextScheduled - b.nextScheduled;
+      return (a.nextScheduled ?? 0) - (b.nextScheduled ?? 0);
     });
   }
 
@@ -232,12 +232,12 @@ export class OutcomePriorityEngine {
     const pending: OutcomePriority[] = [];
 
     for (const record of this.priorityRecords.values()) {
-      if (record.priority.nextScheduled <= now && record.priority.autoFollowUp) {
+      if ((record.priority.nextScheduled ?? Number.POSITIVE_INFINITY) <= now && record.priority.autoFollowUp) {
         pending.push(record.priority);
       }
     }
 
-    return pending.sort((a, b) => a.nextScheduled - b.nextScheduled);
+    return pending.sort((a, b) => (a.nextScheduled ?? 0) - (b.nextScheduled ?? 0));
   }
 
   /**
@@ -277,7 +277,7 @@ export class OutcomePriorityEngine {
   getCurrentPriority(studentId: StudentId): OutcomePriority | undefined {
     const priorities = this.getStudentPriorities(studentId);
     return priorities.length > 0 
-      ? priorities.sort((a, b) => b.nextScheduled - a.nextScheduled)[0]
+      ? priorities.sort((a, b) => (b.nextScheduled ?? 0) - (a.nextScheduled ?? 0))[0]
       : undefined;
   }
 
@@ -340,6 +340,7 @@ export class OutcomePriorityEngine {
    */
   getStats(): {
     totalPriorities: number;
+    criticalCount: number;
     highCount: number;
     mediumCount: number;
     lowCount: number;
@@ -347,6 +348,7 @@ export class OutcomePriorityEngine {
     pendingFollowUps: number;
     averageTrackingFrequency: number;
   } {
+    let criticalCount = 0;
     let highCount = 0;
     let mediumCount = 0;
     let lowCount = 0;
@@ -358,13 +360,14 @@ export class OutcomePriorityEngine {
 
     for (const record of this.priorityRecords.values()) {
       switch (record.priority.level) {
+        case 'CRITICAL': criticalCount++; break;
         case 'HIGH': highCount++; break;
         case 'MEDIUM': mediumCount++; break;
         case 'LOW': lowCount++; break;
         case 'DEFERRED': deferredCount++; break;
       }
 
-      if (record.priority.nextScheduled <= now && record.priority.autoFollowUp) {
+      if ((record.priority.nextScheduled ?? Number.POSITIVE_INFINITY) <= now && record.priority.autoFollowUp) {
         pendingFollowUps++;
       }
 
@@ -375,6 +378,7 @@ export class OutcomePriorityEngine {
 
     return {
       totalPriorities: total,
+      criticalCount,
       highCount,
       mediumCount,
       lowCount,
@@ -391,7 +395,8 @@ export class OutcomePriorityEngine {
     const priority = this.getCurrentPriority(studentId);
     if (!priority) return false;
 
-    return priority.nextScheduled <= Date.now() && priority.autoFollowUp;
+    return (priority.nextScheduled ?? Number.POSITIVE_INFINITY) <= Date.now()
+      && priority.autoFollowUp === true;
   }
 
   /**
@@ -416,6 +421,9 @@ export class OutcomePriorityEngine {
     const overdue: OutcomePriority[] = [];
 
     for (const record of this.priorityRecords.values()) {
+      if (record.priority.nextScheduled === undefined) {
+        continue;
+      }
       const daysOverdue = (now - record.priority.nextScheduled) / (24 * 60 * 60 * 1000);
       if (daysOverdue > this.config.outcomePriority.autoEscalateThreshold) {
         overdue.push(record.priority);
@@ -454,6 +462,7 @@ export class OutcomePriorityEngine {
    */
   private calculateTrackingFrequency(level: PriorityLevel, urgency: OutcomeUrgency): number {
     const baseFrequency = {
+      CRITICAL: this.config.outcomePriority.highPriorityDays,
       HIGH: this.config.outcomePriority.highPriorityDays,
       MEDIUM: this.config.outcomePriority.defaultTrackingDays,
       LOW: this.config.outcomePriority.defaultTrackingDays * 2,

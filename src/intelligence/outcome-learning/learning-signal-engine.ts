@@ -17,6 +17,7 @@ import {
   type LearningInsight,
   type ILearningSignalEngine,
   type OutcomeLearningConfig,
+  type LearningSignalId,
   DEFAULT_OUTCOME_LEARNING_CONFIG,
 } from './learning-types.js';
 
@@ -161,7 +162,7 @@ class SignalGenerator {
     const dominantType = positiveCount > negativeCount ? 'POSITIVE' : 'NEGATIVE';
 
     return {
-      signalId: `agg-${Date.now()}-${engine}`,
+      signalId: `agg-${Date.now()}-${engine}` as LearningSignalId,
       signalType: dominantType as SignalType,
       source: 'AGGREGATE',
       targetEngine: engine,

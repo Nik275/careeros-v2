@@ -19,6 +19,7 @@ import type {
   KeyDriver,
   DriverCategory,
 } from './future-simulation-types';
+import { DEFAULT_FUTURE_SIMULATION_CONFIG } from './future-simulation-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 
 /**
@@ -86,34 +87,34 @@ export class OutcomeEngine {
     }
 
     // Financial advantage
-    if (advantages_data.salaryGrowth?.score ?? 0 > 50) {
+    if (advantages_data.futureRelevance?.score ?? 0 > 50) {
       advantages.push({
         name: 'Income Growth',
         description: 'Strong potential for increasing compensation over time',
         likelihood: this.getScenarioLikelihood(scenarioType, 'HIGH'),
-        impact: advantages_data.salaryGrowth.score ?? 65,
+        impact: advantages_data.futureRelevance.score ?? 65,
         timeframe: this.getTimeframe(timeHorizon, 0.6),
       });
     }
 
     // Learning advantage
-    if (advantages_data.skillDevelopment?.score ?? 0 > 50) {
+    if (advantages_data.transferability?.score ?? 0 > 50) {
       advantages.push({
         name: 'Continuous Learning',
         description: 'Ongoing opportunities to develop new skills and capabilities',
         likelihood: this.getScenarioLikelihood(scenarioType, 'MEDIUM'),
-        impact: advantages_data.skillDevelopment.score ?? 70,
+        impact: advantages_data.transferability.score ?? 70,
         timeframe: this.getTimeframe(timeHorizon, 0.3),
       });
     }
 
     // Recognition advantage
-    if (advantages_data.recognitionPotential?.score ?? 0 > 50) {
+    if (advantages_data.futureRelevance?.score ?? 0 > 50) {
       advantages.push({
         name: 'Professional Recognition',
         description: 'Opportunities for visibility and acknowledgment in the field',
         likelihood: this.getScenarioLikelihood(scenarioType, 'MEDIUM'),
-        impact: advantages_data.recognitionPotential.score ?? 60,
+        impact: advantages_data.futureRelevance.score ?? 60,
         timeframe: this.getTimeframe(timeHorizon, 0.7),
       });
     }
@@ -130,12 +131,12 @@ export class OutcomeEngine {
     }
 
     // Work-life advantage (if score is good)
-    if (advantages_data.workLifeIntegration?.score ?? 0 > 60) {
+    if (advantages_data.optionality?.score ?? 0 > 60) {
       advantages.push({
         name: 'Work-Life Integration',
         description: 'Career allows for meaningful personal life outside work',
         likelihood: this.getScenarioLikelihood(scenarioType, 'MEDIUM'),
-        impact: advantages_data.workLifeIntegration.score ?? 70,
+        impact: advantages_data.optionality.score ?? 70,
         timeframe: this.getTimeframe(timeHorizon, 0.2),
       });
     }
@@ -179,7 +180,7 @@ export class OutcomeEngine {
     const risks_data = career.careerRisks;
 
     // Automation risk
-    if (risks_data.automationRisk?.score ?? 0 > 40) {
+    if ((risks_data.automationRisk?.score ?? 0) > 40) {
       risks.push({
         name: 'Automation Displacement',
         description: 'Role may be partially or fully automated',
@@ -190,7 +191,7 @@ export class OutcomeEngine {
     }
 
     // Competition risk
-    if (risks_data.competitionRisk?.score ?? 0 > 40) {
+    if ((risks_data.competitionRisk?.score ?? 0) > 40) {
       risks.push({
         name: 'Intense Competition',
         description: 'High competition for roles and advancement',
@@ -201,7 +202,7 @@ export class OutcomeEngine {
     }
 
     // Education barrier
-    if (risks_data.educationBarrier?.score ?? 0 > 40) {
+    if ((risks_data.educationBarrier?.score ?? 0) > 40) {
       risks.push({
         name: 'Credential Requirements',
         description: 'Additional credentials may be required for advancement',
@@ -212,23 +213,23 @@ export class OutcomeEngine {
     }
 
     // Physical demands
-    if (risks_data.physicalDemands?.score ?? 0 > 50) {
+    if ((risks_data.burnoutRisk?.score ?? 0) > 50) {
       risks.push({
         name: 'Physical Strain',
         description: 'Physical demands may impact long-term sustainability',
-        likelihood: this.getScenarioLikelihood(scenarioType, 'RISK', risks_data.physicalDemands.score),
-        impact: risks_data.physicalDemands.score ?? 50,
+        likelihood: this.getScenarioLikelihood(scenarioType, 'RISK', risks_data.burnoutRisk.score),
+        impact: risks_data.burnoutRisk.score ?? 50,
         timeframe: this.getTimeframe(timeHorizon, 0.8),
       });
     }
 
     // Market risk
-    if (risks_data.marketVolatility?.score ?? 0 > 40) {
+    if ((risks_data.competitionRisk?.score ?? 0) > 40) {
       risks.push({
         name: 'Market Volatility',
         description: 'Industry or market instability affects career stability',
-        likelihood: this.getScenarioLikelihood(scenarioType, 'RISK', risks_data.marketVolatility.score),
-        impact: risks_data.marketVolatility.score ?? 55,
+        likelihood: this.getScenarioLikelihood(scenarioType, 'RISK', risks_data.competitionRisk.score),
+        impact: risks_data.competitionRisk.score ?? 55,
         timeframe: this.getTimeframe(timeHorizon, 0.4),
       });
     }
@@ -323,7 +324,7 @@ export class OutcomeEngine {
       });
 
     // Geographic mobility
-    if (career.workEnvironment.remoteCompatibility?.score ?? 0 > 50) {
+    if ((career.lifestyleCharacteristics.locationFlexibility?.score ?? 0) > 50) {
       opportunities.push({
         name: 'Geographic Flexibility',
         description: 'Work from different locations or relocate',
@@ -371,7 +372,7 @@ export class OutcomeEngine {
     const constraints: PotentialOutcome[] = [];
 
     // Work schedule constraints
-    const schedulePredictability = career.workEnvironment.schedulePredictability?.score ?? 50;
+    const schedulePredictability = career.lifestyleCharacteristics.workLifeBalance?.score ?? 50;
     if (schedulePredictability < 60) {
       constraints.push({
         name: 'Unpredictable Schedule',
@@ -383,7 +384,7 @@ export class OutcomeEngine {
     }
 
     // Location constraints
-    const remoteCompatibility = career.workEnvironment.remoteCompatibility?.score ?? 50;
+    const remoteCompatibility = career.lifestyleCharacteristics.locationFlexibility?.score ?? 50;
     if (remoteCompatibility < 50) {
       constraints.push({
         name: 'Location Requirements',
@@ -395,7 +396,7 @@ export class OutcomeEngine {
     }
 
     // Skill ceiling constraint
-    const learningRequirement = career.cognitiveDemands.learningRequirement?.score ?? 50;
+    const learningRequirement = career.motivationalDemands.masteryDemand?.score ?? 50;
     if (learningRequirement < 50) {
       constraints.push({
         name: 'Skill Development Ceiling',
@@ -649,7 +650,7 @@ export function createOutcomeEngine(
   config?: Partial<FutureSimulationConfig>
 ): OutcomeEngine {
   const fullConfig: FutureSimulationConfig = {
-    ...import('./future-simulation-types').DEFAULT_FUTURE_SIMULATION_CONFIG,
+    ...DEFAULT_FUTURE_SIMULATION_CONFIG,
     ...config,
   };
 

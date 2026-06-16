@@ -240,7 +240,7 @@ const createTestGraph = (): KnowledgeGraph => {
       type: 'requires',
       metadata: {
         relationType: 'requires',
-        strength: 'essential',
+        strength: 'very-strong',
         strengthScore: 10,
         confidence: 0.95,
         weight: 1,
@@ -257,7 +257,7 @@ const createTestGraph = (): KnowledgeGraph => {
       type: 'requires',
       metadata: {
         relationType: 'requires',
-        strength: 'essential',
+        strength: 'very-strong',
         strengthScore: 10,
         confidence: 0.95,
         weight: 1,
@@ -274,7 +274,7 @@ const createTestGraph = (): KnowledgeGraph => {
       type: 'requires',
       metadata: {
         relationType: 'requires',
-        strength: 'essential',
+        strength: 'very-strong',
         strengthScore: 9,
         confidence: 0.9,
         weight: 1,
@@ -291,7 +291,7 @@ const createTestGraph = (): KnowledgeGraph => {
       type: 'requires',
       metadata: {
         relationType: 'requires',
-        strength: 'essential',
+        strength: 'very-strong',
         strengthScore: 9,
         confidence: 0.9,
         weight: 1,

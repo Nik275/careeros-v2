@@ -86,7 +86,7 @@ export interface SystemHealth {
   drift: {
     detected: boolean;
     severity: 'none' | 'mild' | 'moderate' | 'severe';
-    direction: 'overconfidence' | 'underconfidence' | 'none';
+    direction: 'overconfidence' | 'underconfidence' | 'mixed' | 'none';
   };
   
   /** Last updated */
@@ -105,7 +105,7 @@ export interface DriftDetectionResult {
   severity: 'none' | 'mild' | 'moderate' | 'severe';
   
   /** Drift direction */
-  direction: 'overconfidence' | 'underconfidence' | 'mixed';
+  direction: 'overconfidence' | 'underconfidence' | 'mixed' | 'none';
   
   /** Affected confidence bins */
   affectedBins: string[];
@@ -246,9 +246,10 @@ export class ConfidenceMonitor {
 
     // Emit event if drift detected
     if (detected && this.eventEmitter) {
+      const eventSeverity = severity as 'mild' | 'moderate' | 'severe';
       this.eventEmitter.emit(createDriftDetectedEvent(
         systemId,
-        severity,
+        eventSeverity,
         direction,
         result.affectedBins,
         result.recommendation
@@ -395,7 +396,7 @@ export class ConfidenceMonitor {
    */
   private generateRecommendation(
     severity: 'none' | 'mild' | 'moderate' | 'severe',
-    direction: 'overconfidence' | 'underconfidence' | 'mixed'
+    direction: 'overconfidence' | 'underconfidence' | 'mixed' | 'none'
   ): string {
     if (severity === 'none') {
       return 'No action needed';

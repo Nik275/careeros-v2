@@ -182,14 +182,19 @@ export class UncertaintyEngine {
       }],
       evidenceGaps: [],
       confidenceBounds: {
+        pointEstimate: 0,
+        lowerBound: 0,
+        upperBound: 0,
+        confidenceInterval: 0,
         lower: 0,
         upper: 0,
-        pointEstimate: 0,
       },
       systemResponse: {
+        shouldDefer: true,
         shouldAdmitUncertainty: true,
         shouldGatherMoreData: true,
         shouldEscalate: true,
+        alternativeApproaches: ['Provide valid input data'],
         explanation: 'Critical: No input data available',
       },
     };

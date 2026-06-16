@@ -823,7 +823,7 @@ function generateSatisfactionFactors(
   }
 
   // Autonomy
-  const autonomyTrait = studentBelief.personalityTraits.find(t => t.dimension === 'AUTONOMY');
+  const autonomyTrait = studentBelief.personalityTraits.find(t => t.dimension === 'autonomy');
   if (autonomyTrait) {
     factors.push({
       name: 'Autonomy Match',
@@ -1464,37 +1464,3 @@ export function modelOutcomes(
   const engine = new OutcomeModelingEngine();
   return engine.modelOutcomes(input);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  // ConfidenceLevel renamed to StatisticalConfidence to avoid confusion with constitutional Confidence
-  StatisticalConfidence,
-  OutcomeRange,
-  ConfidenceInterval,
-  IncomeRangeModel,
-  IncomeFactor,
-  OptionalityRangeModel,
-  OptionalityFactor,
-  RegretExposureRangeModel,
-  RegretCategory,
-  RegretTimePoint,
-  RegretFactor,
-  RegretComparison,
-  CoalitionStabilityRangeModel,
-  CoalitionStabilityTimePoint,
-  CoalitionStabilityFactor,
-  SatisfactionLikelihoodRangeModel,
-  SatisfactionDimension,
-  SatisfactionTimePoint,
-  SatisfactionFactor,
-  ScenarioOutcomeModel,
-  MetricCorrelation,
-  OutcomeMetric,
-  OverallConfidenceAssessment,
-  OutcomeModelingInput,
-  OutcomeModelingResult,
-  OutcomeModelingConfig,
-};

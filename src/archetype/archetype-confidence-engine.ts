@@ -104,6 +104,7 @@ export class ArchetypeConfidenceEngine {
 
     return {
       confidenceScore,
+      confidence: confidenceScore / 100,
       constitutionalConfidence: confidenceScore / 100,
       // confidenceLevel removed - use constitutionalConfidence
       stabilityScore: 50,

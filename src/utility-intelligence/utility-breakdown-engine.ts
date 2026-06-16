@@ -17,6 +17,7 @@ import type {
   UtilityDimension,
   UtilityIntelligenceConfig,
 } from './utility-types';
+import { DEFAULT_UTILITY_INTELLIGENCE_CONFIG } from './utility-types';
 import type { CareerFitResult } from '@/career-fit/career-fit-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 import type { GeneratedProfile } from '@/profile/profile-types';
@@ -589,7 +590,7 @@ export function createUtilityBreakdownEngine(
   config?: Partial<UtilityIntelligenceConfig>
 ): UtilityBreakdownEngine {
   const fullConfig: UtilityIntelligenceConfig = {
-    ...import('./utility-types').DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
+    ...DEFAULT_UTILITY_INTELLIGENCE_CONFIG,
     ...config,
   };
 

@@ -17,7 +17,7 @@
  * This is the ONLY system that may perform meta-decision analysis.
  */
 
-import type { Confidence } from '../ConfidenceTypes';
+import type { Confidence } from '../../confidence/ConfidenceTypes';
 import type { DecisionContext } from '../DecisionTypes';
 
 // Re-export types from meta-decision-engine for internal use
@@ -152,6 +152,9 @@ export interface MetaDecisionAnalysis {
 export interface MetaDecisionInput {
   readonly studentId: string;
   readonly decisionId: string;
+  readonly context?: Partial<DecisionContext> & {
+    readonly timePressure?: string;
+  };
   readonly studentBeliefs: {
     readonly identityStability: number;
     readonly valueStability: number;
@@ -342,9 +345,13 @@ export class MetaDecisionAuthority implements IMetaDecisionAuthority {
       studentId: input.studentId,
       decisionId: input.decisionId,
       context: {
+        ...input.context,
+        studentId: input.studentId,
+        sessionId: input.context?.sessionId ?? `meta-${input.decisionId}`,
+        timestamp: input.context?.timestamp ?? new Date(),
         careerOptions: input.decisionIntelligence.alternatives,
         decisionType: 'initial',
-        timePressure: 'none',
+        timePressure: input.context?.timePressure ?? 'none',
       },
       readiness,
       quality,

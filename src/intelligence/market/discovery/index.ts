@@ -97,7 +97,6 @@ export {
 
 // Models
 export {
-  DiscoverySignal,
   createDiscoverySignal,
   validateSignal,
   calculateWeightedStrength,
@@ -108,8 +107,11 @@ export {
   type SignalProcessingConfig,
 } from './models/DiscoverySignal';
 
+export type {
+  DiscoverySignal,
+} from './models/DiscoverySignal';
+
 export {
-  EmergingCareer,
   createEmergingCareer,
   updateCareerStage,
   calculateMaturityScore,
@@ -118,8 +120,11 @@ export {
   type CareerEvidenceType,
 } from './models/EmergingCareer';
 
+export type {
+  EmergingCareer,
+} from './models/EmergingCareer';
+
 export {
-  EmergingSkill,
   createEmergingSkill,
   updateSkillStage,
   calculateRelevanceScore,
@@ -128,8 +133,11 @@ export {
   type SkillCategory,
 } from './models/EmergingSkill';
 
+export type {
+  EmergingSkill,
+} from './models/EmergingSkill';
+
 export {
-  EmergingIndustry,
   createEmergingIndustry,
   updateIndustryStage,
   calculateOpportunityScore,
@@ -138,8 +146,11 @@ export {
   type IndustryCategory,
 } from './models/EmergingIndustry';
 
+export type {
+  EmergingIndustry,
+} from './models/EmergingIndustry';
+
 export {
-  DecliningCareer,
   createDecliningCareer,
   updateDeclineStage,
   calculateDeclineUrgency,
@@ -149,8 +160,11 @@ export {
   type DeclineDriver,
 } from './models/DecliningCareer';
 
+export type {
+  DecliningCareer,
+} from './models/DecliningCareer';
+
 export {
-  DiscoveryAnalysis,
   createDiscoveryAnalysis,
   calculateOverallConfidence,
   updateDiscoveryStatus,
@@ -159,4 +173,8 @@ export {
   type DiscoveryType,
   type DiscoveryStatus,
   type ConfidenceFactors,
+} from './models/DiscoveryAnalysis';
+
+export type {
+  DiscoveryAnalysis,
 } from './models/DiscoveryAnalysis';

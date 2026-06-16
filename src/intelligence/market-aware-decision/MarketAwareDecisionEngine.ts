@@ -171,7 +171,7 @@ export class MarketAwareDecisionEngine {
     // Skip if no market intelligence
     if (!marketIntelligence) {
       if (this.config.debug) {
-        console.warn(`No market intelligence for ${decision.recommendationId}`);
+        console.warn('No market intelligence available for a decision.');
       }
       return null;
     }
@@ -201,7 +201,7 @@ export class MarketAwareDecisionEngine {
     // Block if trend chasing detected
     if (trendDetection.recommendation === 'block') {
       if (this.config.debug) {
-        console.log(`Blocking ${recommendationId} due to trend chasing detection`);
+        console.log('Blocking a recommendation due to trend chasing detection.');
       }
       return null;
     }
@@ -374,9 +374,7 @@ export class MarketAwareDecisionEngine {
       // Check 1: Low fit should not result in high final score
       if (decision.fit.overall < 50 && rec.scores.final > 70) {
         if (this.config.debug) {
-          console.warn(
-            `Decision quality violation: ${rec.recommendationId} has low fit (${decision.fit.overall}) but high score (${rec.scores.final})`
-          );
+          console.warn('Decision quality violation: low fit with high final score.');
         }
         return false;
       }
@@ -384,9 +382,7 @@ export class MarketAwareDecisionEngine {
       // Check 2: High regret risk should be reflected
       if (decision.regretRisk > 70 && rec.scores.final > 75) {
         if (this.config.debug) {
-          console.warn(
-            `Decision quality violation: ${rec.recommendationId} has high regret risk (${decision.regretRisk}) but high score (${rec.scores.final})`
-          );
+          console.warn('Decision quality violation: high regret risk with high final score.');
         }
         return false;
       }
@@ -394,9 +390,7 @@ export class MarketAwareDecisionEngine {
       // Check 3: Identity mismatch should limit score
       if (decision.identityCongruence < 40 && rec.scores.final > 65) {
         if (this.config.debug) {
-          console.warn(
-            `Decision quality violation: ${rec.recommendationId} has low identity congruence (${decision.identityCongruence}) but high score (${rec.scores.final})`
-          );
+          console.warn('Decision quality violation: low identity congruence with high final score.');
         }
         return false;
       }

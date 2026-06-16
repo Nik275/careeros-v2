@@ -8,7 +8,7 @@
  * @module intelligence/decision/coalition
  */
 
-import type { Confidence } from '../ConfidenceTypes';
+import type { Confidence } from '../../confidence/ConfidenceTypes';
 
 // ============================================================================
 // COALITION TYPES
@@ -1066,24 +1066,3 @@ export class CoalitionModule implements ICoalitionModule {
 export function createCoalitionModule(config?: CoalitionConfig): ICoalitionModule {
   return new CoalitionModule(config);
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export type {
-  CoalitionMember,
-  CoalitionMemberEvaluation,
-  MemberConflict,
-  CoalitionDynamics,
-  CoalitionAggregateScores,
-  CoalitionConfig,
-  CoalitionEvaluationInput,
-  StudentInterestsInput,
-  StudentValuesInput,
-  StudentConstraintsInput,
-  PathMetricsInput,
-  PathScoresInput,
-  PathNodeInput,
-  PathInput,
-};

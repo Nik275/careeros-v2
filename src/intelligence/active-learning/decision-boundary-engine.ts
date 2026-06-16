@@ -18,12 +18,13 @@
 
 import {
   DecisionBoundary,
-  CareerCategory,
+  BoundaryCategory,
   BoundaryCharacteristics,
   BoundaryHistoricalData,
   BoundaryProximity,
   BoundaryStudent,
   BoundaryApproachStrategy,
+  DecisionBoundaryZone,
   LearningValueScore,
   StudentProfile,
   DecisionBoundaryEngineConfig,
@@ -436,7 +437,7 @@ function calculateCosineSimilarity(
  */
 function calculateCategoryDistance(
   studentFeatures: StudentFeatureVector,
-  category: CareerCategory
+  category: BoundaryCategory
 ): number {
   // Create category feature vectors
   const categoryTraits: Record<string, number> = {};
@@ -1097,6 +1098,28 @@ export class DecisionBoundaryEngine {
   getMetrics(): ActiveLearningMetrics {
     return { ...this.metrics };
   }
+
+  getStats(): ActiveLearningMetrics {
+    return this.getMetrics();
+  }
+
+  findBoundaryZones(): DecisionBoundaryZone[] {
+    const zones: DecisionBoundaryZone[] = [];
+
+    for (const [studentId, history] of this.boundaryStudentHistory.entries()) {
+      const latest = history[history.length - 1];
+      if (!latest) continue;
+
+      zones.push({
+        zoneId: `zone-${studentId}`,
+        boundaries: latest.boundaries.map((boundary) => String(boundary.boundaryId)),
+        students: [studentId],
+        learningIntensity: latest.learningValue.totalScore,
+      });
+    }
+
+    return zones;
+  }
   
   /**
    * Update configuration
@@ -1117,6 +1140,10 @@ export class DecisionBoundaryEngine {
    */
   clearHistory(): void {
     this.boundaryStudentHistory.clear();
+  }
+
+  clear(): void {
+    this.clearHistory();
   }
 }
 

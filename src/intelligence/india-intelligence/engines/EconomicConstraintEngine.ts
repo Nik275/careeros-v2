@@ -22,6 +22,7 @@ import {
   IndiaExamType,
   MedicalEducationPath,
 } from '../types';
+import { normalizeLoanToleranceToWillingness } from '../vocabulary';
 
 /**
  * Economic Constraint Engine Configuration
@@ -149,7 +150,9 @@ export class EconomicConstraintEngine {
       affordableExamCoaching: affordableCoaching,
       affordableColleges,
       loanCapacity,
-      loanWillingness: input.profile.financialConstraints.loanTolerance,
+      loanWillingness: normalizeLoanToleranceToWillingness(
+        input.profile.financialConstraints.loanTolerance
+      ),
       familyContribution: this.estimateFamilyContribution(input),
       selfContributionRequired: stratum <= EconomicStratum.LOWER_MIDDLE,
     };

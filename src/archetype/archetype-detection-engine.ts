@@ -13,6 +13,7 @@ import type {
   ArchetypeProfile,
   ArchetypeType,
 } from '@/types/archetype-profile';
+import { ALL_ARCHETYPE_TYPES } from '@/types/archetype-profile';
 import type {
   ArchetypeDetectionInput,
   ArchetypeDetectionResult,
@@ -29,7 +30,6 @@ import {
 } from './archetype-calculator';
 import {
   DEFAULT_ARCHETYPE_SCORING_CONFIG,
-  ALL_ARCHETYPE_TYPES,
   hasSufficientData,
 } from './archetype-types';
 

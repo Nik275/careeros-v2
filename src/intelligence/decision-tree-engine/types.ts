@@ -62,6 +62,15 @@ export type UpsideLevel = 'minimal' | 'low' | 'moderate' | 'high' | 'exceptional
  */
 export type OptionalityLevel = 'constrained' | 'limited' | 'moderate' | 'flexible' | 'expansive';
 
+/**
+ * Metrics that may be attached to decision-tree nodes.
+ *
+ * Decision nodes carry explored path metrics. Outcome nodes may carry future
+ * scenario metrics. Keep this local surface explicit so neither upstream
+ * contract absorbs fields it does not own.
+ */
+export type DecisionTreeNodeMetrics = Partial<PathMetrics> & Partial<ScenarioMetrics>;
+
 // ============================================================================
 // DECISION TREE NODE
 // ============================================================================
@@ -100,7 +109,7 @@ export interface DecisionTreeNode {
     scenarioId?: string;
 
     /** Metrics at this node */
-    metrics?: Partial<PathMetrics>;
+    metrics?: DecisionTreeNodeMetrics;
 
     /** Scores at this node */
     scores?: Partial<PathScores>;
@@ -481,6 +490,9 @@ export interface DecisionTreeInput {
 
   /** Starting career */
   startingCareerId: string;
+
+  /** Optional human-readable starting career name for tree display */
+  startingCareerName?: string;
 
   /** Available career paths */
   careerPaths: ExploredCareerPath[];

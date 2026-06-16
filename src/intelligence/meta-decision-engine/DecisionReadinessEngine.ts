@@ -6,11 +6,11 @@
 
 import type {
   DecisionReadinessAnalysis,
-  DecisionState,
   DecisionTiming,
   MetaDecisionInput,
   MetaDecisionConfig,
 } from './types';
+import { DecisionState } from './types';
 
 /**
  * Evaluates decision readiness.

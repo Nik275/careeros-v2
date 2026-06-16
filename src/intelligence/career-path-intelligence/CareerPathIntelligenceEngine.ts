@@ -24,11 +24,14 @@
  */
 
 import {
+  DEFAULT_CAREER_PATH_CONFIG,
+} from './types';
+
+import type {
   CareerPathIntelligenceInput,
   CareerPathIntelligenceAnalysis,
   CareerPath,
   CareerPathIntelligenceConfig,
-  DEFAULT_CAREER_PATH_CONFIG,
   PathRecommendation,
   IntegratedRecommendation,
 } from './types';
@@ -36,44 +39,44 @@ import {
 import {
   PathDiscoveryEngine,
   createPathDiscoveryEngine,
-  PathDiscoveryEngineConfig,
 } from './engines/PathDiscoveryEngine';
+import type { PathDiscoveryEngineConfig } from './engines/PathDiscoveryEngine';
 
 import {
   PathValidationEngine,
   createPathValidationEngine,
-  PathValidationEngineConfig,
 } from './engines/PathValidationEngine';
+import type { PathValidationEngineConfig } from './engines/PathValidationEngine';
 
 import {
   MilestoneEngine,
   createMilestoneEngine,
-  MilestoneEngineConfig,
 } from './engines/MilestoneEngine';
+import type { MilestoneEngineConfig } from './engines/MilestoneEngine';
 
 import {
   AlternativePathEngine,
   createAlternativePathEngine,
-  AlternativePathEngineConfig,
 } from './engines/AlternativePathEngine';
+import type { AlternativePathEngineConfig } from './engines/AlternativePathEngine';
 
 import {
   FailureRecoveryEngine,
   createFailureRecoveryEngine,
-  FailureRecoveryEngineConfig,
 } from './engines/FailureRecoveryEngine';
+import type { FailureRecoveryEngineConfig } from './engines/FailureRecoveryEngine';
 
 import {
   PathComparisonEngine,
   createPathComparisonEngine,
-  PathComparisonEngineConfig,
 } from './engines/PathComparisonEngine';
+import type { PathComparisonEngineConfig } from './engines/PathComparisonEngine';
 
 import {
   PathExplanationEngine,
   createPathExplanationEngine,
-  PathExplanationEngineConfig,
 } from './engines/PathExplanationEngine';
+import type { PathExplanationEngineConfig } from './engines/PathExplanationEngine';
 
 /**
  * Configuration for Career Path Intelligence Engine

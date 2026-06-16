@@ -7,6 +7,11 @@
 import type { TrendSnapshot, TrendFrequency, TrendEntityType, TrendMetricType } from './TrendSnapshot';
 
 /**
+ * Historical trend point alias.
+ */
+export type TrendPoint = TrendSnapshot;
+
+/**
  * Trend history for a single entity-metric combination.
  */
 export interface TrendHistory {

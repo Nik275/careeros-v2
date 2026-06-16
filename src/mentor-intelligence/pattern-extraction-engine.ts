@@ -368,9 +368,9 @@ export class PatternExtractionEngine {
     const category = this.categorizeTurningPoint(tp);
     
     return {
-      pattern: `${tp.event} leading to ${tp.positiveEffects.join(', ')}`,
+      pattern: `${tp.event} leading to ${tp.positiveEffects.map(effect => effect.description).join(', ')}`,
       category: category as SuccessCategory,
-      behaviors: [tp.event, ...tp.positiveEffects],
+      behaviors: [tp.event, ...tp.positiveEffects.map(effect => effect.description)],
       sourceJourneys: [journey.id],
       type: 'SUCCESS',
     };
@@ -567,7 +567,7 @@ export class PatternExtractionEngine {
   }
 
   private categorizeDecision(decision: CareerDecision): SuccessCategory {
-    const type = decision.decisionType;
+    const type = decision.type;
     
     const categoryMap: Record<string, SuccessCategory> = {
       'CAREER_CHANGE': 'CAREER_ADVANCEMENT',

@@ -82,7 +82,6 @@ export {
 
 // Models
 export {
-  Forecast,
   createForecast,
   calculateExpectedValues,
   generateForecastSummary,
@@ -93,10 +92,16 @@ export {
   type ForecastEntityType,
   type ForecastHorizon,
   type ForecastStatus,
+  type ForecastSignalDirection,
+} from './models/Forecast';
+
+export type {
+  Forecast,
+  ForecastInput,
+  ForecastSignal,
 } from './models/Forecast';
 
 export {
-  ForecastScenario,
   createForecastScenario,
   createScenarioSet,
   compareScenarios,
@@ -106,8 +111,11 @@ export {
   type ScenarioProbability,
 } from './models/ForecastScenario';
 
+export type {
+  ForecastScenario,
+} from './models/ForecastScenario';
+
 export {
-  ForecastRange,
   createForecastRange,
   createAsymmetricRange,
   calculateVariance,
@@ -118,9 +126,11 @@ export {
   assessUncertainty,
 } from './models/ForecastRange';
 
+export type {
+  ForecastRange,
+} from './models/ForecastRange';
+
 export {
-  ForecastConfidence,
-  ConfidenceFactors,
   calculateConfidence,
   assessConfidenceLevel,
   adjustConfidenceForHorizon,
@@ -128,9 +138,12 @@ export {
   mergeConfidence,
 } from './models/ForecastConfidence';
 
+export type {
+  ForecastConfidence,
+  ConfidenceFactors,
+} from './models/ForecastConfidence';
+
 export {
-  ForecastEvidence,
-  EvidenceCollection,
   createForecastEvidence,
   buildEvidenceCollection,
   scoreEvidenceQuality,
@@ -139,4 +152,9 @@ export {
   generateEvidenceSummary,
   type EvidenceType,
   type EvidenceQuality,
+} from './models/ForecastEvidence';
+
+export type {
+  ForecastEvidence,
+  EvidenceCollection,
 } from './models/ForecastEvidence';

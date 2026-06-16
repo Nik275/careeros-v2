@@ -18,19 +18,23 @@ import {
 import { BiasImpactAnalysis } from './BiasImpactAnalysis';
 import { BiasExplanationEngine } from './BiasExplanationEngine';
 
+import {
+  DEFAULT_PROSPECT_THEORY_CONFIG,
+} from './types';
+
 import type {
   BiasAnalysisId,
   BiasProfile,
   BiasSignal,
   BiasImpact,
   BiasType,
+  BiasSeverity,
   BiasAnalysis,
   BiasDetectionInput,
   BiasExplanation,
   DecisionDistortion,
   DecisionDistortionReport,
   ProspectTheoryConfig,
-  DEFAULT_PROSPECT_THEORY_CONFIG,
 } from './types';
 
 /**
@@ -330,7 +334,7 @@ export class ProspectTheoryEngine {
   /**
    * Get bias severity from score.
    */
-  private getBiasSeverity(score: number) {
+  private getBiasSeverity(score: number): BiasSeverity {
     if (score >= 70) return 'extreme';
     if (score >= 50) return 'strong';
     if (score >= 30) return 'moderate';

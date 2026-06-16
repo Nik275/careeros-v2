@@ -15,15 +15,20 @@ import type { CareerIntelligence, CareerId } from '../career-intelligence/career
 import type {
   CareerFitResult,
   FitCalculationConfig,
-  DEFAULT_FIT_CONFIG,
   FitQuery,
   FitComparison,
 } from './career-fit-types';
 
+import { DEFAULT_FIT_CONFIG } from './career-fit-types';
 import { FitCalculator } from './fit-calculator';
 import { FitBreakdownEngine } from './fit-breakdown-engine';
 import { FitConfidenceEngine } from './fit-confidence-engine';
 import { FitExplanationEngine } from './fit-explanation-engine';
+import {
+  createCareerFitObserveHook,
+  type CareerFitObserveHook,
+  type CareerFitObserveHookOptions,
+} from '../intelligence/orchestrator/observe/CareerFitObserveHook';
 
 /**
  * Main orchestrator for Career Fit Engine.
@@ -38,13 +43,15 @@ export class CareerFitEngine {
   private explanationEngine: FitExplanationEngine;
   private config: FitCalculationConfig;
   private fitCache: Map<string, CareerFitResult> = new Map();
+  private observeHook: CareerFitObserveHook;
 
-  constructor(config?: Partial<FitCalculationConfig>) {
+  constructor(config?: Partial<FitCalculationConfig>, observeOptions?: CareerFitObserveHookOptions) {
     this.config = { ...DEFAULT_FIT_CONFIG, ...config };
     this.calculator = new FitCalculator(this.config);
     this.breakdownEngine = new FitBreakdownEngine();
     this.confidenceEngine = new FitConfidenceEngine();
     this.explanationEngine = new FitExplanationEngine();
+    this.observeHook = createCareerFitObserveHook(observeOptions);
   }
 
   /**
@@ -76,6 +83,17 @@ export class CareerFitEngine {
 
     // Cache result
     this.fitCache.set(cacheKey, fitResult);
+
+    this.observeHook.observeCalculateFit({
+      profile,
+      career,
+      profileId,
+      productionOutput: fitResult,
+      independentDryRunOperation: () => {
+        const dryRunEngine = new CareerFitEngine(this.config);
+        return dryRunEngine.calculateFit(profile, career, profileId);
+      },
+    });
 
     return fitResult;
   }
@@ -334,9 +352,10 @@ export class CareerFitEngine {
  * Factory function for CareerFitEngine.
  */
 export function createCareerFitEngine(
-  config?: Partial<FitCalculationConfig>
+  config?: Partial<FitCalculationConfig>,
+  observeOptions?: CareerFitObserveHookOptions
 ): CareerFitEngine {
-  return new CareerFitEngine(config);
+  return new CareerFitEngine(config, observeOptions);
 }
 
 // Re-export all engines and types

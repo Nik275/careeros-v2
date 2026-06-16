@@ -337,12 +337,7 @@ function createMockOption(id: string, title: string): DecisionOption {
     id,
     title,
     description: `Description for ${title}`,
-    industry: 'Technology',
-    educationRequired: 'Bachelor\'s Degree',
-    salaryRange: { min: 80000, max: 150000 },
-    growthOutlook: 'Positive',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    careerId: id,
   };
 }
 
@@ -358,11 +353,11 @@ function createMockAnalysis(
     overall: number;
   },
   confidence: { overall: number },
-  overrides?: { advantages?: Array<{ description: string; importance: number }>; disadvantages?: Array<{ description: string; severity: number }> }
+  overrides?: { advantages?: DecisionAnalysis['advantages']; disadvantages?: DecisionAnalysis['disadvantages'] }
 ): DecisionAnalysis {
   return {
+    decisionId: 'decision-123',
     option: createMockOption(id, title),
-    studentId: 'student-123',
     decisionQuality: {
       fitQuality: { score: quality.fitQuality, confidence: confidence.overall },
       lifestyleQuality: { score: quality.lifestyleQuality, confidence: confidence.overall },
@@ -372,26 +367,96 @@ function createMockAnalysis(
       overall: quality.overall,
     },
     confidence: {
+      profileCertainty: confidence.overall,
+      careerCertainty: confidence.overall,
+      evidenceCertainty: confidence.overall,
+      recommendationCertainty: confidence.overall,
       overall: confidence.overall,
-      fitQuality: confidence.overall,
-      lifestyleQuality: confidence.overall,
-      valueAlignment: confidence.overall,
-      futurePotential: confidence.overall,
-      flexibility: confidence.overall,
     },
     advantages: overrides?.advantages ?? [
-      { description: `Strong ${title} fundamentals`, importance: 80 },
-      { description: 'Good career prospects', importance: 75 },
+      {
+        id: 'advantage-1',
+        description: `Strong ${title} fundamentals`,
+        category: 'FIT',
+        importance: 80,
+        evidence: ['Mock analysis evidence'],
+      },
+      {
+        id: 'advantage-2',
+        description: 'Good career prospects',
+        category: 'GROWTH',
+        importance: 75,
+        evidence: ['Mock market evidence'],
+      },
     ],
     disadvantages: overrides?.disadvantages ?? [
-      { description: 'Competitive field', severity: 60 },
+      {
+        id: 'disadvantage-1',
+        description: 'Competitive field',
+        category: 'BARRIER_TO_ENTRY',
+        severity: 60,
+        isDealBreaker: false,
+        evidence: ['Mock competition evidence'],
+      },
     ],
     risks: [
-      { riskId: 'risk-1', riskScore: 40, description: 'Market volatility', mitigation: 'Diversify skills' },
+      {
+        id: 'risk-1',
+        description: 'Market volatility',
+        category: 'MARKET',
+        probability: 50,
+        impact: 80,
+        riskScore: 40,
+        mitigations: ['Diversify skills'],
+      },
     ],
     opportunities: [
-      { opportunityId: 'opp-1', opportunityScore: 75, description: 'Growing demand' },
+      {
+        id: 'opp-1',
+        description: 'Growing demand',
+        category: 'INDUSTRY_SHIFT',
+        probability: 75,
+        potentialValue: 100,
+        opportunityScore: 75,
+        requirements: ['Keep skills current'],
+      },
     ],
+    tradeoffs: {
+      gains: [
+        {
+          id: 'gain-1',
+          description: 'Career growth',
+          category: 'EXPERIENCE',
+          magnitude: 80,
+        },
+      ],
+      losses: [
+        {
+          id: 'loss-1',
+          description: 'Alternative path optionality',
+          category: 'ALTERNATIVE_PATH',
+          magnitude: 30,
+          isPermanent: false,
+        },
+      ],
+      becomesEasier: ['Building domain expertise'],
+      becomesHarder: ['Switching to unrelated paths'],
+      primaryTradeoff: {
+        name: 'Growth versus flexibility',
+        description: 'Mock tradeoff for comparison tests.',
+        gain: 'Career growth',
+        sacrifice: 'Some flexibility',
+        forWhom: 'Students prioritizing growth',
+        avoidIf: 'Student needs maximum reversibility',
+      },
+    },
+    explanation: {
+      whyAttractive: `${title} has strong upside.`,
+      whyRisky: `${title} has market uncertainty.`,
+      whyAlternativeMayOutperform: 'Another option may fit different values better.',
+      keyFactors: ['fit', 'growth', 'flexibility'],
+      summary: `Mock explanation for ${title}.`,
+    },
     analyzedAt: new Date(),
   };
 }

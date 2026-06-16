@@ -272,10 +272,10 @@ export class OptionalityEngine {
     if (option.reversibility.score > 70) {
       enablers.push('Path is reversible if needed');
     }
-    if (input.dimensionScores.get('analyticalThinking')?.percentileScore ?? 0 > 70) {
+    if (input.dimensionScores.get('analyticalThinking')?.score ?? 0 > 70) {
       enablers.push('Strong analytical skills transfer across fields');
     }
-    if (input.dimensionScores.get('adaptability')?.percentileScore ?? 0 > 70) {
+    if (input.dimensionScores.get('adaptability')?.score ?? 0 > 70) {
       enablers.push('High adaptability enables pivots');
     }
 

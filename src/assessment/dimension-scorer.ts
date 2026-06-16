@@ -14,8 +14,8 @@ import type {
   DimensionScore,
   DimensionScoreMap,
   SupportedDimension,
-  SUPPORTED_DIMENSIONS,
 } from './assessment-types';
+import { SUPPORTED_DIMENSIONS } from './assessment-types';
 
 /**
  * Calculates dimension scores from assessment signals.

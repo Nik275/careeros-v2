@@ -75,6 +75,21 @@ export interface MarketAwareCareerAnalysis {
 }
 
 /**
+ * Input required before computed market-aware analysis fields are assigned.
+ */
+export type MarketAwareCareerAnalysisInput = Omit<
+  MarketAwareCareerAnalysis,
+  | 'marketAdjustment'
+  | 'finalScore'
+  | 'confidence'
+  | 'marketImpact'
+  | 'explanation'
+  | 'marketDriven'
+  | 'confidenceAdjustment'
+  | 'riskFlags'
+>;
+
+/**
  * Weights for final score calculation.
  */
 export interface ScoreWeights {
@@ -133,10 +148,7 @@ export const DEFAULT_ANALYSIS_CONFIG: AnalysisConfig = {
  * Create market-aware career analysis.
  */
 export function createMarketAwareAnalysis(
-  params: Omit<
-    MarketAwareCareerAnalysis,
-    'marketAdjustment' | 'finalScore' | 'confidence' | 'marketImpact' | 'explanation' | 'marketDriven' | 'confidenceAdjustment' | 'riskFlags'
-  >,
+  params: MarketAwareCareerAnalysisInput,
   config: Partial<AnalysisConfig> = {}
 ): MarketAwareCareerAnalysis {
   const fullConfig = { ...DEFAULT_ANALYSIS_CONFIG, ...config };
@@ -204,11 +216,12 @@ export function createMarketAwareAnalysis(
     marketAdjustment,
     confidenceAdjustment,
     finalScore,
-    marketDriven
+    marketDriven,
+    confidence
   );
 
   // Identify risk flags
-  const riskFlags = identifyRiskFlags(params, marketAdjustment);
+  const riskFlags = identifyRiskFlags(params, marketAdjustment, confidence);
 
   return {
     ...params,
@@ -351,14 +364,12 @@ function generateMarketImpactExplanation(
  * Generate full explanation.
  */
 function generateFullExplanation(
-  params: Omit<
-    MarketAwareCareerAnalysis,
-    'marketAdjustment' | 'finalScore' | 'confidence' | 'marketImpact' | 'explanation' | 'marketDriven' | 'confidenceAdjustment' | 'riskFlags'
-  >,
+  params: MarketAwareCareerAnalysisInput,
   marketAdjustment: number,
   confidenceAdjustment: number,
   finalScore: number,
-  marketDriven: boolean
+  marketDriven: boolean,
+  confidence: number
 ): string[] {
   const explanation: string[] = [];
 
@@ -385,9 +396,9 @@ function generateFullExplanation(
 
   // Confidence
   if (confidenceAdjustment > 0) {
-    explanation.push(`High confidence (${params.confidence}%) due to alignment of fit and market conditions.`);
+    explanation.push(`High confidence (${confidence}%) due to alignment of fit and market conditions.`);
   } else if (confidenceAdjustment < 0) {
-    explanation.push(`Moderate confidence (${params.confidence}%) due to fit-market divergence.`);
+    explanation.push(`Moderate confidence (${confidence}%) due to fit-market divergence.`);
   }
 
   // Audit warning
@@ -402,11 +413,9 @@ function generateFullExplanation(
  * Identify risk flags.
  */
 function identifyRiskFlags(
-  params: Omit<
-    MarketAwareCareerAnalysis,
-    'marketAdjustment' | 'finalScore' | 'confidence' | 'marketImpact' | 'explanation' | 'marketDriven' | 'confidenceAdjustment' | 'riskFlags'
-  >,
-  marketAdjustment: number
+  params: MarketAwareCareerAnalysisInput,
+  marketAdjustment: number,
+  confidence: number
 ): string[] {
   const flags: string[] = [];
 
@@ -422,7 +431,7 @@ function identifyRiskFlags(
     flags.push('large-market-adjustment');
   }
 
-  if (params.confidence < 60) {
+  if (confidence < 60) {
     flags.push('low-overall-confidence');
   }
 

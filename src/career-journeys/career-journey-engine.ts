@@ -22,7 +22,6 @@ import {
   JourneyMetadata,
   JourneySource,
   // ConfidenceLevel BANNED - use Confidence from @/intelligence/confidence
-  ValidationResult,
   AnalysisDepth,
   JourneyAnalysisInput,
   JourneyAnalysisResult,
@@ -82,7 +81,7 @@ export interface CareerJourneyEngineConfig {
  * Default engine configuration
  */
 const DEFAULT_CONFIG: CareerJourneyEngineConfig = {
-  minDataQuality: 'MODERATE',
+  minDataQuality: 0.5,
   defaultAnalysisDepth: 'STANDARD',
   maxBatchSize: 100,
   enableCaching: true,
@@ -133,7 +132,7 @@ export class CareerJourneyEngine {
       updatedAt: now,
       verified: false,
       source,
-      dataQuality: 'MODERATE',
+      dataQuality: 0.5,
       tags: [],
     };
 
@@ -158,6 +157,7 @@ export class CareerJourneyEngine {
       lessons: [],
       regrets: [],
       metadata,
+      networkQuality: () => startingPoint.familyBackground.networkQuality,
     };
 
     const validation = this.validateJourney(journey);
@@ -450,7 +450,7 @@ export class CareerJourneyEngine {
     const allJourneys = Array.from(this.journeyStore.values());
     
     const results: SimilarJourneyResult[] = allJourneys
-      .map(journey => ({
+      .map((journey): SimilarJourneyResult => ({
         journeyId: journey.id,
         similarityScore: this.calculateSimilarity(journey, query),
         matchingFactors: this.getMatchingFactors(journey, query),
@@ -510,9 +510,10 @@ export class CareerJourneyEngine {
       );
     }
 
-    if (criteria.minDataQuality) {
+    if (criteria.minDataQuality !== undefined) {
+      const minDataQuality = criteria.minDataQuality;
       journeys = journeys.filter(
-        j => this.compareConfidence(j.metadata.dataQuality, criteria.minDataQuality) >= 0
+        j => this.compareConfidence(j.metadata.dataQuality, minDataQuality) >= 0
       );
     }
 
@@ -576,7 +577,7 @@ export class CareerJourneyEngine {
     }
 
     // Data quality check
-    if (journey.metadata.dataQuality === 'VERY_LOW') {
+    if (journey.metadata.dataQuality < 0.2) {
       warnings.push({
         field: 'dataQuality',
         message: 'Data quality is very low, results may be unreliable',

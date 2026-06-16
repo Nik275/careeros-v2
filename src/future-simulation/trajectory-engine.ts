@@ -23,6 +23,7 @@ import type {
   LikelihoodEstimate,
   FutureSimulationConfig,
 } from './future-simulation-types';
+import { DEFAULT_FUTURE_SIMULATION_CONFIG } from './future-simulation-types';
 import type { CareerIntelligence } from '@/career-intelligence/career-types';
 
 /**
@@ -502,7 +503,7 @@ export class TrajectoryEngine {
     career: CareerIntelligence,
     scenarioType: ScenarioType
   ): IncomeBand {
-    const baseSalary = career.metadata.averageSalary.median;
+    const baseSalary = (career.lifestyleCharacteristics.incomePotential?.score ?? 50) * 2000;
 
     // Level multipliers
     let multiplier = 1.0;
@@ -548,7 +549,7 @@ export class TrajectoryEngine {
     // Adjust by career advantages
     const advantages = career.careerAdvantages;
     if (advantages.careerMobility?.score ?? 0 > 70) adjustment += 5;
-    if (advantages.salaryGrowth?.score ?? 0 > 70) adjustment += 5;
+    if (advantages.futureRelevance?.score ?? 0 > 70) adjustment += 5;
     if (advantages.optionality?.score ?? 0 > 70) adjustment += 5;
 
     return Math.max(0, Math.min(100, baseSatisfaction + adjustment));
@@ -696,7 +697,7 @@ export function createTrajectoryEngine(
   config?: Partial<FutureSimulationConfig>
 ): TrajectoryEngine {
   const fullConfig: FutureSimulationConfig = {
-    ...import('./future-simulation-types').DEFAULT_FUTURE_SIMULATION_CONFIG,
+    ...DEFAULT_FUTURE_SIMULATION_CONFIG,
     ...config,
   };
 
