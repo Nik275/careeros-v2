@@ -14,21 +14,29 @@ export default function WelcomePage() {
       {/* 1. Deep Space Cosmic Background */}
       <CareerGlobeBackground variant="landing" />
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 bg-black/80 backdrop-blur-md border-b border-white/[0.04]">
-        <div className="text-[17px] font-semibold tracking-tight">CareerOS</div>
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-4 sm:px-6 md:px-10 py-5 bg-black/80 backdrop-blur-md border-b border-white/[0.04]">
+        <div className="shrink-0 text-[17px] font-semibold tracking-tight">CareerOS</div>
         <div className="hidden md:flex items-center gap-10 text-[12px] font-medium tracking-[0.15em] text-white/50">
           <Link href="#how-it-works" className="hover:text-white transition-colors uppercase">How it works</Link>
           <Link href="#intelligence" className="hover:text-white transition-colors uppercase">Intelligence</Link>
         </div>
-        <Link href="/assessment">
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 md:py-2 rounded-full bg-[#8052ff] text-white text-[13px] font-semibold tracking-[0.05em] hover:bg-[#6c42db] transition-colors"
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link
+            href="/sign-in"
+            className="rounded-full border border-white/10 px-3 py-2 text-[12px] font-medium tracking-[0.04em] text-white/70 transition-colors hover:border-white/20 hover:text-white sm:px-4"
           >
-            START
-          </motion.button>
-        </Link>
+            Sign in
+          </Link>
+          <Link href="/assessment">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-4 py-2.5 sm:px-5 md:px-6 md:py-2 rounded-full bg-[#8052ff] text-white text-[13px] font-semibold tracking-[0.05em] hover:bg-[#6c42db] transition-colors"
+            >
+              START
+            </motion.button>
+          </Link>
+        </div>
       </nav>
 
       {/* Hero Section */}
