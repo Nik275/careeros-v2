@@ -262,7 +262,8 @@ export function PsychologyQuestions({
           alignItems: 'center',
           justifyContent: 'flex-start',
           overflowY: 'auto',
-          padding: '0 0 160px 0',
+          minHeight: 0,
+          padding: '0 0 calc(24px + env(safe-area-inset-bottom, 0px)) 0',
         }}
       >
         <AnimatePresence mode="wait" custom={direction}>
@@ -282,7 +283,7 @@ export function PsychologyQuestions({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              margin: 'auto 0',
+              margin: '0',
             }}
           >
             <QuestionCard
@@ -302,14 +303,14 @@ export function PsychologyQuestions({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: duration.normal, delay: 0.3, ease: ease.luxury }}
         style={{
-          position: 'fixed',
+          position: 'relative',
           bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '20px',
+          margin: '0 -20px -20px',
+          padding: '12px 20px calc(8px + env(safe-area-inset-bottom, 0px))',
           background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.8) 70%, transparent 100%)',
           display: 'flex',
           justifyContent: 'center',
+          flexShrink: 0,
           zIndex: 10,
         }}
       >

@@ -58,7 +58,7 @@ export function QuestionCard({
         maxWidth: '720px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
+        gap: '18px',
       }}
     >
       {/* Progress Bar */}
