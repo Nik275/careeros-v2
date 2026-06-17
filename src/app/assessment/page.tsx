@@ -113,7 +113,8 @@ export default function AssessmentPage() {
           position: 'relative',
           zIndex: 1,
           width: '100%',
-          height: '100vh',
+          height: '100dvh',
+          minHeight: '100svh',
           overflow: 'hidden',
         }}
       >

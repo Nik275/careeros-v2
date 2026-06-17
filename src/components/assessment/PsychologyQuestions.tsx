@@ -177,7 +177,10 @@ export function PsychologyQuestions({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        padding: '20px',
+        height: '100%',
+        minHeight: 0,
+        padding: '20px 20px 0',
+        boxSizing: 'border-box',
         overflow: 'hidden',
       }}
     >
@@ -192,6 +195,7 @@ export function PsychologyQuestions({
           justifyContent: 'space-between',
           marginBottom: '24px',
           paddingTop: '8px',
+          flexShrink: 0,
         }}
       >
         <motion.button
@@ -263,7 +267,8 @@ export function PsychologyQuestions({
           justifyContent: 'flex-start',
           overflowY: 'auto',
           minHeight: 0,
-          padding: '0 0 calc(24px + env(safe-area-inset-bottom, 0px)) 0',
+          padding: '0 0 calc(20px + env(safe-area-inset-bottom, 0px)) 0',
+          scrollPaddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
         }}
       >
         <AnimatePresence mode="wait" custom={direction}>
@@ -304,16 +309,30 @@ export function PsychologyQuestions({
         transition={{ duration: duration.normal, delay: 0.3, ease: ease.luxury }}
         style={{
           position: 'relative',
-          bottom: 0,
-          margin: '0 -20px -20px',
-          padding: '12px 20px calc(8px + env(safe-area-inset-bottom, 0px))',
+          margin: '0 -20px',
+          padding: '12px 20px calc(14px + env(safe-area-inset-bottom, 0px))',
           background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.8) 70%, transparent 100%)',
           display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           justifyContent: 'center',
+          gap: '8px',
           flexShrink: 0,
           zIndex: 10,
+          pointerEvents: 'none',
         }}
       >
+        <span
+          style={{
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontSize: '13px',
+            fontWeight: 450,
+            color: 'rgba(255, 255, 255, 0.42)',
+            lineHeight: 1,
+          }}
+        >
+          {currentQuestionIndex + 1} of {questions.length}
+        </span>
         <motion.button
           onClick={handleNext}
           disabled={!hasSelection}
@@ -340,6 +359,7 @@ export function PsychologyQuestions({
               ? '0 12px 32px rgba(128,82,255,0.3), 0 4px 12px rgba(0,0,0,0.2)'
               : 'none',
             transition: 'all 0.3s ease',
+            pointerEvents: 'auto',
           }}
         >
           {currentQuestionIndex === questions.length - 1 ? 'See Your Results' : 'Continue'}

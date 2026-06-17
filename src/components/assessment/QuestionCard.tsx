@@ -58,7 +58,8 @@ export function QuestionCard({
         maxWidth: '720px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px',
+        gap: '12px',
+        paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
       }}
     >
       {/* Progress Bar */}
@@ -146,7 +147,7 @@ export function QuestionCard({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px',
+          gap: '6px',
           width: '100%',
         }}
       >
@@ -178,7 +179,7 @@ export function QuestionCard({
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '4px',
-                padding: '16px 20px',
+                padding: '10px 14px',
                 borderRadius: '16px',
                 background: isSelected
                   ? 'linear-gradient(135deg, rgba(128, 82, 255, 0.2) 0%, rgba(100, 50, 200, 0.15) 100%)'
@@ -193,6 +194,7 @@ export function QuestionCard({
                 textAlign: 'left',
                 width: '100%',
                 transition: 'all 0.25s ease',
+                scrollMarginBottom: 'calc(112px + env(safe-area-inset-bottom, 0px))',
               }}
             >
               <div
@@ -270,9 +272,9 @@ export function QuestionCard({
                   }}
                   style={{
                     fontFamily: 'Inter, system-ui, sans-serif',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     fontWeight: 400,
-                    lineHeight: '1.5',
+                    lineHeight: '1.4',
                     color: isSelected ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.55)',
                     margin: '0 0 0 34px',
                     paddingTop: '4px',
@@ -287,27 +289,6 @@ export function QuestionCard({
         })}
       </div>
 
-      {/* Question Counter */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: duration.normal, delay: 0.4 }}
-        style={{
-          textAlign: 'center',
-          marginTop: '8px',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'Inter, system-ui, sans-serif',
-            fontSize: '13px',
-            fontWeight: 450,
-            color: 'rgba(255, 255, 255, 0.4)',
-          }}
-        >
-          {questionNumber} of {totalQuestions}
-        </span>
-      </motion.div>
     </motion.div>
   );
 }
