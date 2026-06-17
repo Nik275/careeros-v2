@@ -1,38 +1,325 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Target, Heart, Briefcase, TrendingUp, Users, Clock, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import {
+  ArrowRight,
+  Sparkles,
+  Target,
+  Briefcase,
+  TrendingUp,
+  ShieldAlert,
+  Compass,
+  RefreshCw,
+  BadgeIndianRupee,
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { ease, duration, stagger } from '@/lib/motion';
-import { AssessmentData } from '@/app/assessment/page';
+import type { AssessmentData } from '@/app/assessment/page';
+import { generateCareerResultIntelligence, type CareerRecommendation } from './resultIntelligence';
 
 interface ResultsDashboardProps {
   data: AssessmentData;
   onRestart: () => void;
 }
 
-// Mock results based on assessment data
-const mockResults = {
-  archetype: {
-    name: 'The Strategic Creator',
-    description: 'You thrive when combining analytical thinking with creative problem-solving. You value autonomy and meaningful impact.',
-    match: 94,
-  },
-  topCareers: [
-    { name: 'Product Manager', match: 96, growth: 'High', salary: '$95K-$180K' },
-    { name: 'UX Researcher', match: 91, growth: 'Very High', salary: '$75K-$145K' },
-    { name: 'Strategy Consultant', match: 88, growth: 'High', salary: '$85K-$200K' },
-  ],
-  insights: [
-    { title: 'Your Strength', description: 'You excel at connecting ideas and seeing patterns others miss.', icon: Sparkles },
-    { title: 'Ideal Environment', description: 'You need autonomy with collaborative touchpoints.', icon: Users },
-    { title: 'Growth Path', description: 'Leadership roles that leverage your strategic thinking.', icon: TrendingUp },
-  ],
-};
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <h3
+      style={{
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '12px',
+        fontWeight: 620,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: 'rgba(255, 255, 255, 0.46)',
+        margin: '0 0 14px 0',
+      }}
+    >
+      {children}
+    </h3>
+  );
+}
+
+function IntelligenceCard({
+  title,
+  children,
+  accent = 'rgba(128, 82, 255, 0.16)',
+}: {
+  title: string;
+  children: ReactNode;
+  accent?: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: '20px',
+        background: 'linear-gradient(135deg, rgba(20,20,25,0.92) 0%, rgba(10,10,15,0.86) 100%)',
+        borderRadius: '16px',
+        border: '1px solid rgba(255,255,255,0.05)',
+        boxShadow: '0 2px 14px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div
+        style={{
+          width: '30px',
+          height: '3px',
+          borderRadius: '999px',
+          background: accent,
+          marginBottom: '12px',
+        }}
+      />
+      <h4
+        style={{
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: '14px',
+          fontWeight: 650,
+          color: '#ffffff',
+          margin: '0 0 8px 0',
+        }}
+      >
+        {title}
+      </h4>
+      {children}
+    </div>
+  );
+}
+
+function SmallText({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '13px',
+        lineHeight: '1.55',
+        color: 'rgba(255, 255, 255, 0.58)',
+        margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function PathMiniCard({
+  label,
+  path,
+  icon,
+}: {
+  label: string;
+  path: CareerRecommendation;
+  icon: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        padding: '18px',
+        background: 'rgba(255,255,255,0.035)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '14px',
+        display: 'flex',
+        gap: '14px',
+        alignItems: 'flex-start',
+      }}
+    >
+      <div
+        style={{
+          width: '38px',
+          height: '38px',
+          borderRadius: '12px',
+          background: 'rgba(128,82,255,0.13)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '1px solid rgba(128,82,255,0.2)',
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </div>
+      <div>
+        <div
+          style={{
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontSize: '11px',
+            fontWeight: 650,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.44)',
+            marginBottom: '4px',
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontSize: '15px',
+            fontWeight: 680,
+            color: '#ffffff',
+            marginBottom: '4px',
+          }}
+        >
+          {path.title}
+        </div>
+        <SmallText>{path.salaryRange}</SmallText>
+      </div>
+    </div>
+  );
+}
+
+function RecommendationCard({ career, index }: { career: CareerRecommendation; index: number }) {
+  const accent =
+    index === 0
+      ? 'rgba(128, 82, 255, 0.9)'
+      : index === 1
+        ? 'rgba(87, 181, 255, 0.82)'
+        : 'rgba(69, 214, 160, 0.78)';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: duration.normal,
+        delay: 0.55 + index * stagger.tight,
+        ease: ease.luxury,
+      }}
+      style={{
+        padding: '22px',
+        background: 'linear-gradient(135deg, rgba(20,20,25,0.94) 0%, rgba(10,10,15,0.88) 100%)',
+        borderRadius: '16px',
+        border: '1px solid rgba(255,255,255,0.055)',
+        boxShadow: '0 2px 14px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '16px',
+          alignItems: 'flex-start',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '5px 9px',
+              borderRadius: '999px',
+              background: 'rgba(255,255,255,0.045)',
+              color: 'rgba(255,255,255,0.56)',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: '11px',
+              fontWeight: 650,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              marginBottom: '10px',
+            }}
+          >
+            Path {index + 1}
+          </div>
+          <h4
+            style={{
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: '19px',
+              fontWeight: 700,
+              color: '#ffffff',
+              margin: '0 0 8px 0',
+            }}
+          >
+            {career.title}
+          </h4>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              alignItems: 'center',
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.72)',
+              }}
+            >
+              <BadgeIndianRupee size={15} strokeWidth={1.7} style={{ color: accent }} />
+              {career.salaryRange}
+            </span>
+          </div>
+        </div>
+
+        <div
+          style={{
+            minWidth: '68px',
+            height: '68px',
+            borderRadius: '16px',
+            background: 'rgba(128,82,255,0.1)',
+            border: '1px solid rgba(128,82,255,0.2)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: '20px',
+              fontWeight: 760,
+              color: accent,
+              lineHeight: 1,
+            }}
+          >
+            {career.fitScore}%
+          </span>
+          <span
+            style={{
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: '10px',
+              color: 'rgba(255,255,255,0.42)',
+              marginTop: '4px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
+            Fit
+          </span>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gap: '12px' }}>
+        <IntelligenceCard title="Why it fits" accent={accent}>
+          <SmallText>{career.whyFits}</SmallText>
+        </IntelligenceCard>
+        <IntelligenceCard title="Answer pattern" accent={accent}>
+          <SmallText>{career.answerPattern}</SmallText>
+        </IntelligenceCard>
+        <IntelligenceCard title="Tradeoff" accent="rgba(255, 180, 90, 0.45)">
+          <SmallText>{career.tradeoff}</SmallText>
+        </IntelligenceCard>
+        <IntelligenceCard title="Best next step" accent="rgba(69, 214, 160, 0.5)">
+          <SmallText>{career.nextStep}</SmallText>
+        </IntelligenceCard>
+        <IntelligenceCard title="Avoid this if..." accent="rgba(255, 100, 120, 0.45)">
+          <SmallText>{career.avoidIf}</SmallText>
+        </IntelligenceCard>
+      </div>
+    </motion.div>
+  );
+}
 
 export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'careers' | 'path'>('overview');
   const [isHovered, setIsHovered] = useState(false);
+  const results = useMemo(() => generateCareerResultIntelligence(data), [data]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -64,7 +351,6 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
         overflowY: 'auto',
       }}
     >
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -84,13 +370,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             gap: '8px',
           }}
         >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ color: '#8052ff' }}
-          >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ color: '#8052ff' }}>
             <path
               d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
               fill="currentColor"
@@ -130,29 +410,28 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
         </motion.button>
       </motion.div>
 
-      {/* Content */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         style={{
           width: '100%',
-          maxWidth: '720px',
+          maxWidth: '820px',
           margin: '0 auto',
           display: 'flex',
           flexDirection: 'column',
           gap: '24px',
+          paddingBottom: '32px',
         }}
       >
-        {/* Success Message */}
         <motion.div
           variants={itemVariants}
           style={{
             textAlign: 'center',
-            padding: '32px 24px',
-            background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.08) 0%, rgba(108, 66, 219, 0.06) 100%)',
+            padding: '30px 22px',
+            background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.1) 0%, rgba(30, 30, 45, 0.78) 100%)',
             borderRadius: '20px',
-            border: '1px solid rgba(128, 82, 255, 0.15)',
+            border: '1px solid rgba(128, 82, 255, 0.18)',
           }}
         >
           <motion.div
@@ -176,8 +455,8 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
           <h2
             style={{
               fontFamily: 'Inter, "SF Pro Display", system-ui, sans-serif',
-              fontSize: '24px',
-              fontWeight: 640,
+              fontSize: 'clamp(24px, 4vw, 34px)',
+              fontWeight: 720,
               color: '#ffffff',
               margin: '0 0 8px 0',
             }}
@@ -188,23 +467,23 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: '15px',
-              color: 'rgba(255, 255, 255, 0.55)',
+              lineHeight: 1.55,
+              color: 'rgba(255, 255, 255, 0.62)',
               margin: 0,
             }}
           >
-            Based on your psychology and preferences
+            India-aware recommendations based on your motivations, strengths, work style, lifestyle, and risk signals.
           </p>
         </motion.div>
 
-        {/* Archetype Card */}
         <motion.div
           variants={itemVariants}
           style={{
-            padding: '28px',
-            background: 'linear-gradient(135deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.85) 100%)',
+            padding: '26px',
+            background: 'linear-gradient(135deg, rgba(20,20,25,0.93) 0%, rgba(10,10,15,0.88) 100%)',
             borderRadius: '20px',
-            border: '1px solid rgba(255,255,255,0.04)',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.03)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            boxShadow: '0 2px 16px rgba(0,0,0,0.04)',
           }}
         >
           <div
@@ -212,7 +491,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               display: 'flex',
               alignItems: 'flex-start',
               gap: '16px',
-              marginBottom: '16px',
+              marginBottom: '18px',
             }}
           >
             <div
@@ -220,7 +499,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
                 width: '48px',
                 height: '48px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.15) 0%, rgba(108, 66, 219, 0.12) 100%)',
+                background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.16) 0%, rgba(108, 66, 219, 0.12) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -234,21 +513,22 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               <div
                 style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '4px',
+                  gap: '10px',
+                  marginBottom: '7px',
                 }}
               >
                 <h3
                   style={{
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '20px',
-                    fontWeight: 640,
+                    fontWeight: 700,
                     color: '#ffffff',
                     margin: 0,
                   }}
                 >
-                  {mockResults.archetype.name}
+                  {results.archetype.name}
                 </h3>
                 <span
                   style={{
@@ -257,258 +537,130 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
                     borderRadius: '6px',
                     fontFamily: 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
-                    fontWeight: 600,
+                    fontWeight: 650,
                     color: 'rgba(128, 82, 255, 1)',
                   }}
                 >
-                  {mockResults.archetype.match}% match
+                  {results.archetype.match}% identity fit
                 </span>
               </div>
-              <p
-                style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: '14px',
-                  lineHeight: '1.6',
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  margin: 0,
-                }}
-              >
-                {mockResults.archetype.description}
-              </p>
+              <SmallText>{results.archetype.description}</SmallText>
             </div>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            <IntelligenceCard title="Your decision pattern">
+              <SmallText>{results.summary.decisionPattern}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Your strongest signals" accent="rgba(87, 181, 255, 0.45)">
+              <SmallText>{results.summary.strongestSignals}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Your hidden tension" accent="rgba(255, 180, 90, 0.45)">
+              <SmallText>{results.summary.hiddenTension}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="What you should not ignore" accent="rgba(69, 214, 160, 0.45)">
+              <SmallText>{results.summary.whatNotIgnore}</SmallText>
+            </IntelligenceCard>
           </div>
         </motion.div>
 
-        {/* Top Career Matches */}
         <motion.div variants={itemVariants}>
-          <h3
+          <SectionLabel>CareerOS recommendation frame</SectionLabel>
+          <div
             style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '13px',
-              fontWeight: 580,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.45)',
-              margin: '0 0 16px 0',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
             }}
           >
-            Top Career Matches
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {mockResults.topCareers.map((career, index) => (
-              <motion.div
-                key={career.name}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: duration.normal,
-                  delay: 0.5 + index * stagger.tight,
-                  ease: ease.luxury,
-                }}
-                whileHover={{
-                  scale: 1.01,
-                  y: -2,
-                  transition: { duration: duration.instant, ease: ease.snappy },
-                }}
-                style={{
-                  padding: '20px 24px',
-                  background: 'linear-gradient(135deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.85) 100%)',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(255,255,255,0.04)',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div
-                    style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '12px',
-                      background: index === 0 
-                        ? 'rgba(128, 82, 255, 0.12)' 
-                        : index === 1 
-                        ? 'rgba(108, 66, 219, 0.12)' 
-                        : 'rgba(150, 100, 255, 0.12)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: index === 0 
-                        ? '1px solid rgba(128, 82, 255, 0.2)' 
-                        : index === 1 
-                        ? '1px solid rgba(108, 66, 219, 0.2)' 
-                        : '1px solid rgba(150, 100, 255, 0.2)',
-                    }}
-                  >
-                    <Briefcase
-                      size={20}
-                      strokeWidth={1.5}
-                      style={{
-                        color: index === 0 
-                          ? 'rgba(128, 82, 255, 0.85)' 
-                          : index === 1 
-                          ? 'rgba(108, 66, 219, 0.85)' 
-                          : 'rgba(150, 100, 255, 0.85)',
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: 'Inter, system-ui, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: 600,
-                        color: '#ffffff',
-                        marginBottom: '2px',
-                      }}
-                    >
-                      {career.name}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: 'Inter, system-ui, sans-serif',
-                        fontSize: '13px',
-                        color: 'rgba(255, 255, 255, 0.5)',
-                      }}
-                    >
-                      {career.salary} • {career.growth} growth
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span
-                    style={{
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                      fontSize: '18px',
-                      fontWeight: 700,
-                      color: index === 0 
-                        ? 'rgba(128, 82, 255, 1)' 
-                        : index === 1 
-                        ? 'rgba(108, 66, 219, 1)' 
-                        : 'rgba(150, 100, 255, 1)',
-                    }}
-                  >
-                    {career.match}%
-                  </span>
-                  <ChevronRight size={18} style={{ color: 'rgba(255, 255, 255, 0.3)' }} />
-                </div>
-              </motion.div>
+            <PathMiniCard
+              label="Natural Fit Path"
+              path={results.paths.naturalFit}
+              icon={<Compass size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
+            />
+            <PathMiniCard
+              label="Best Long-Term Outcome"
+              path={results.paths.longTermOutcome}
+              icon={<TrendingUp size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
+            />
+            <PathMiniCard
+              label="Balanced Recommendation"
+              path={results.paths.balanced}
+              icon={<ShieldAlert size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
+            />
+          </div>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <SectionLabel>Top 3 recommended paths</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {results.recommendations.map((career, index) => (
+              <RecommendationCard key={career.id} career={career} index={index} />
             ))}
           </div>
         </motion.div>
 
-        {/* Key Insights */}
-        <motion.div variants={itemVariants}>
-          <h3
-            style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '13px',
-              fontWeight: 580,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.45)',
-              margin: '0 0 16px 0',
-            }}
-          >
-            Key Insights
-          </h3>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '12px',
-            }}
-          >
-            {mockResults.insights.map((insight, index) => {
-              const Icon = insight.icon;
-              return (
-                <motion.div
-                  key={insight.title}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: duration.normal,
-                    delay: 0.7 + index * stagger.tight,
-                    ease: ease.luxury,
-                  }}
-                  style={{
-                    padding: '20px',
-                    background: 'linear-gradient(135deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.85) 100%)',
-                    borderRadius: '16px',
-                    border: '1px solid rgba(255,255,255,0.04)',
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
-                  }}
-                >
-                  <Icon
-                    size={20}
-                    strokeWidth={1.5}
-                    style={{
-                      color: 'rgba(128, 82, 255, 0.7)',
-                      marginBottom: '12px',
-                    }}
-                  />
-                  <h4
-                    style={{
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: '#ffffff',
-                      margin: '0 0 6px 0',
-                    }}
-                  >
-                    {insight.title}
-                  </h4>
-                  <p
-                    style={{
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                      fontSize: '13px',
-                      lineHeight: '1.5',
-                      color: 'rgba(255, 255, 255, 0.55)',
-                      margin: 0,
-                    }}
-                  >
-                    {insight.description}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* CTA */}
         <motion.div
           variants={itemVariants}
           style={{
-            padding: '32px',
-            background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.08) 0%, rgba(108, 66, 219, 0.06) 100%)',
+            padding: '26px',
+            background: 'linear-gradient(135deg, rgba(128, 82, 255, 0.1) 0%, rgba(10,10,15,0.86) 100%)',
             borderRadius: '20px',
-            border: '1px solid rgba(128, 82, 255, 0.12)',
+            border: '1px solid rgba(128, 82, 255, 0.14)',
+          }}
+        >
+          <SectionLabel>Come back reason</SectionLabel>
+          <div style={{ display: 'grid', gap: '14px' }}>
+            <IntelligenceCard title="Your next 7-day clarity action" accent="rgba(69, 214, 160, 0.52)">
+              <SmallText>{results.nextSevenDayAction}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="What to test before choosing" accent="rgba(255, 180, 90, 0.48)">
+              <SmallText>{results.testBeforeChoosing}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Update your model" accent="rgba(128, 82, 255, 0.5)">
+              <SmallText>{results.comebackPrompt}</SmallText>
+            </IntelligenceCard>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          style={{
+            padding: '30px',
+            background: 'linear-gradient(135deg, rgba(20,20,25,0.92) 0%, rgba(10,10,15,0.86) 100%)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255,255,255,0.05)',
             textAlign: 'center',
           }}
         >
+          <Briefcase size={22} strokeWidth={1.5} style={{ color: 'rgba(128,82,255,0.8)', marginBottom: '12px' }} />
           <h3
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: '18px',
-              fontWeight: 640,
+              fontWeight: 680,
               color: '#ffffff',
               margin: '0 0 8px 0',
             }}
           >
-            Want the full report?
+            Keep refining your CareerOS model
           </h3>
           <p
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.55)',
-              margin: '0 0 24px 0',
+              color: 'rgba(255, 255, 255, 0.58)',
+              margin: '0 0 22px 0',
+              lineHeight: 1.55,
             }}
           >
-            Get detailed career paths, skill recommendations, and next steps.
+            This staging result uses logic-based intelligence only. The next useful input is what happens after you test the recommended path.
           </p>
           <motion.button
             onMouseEnter={() => setIsHovered(true)}
@@ -522,11 +674,11 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '10px',
-              height: '52px',
-              padding: '0 28px',
+              minHeight: '52px',
+              padding: '0 24px',
               borderRadius: '999px',
               fontSize: '15px',
-              fontWeight: 600,
+              fontWeight: 650,
               fontFamily: 'Inter, system-ui, sans-serif',
               color: 'white',
               background: isHovered
@@ -540,23 +692,24 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               transition: 'all 0.3s ease',
             }}
           >
-            <span>Unlock Full Report</span>
+            <RefreshCw size={17} />
+            <span>Retake After the 7-Day Test</span>
             <ArrowRight size={18} />
           </motion.button>
         </motion.div>
 
-        {/* Footer */}
         <motion.p
           variants={itemVariants}
           style={{
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.35)',
+            color: 'rgba(255, 255, 255, 0.38)',
             textAlign: 'center',
-            marginTop: '16px',
+            marginTop: '4px',
+            lineHeight: 1.5,
           }}
         >
-          This is a preview based on your assessment. Full reports include detailed action plans.
+          Salary ranges are approximate India-context bands for staging review. They should be validated with market data before public launch.
         </motion.p>
       </motion.div>
     </div>
