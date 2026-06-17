@@ -106,15 +106,6 @@ function SmallText({ children }: { children: React.ReactNode }) {
   );
 }
 
-function compactText(text: string, maxLength = 170): string {
-  if (text.length <= maxLength) return text;
-
-  const firstSentence = text.split(/(?<=[.!?])\s+/)[0];
-  if (firstSentence && firstSentence.length <= maxLength) return firstSentence;
-
-  return `${text.slice(0, maxLength - 1).trim()}...`;
-}
-
 function buildTopVerdict(results: CareerResultIntelligence): string {
   const pathTitle = results.paths.balanced.title;
   const archetype = results.archetype.name.toLowerCase();
@@ -427,7 +418,7 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
           }}
         >
           <IntelligenceCard title="Why-fit" accent={accent}>
-            <SmallText>{compactText(career.whyFits, 180)}</SmallText>
+            <SmallText>{career.whyFits}</SmallText>
           </IntelligenceCard>
           <IntelligenceCard title="What your answers showed" accent={accent}>
             <SmallText>{career.answerPattern}</SmallText>
@@ -436,13 +427,13 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
 
         <div>
           <DetailRow title="Tradeoff" accent="rgba(255, 190, 110, 0.86)">
-            {compactText(career.tradeoff, 240)}
+            {career.tradeoff}
           </DetailRow>
           <DetailRow title="Next-step" accent="rgba(88, 222, 170, 0.86)">
-            {compactText(career.nextStep, 220)}
+            {career.nextStep}
           </DetailRow>
           <DetailRow title="Avoid-if" accent="rgba(255, 120, 140, 0.86)">
-            {compactText(career.avoidIf, 220)}
+            {career.avoidIf}
           </DetailRow>
         </div>
       </div>
@@ -662,10 +653,10 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               <SmallText>{results.paths.balanced.title}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="Proof to collect" accent="rgba(69, 214, 160, 0.62)">
-              <SmallText>{compactText(results.nextSevenDayAction, 150)}</SmallText>
+              <SmallText>{results.nextSevenDayAction}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="Watch-out" accent="rgba(255, 180, 90, 0.62)">
-              <SmallText>{compactText(results.testBeforeChoosing, 150)}</SmallText>
+              <SmallText>{results.testBeforeChoosing}</SmallText>
             </IntelligenceCard>
           </div>
         </motion.div>
@@ -764,16 +755,16 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             }}
           >
             <IntelligenceCard title="Your decision pattern">
-              <SmallText>{compactText(results.summary.decisionPattern, 190)}</SmallText>
+              <SmallText>{results.summary.decisionPattern}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="Your strongest signals" accent="rgba(87, 181, 255, 0.45)">
               <SmallText>{results.summary.strongestSignals}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="Your hidden tension" accent="rgba(255, 180, 90, 0.45)">
-              <SmallText>{compactText(results.summary.hiddenTension, 190)}</SmallText>
+              <SmallText>{results.summary.hiddenTension}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="What you should not ignore" accent="rgba(69, 214, 160, 0.45)">
-              <SmallText>{compactText(results.summary.whatNotIgnore, 210)}</SmallText>
+              <SmallText>{results.summary.whatNotIgnore}</SmallText>
             </IntelligenceCard>
           </div>
         </motion.div>
@@ -886,7 +877,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               lineHeight: 1.55,
             }}
           >
-            This staging result uses logic-based intelligence only. The next useful input is what happens after you test the recommended path.
+            Your CareerOS model gets sharper when you test a path and come back with what felt energizing, boring, stressful, or natural.
           </p>
           <motion.button
             onMouseEnter={() => setIsHovered(true)}
@@ -935,7 +926,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             lineHeight: 1.5,
           }}
         >
-          Salary ranges are approximate India-context bands for staging review. They should be validated with market data before public launch.
+          Salary ranges are approximate India-market ranges and may vary by city, company, skill proof, and experience.
         </motion.p>
       </motion.div>
     </div>
