@@ -187,6 +187,8 @@ describe('generateCareerResultIntelligence', () => {
     for (const recommendation of result.recommendations) {
       expect(recommendation.whyFits.length).toBeGreaterThan(20);
       expect(recommendation.answerPattern.length).toBeGreaterThan(20);
+      expect(recommendation.answerPattern).not.toContain('Triggered by');
+      expect(recommendation.answerPattern).toMatch(/^Your answers/);
       expect(recommendation.tradeoff.length).toBeGreaterThan(20);
       expect(recommendation.nextStep.length).toBeGreaterThan(20);
       expect(recommendation.avoidIf.length).toBeGreaterThan(20);

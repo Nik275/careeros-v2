@@ -812,7 +812,10 @@ function buildRecommendation(
     salaryRange: contextualSalaryRange(candidate.salaryRange, signals),
     fitScore,
     whyFits: candidate.whyFits,
-    answerPattern: `Triggered by ${labels.length > 0 ? labels.join(' + ') : 'your current assessment pattern'} in the assessment.`,
+    answerPattern:
+      labels.length > 0
+        ? `Your answers highlighted ${labels.slice(0, 5).join(', ')}${labels.length > 5 ? ', and related signals' : ''}.`
+        : 'Your answers show an early pattern that needs one practical test before you commit.',
     tradeoff: contextualTradeoff(candidate.tradeoff, signals),
     nextStep: contextualNextStep(candidate.nextStep, signals),
     avoidIf: contextualAvoidIf(candidate.avoidIf, signals),
