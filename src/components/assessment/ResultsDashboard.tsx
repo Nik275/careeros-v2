@@ -297,7 +297,7 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
       </div>
 
       <div style={{ display: 'grid', gap: '12px' }}>
-        <IntelligenceCard title="Why it fits" accent={accent}>
+        <IntelligenceCard title="Why-fit" accent={accent}>
           <SmallText>{career.whyFits}</SmallText>
         </IntelligenceCard>
         <IntelligenceCard title="Answer pattern" accent={accent}>
@@ -306,10 +306,10 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
         <IntelligenceCard title="Tradeoff" accent="rgba(255, 180, 90, 0.45)">
           <SmallText>{career.tradeoff}</SmallText>
         </IntelligenceCard>
-        <IntelligenceCard title="Best next step" accent="rgba(69, 214, 160, 0.5)">
+        <IntelligenceCard title="Next-step" accent="rgba(69, 214, 160, 0.5)">
           <SmallText>{career.nextStep}</SmallText>
         </IntelligenceCard>
-        <IntelligenceCard title="Avoid this if..." accent="rgba(255, 100, 120, 0.45)">
+        <IntelligenceCard title="Avoid-if" accent="rgba(255, 100, 120, 0.45)">
           <SmallText>{career.avoidIf}</SmallText>
         </IntelligenceCard>
       </div>
@@ -543,6 +543,19 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
                 >
                   {results.archetype.match}% identity fit
                 </span>
+                <span
+                  style={{
+                    padding: '4px 10px',
+                    background: 'rgba(69, 214, 160, 0.1)',
+                    borderRadius: '6px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 650,
+                    color: 'rgba(69, 214, 160, 0.95)',
+                  }}
+                >
+                  {results.confidence.label}
+                </span>
               </div>
               <SmallText>{results.archetype.description}</SmallText>
             </div>
@@ -566,6 +579,11 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             </IntelligenceCard>
             <IntelligenceCard title="What you should not ignore" accent="rgba(69, 214, 160, 0.45)">
               <SmallText>{results.summary.whatNotIgnore}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Result confidence" accent="rgba(69, 214, 160, 0.52)">
+              <SmallText>
+                {results.confidence.label} ({results.confidence.score}/100). {results.confidence.rationale}
+              </SmallText>
             </IntelligenceCard>
           </div>
         </motion.div>

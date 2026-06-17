@@ -1,38 +1,142 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ASSESSMENT_QUESTIONS,
+  createEmptyAssessmentPsychologyData,
+  type AssessmentPsychologyData,
+} from '../assessmentQuestions';
+import {
   generateCareerResultIntelligence,
   type ResultAssessmentData,
 } from '../resultIntelligence';
 
-const builderPersona: ResultAssessmentData = {
-  psychology: {
-    motivations: ['creativity', 'independence', 'mastery'],
-    strengths: ['practical', 'analytical', 'creative'],
-    personalityTraits: ['independent'],
-    values: ['growth', 'financial', 'creativity'],
-    lifestylePreferences: ['remote'],
-  },
-};
+function createPersona(overrides: Partial<AssessmentPsychologyData>): ResultAssessmentData {
+  return {
+    psychology: {
+      ...createEmptyAssessmentPsychologyData(),
+      motivations: ['mastery'],
+      strengths: ['analytical'],
+      personalityTraits: ['structured'],
+      values: ['growth'],
+      lifestylePreferences: ['hybrid'],
+      financialPressure: ['earning_1_2_years'],
+      familyExpectations: ['family_somewhat'],
+      riskTolerance: ['risk_balanced'],
+      academicConfidence: ['academic_steady'],
+      learningDiscipline: ['learning_weekly'],
+      socialEnergy: ['social_small_team'],
+      ambiguityTolerance: ['ambiguity_milestones'],
+      locationFlexibility: ['location_hybrid_nearby'],
+      skillReadiness: ['proof_coursework'],
+      decisionTension: ['regret_wrong_fit'],
+      ...overrides,
+    },
+  };
+}
 
-const stabilityPersona: ResultAssessmentData = {
-  psychology: {
-    motivations: ['security'],
-    strengths: ['organizing', 'analytical'],
-    personalityTraits: ['structured'],
-    values: ['stability', 'worklife'],
-    lifestylePreferences: ['office'],
-  },
-};
+const builderPersona = createPersona({
+  motivations: ['creativity', 'independence', 'mastery'],
+  strengths: ['practical', 'analytical', 'creative'],
+  personalityTraits: ['independent'],
+  values: ['growth', 'financial'],
+  lifestylePreferences: ['remote'],
+  financialPressure: ['explore_longer'],
+  familyExpectations: ['self_directed'],
+  riskTolerance: ['risk_founder'],
+  academicConfidence: ['academic_practical'],
+  learningDiscipline: ['learning_daily'],
+  socialEnergy: ['social_solo'],
+  ambiguityTolerance: ['ambiguity_curious'],
+  locationFlexibility: ['location_remote'],
+  skillReadiness: ['proof_shipped'],
+  decisionTension: ['regret_missed_potential'],
+});
 
-const peopleImpactPersona: ResultAssessmentData = {
-  psychology: {
-    motivations: ['impact', 'recognition'],
-    strengths: ['social', 'leading'],
-    personalityTraits: ['collaborative'],
-    values: ['purpose', 'growth'],
-    lifestylePreferences: ['field'],
-  },
-};
+const stabilityPersona = createPersona({
+  motivations: ['security'],
+  strengths: ['organizing', 'analytical'],
+  personalityTraits: ['structured'],
+  values: ['stability', 'worklife'],
+  lifestylePreferences: ['office'],
+  financialPressure: ['earning_6_months'],
+  familyExpectations: ['family_very_strong'],
+  riskTolerance: ['risk_stable'],
+  academicConfidence: ['academic_strong'],
+  learningDiscipline: ['learning_needs_structure'],
+  socialEnergy: ['social_solo'],
+  ambiguityTolerance: ['ambiguity_avoid'],
+  locationFlexibility: ['location_family_close'],
+  skillReadiness: ['proof_coursework'],
+  decisionTension: ['regret_disappoint_family'],
+});
+
+const peopleImpactPersona = createPersona({
+  motivations: ['impact', 'recognition'],
+  strengths: ['social', 'organizing'],
+  personalityTraits: ['collaborative'],
+  values: ['purpose', 'growth'],
+  lifestylePreferences: ['field'],
+  financialPressure: ['earning_1_2_years'],
+  familyExpectations: ['family_somewhat'],
+  riskTolerance: ['risk_balanced'],
+  academicConfidence: ['academic_steady'],
+  learningDiscipline: ['learning_deadline'],
+  socialEnergy: ['social_one_on_one'],
+  ambiguityTolerance: ['ambiguity_milestones'],
+  locationFlexibility: ['location_hybrid_nearby'],
+  skillReadiness: ['proof_internship'],
+  decisionTension: ['regret_wrong_fit'],
+});
+
+describe('assessment question contract', () => {
+  it('exposes a 15-question MVP assessment with one tracked signal group per question', () => {
+    expect(ASSESSMENT_QUESTIONS).toHaveLength(15);
+    expect(ASSESSMENT_QUESTIONS[0].id).toBe('motivations');
+    expect(ASSESSMENT_QUESTIONS[14].id).toBe('decisionTension');
+
+    const ids = ASSESSMENT_QUESTIONS.map((question) => question.id);
+    expect(new Set(ids).size).toBe(15);
+
+    for (const question of ASSESSMENT_QUESTIONS) {
+      expect(question.options.length).toBeGreaterThanOrEqual(4);
+      expect(question.options.length).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it('captures the required depth areas without exact income or sensitive identity questions', () => {
+    const ids = ASSESSMENT_QUESTIONS.map((question) => question.id);
+    expect(ids).toEqual([
+      'motivations',
+      'strengths',
+      'personalityTraits',
+      'values',
+      'lifestylePreferences',
+      'financialPressure',
+      'familyExpectations',
+      'riskTolerance',
+      'academicConfidence',
+      'learningDiscipline',
+      'socialEnergy',
+      'ambiguityTolerance',
+      'locationFlexibility',
+      'skillReadiness',
+      'decisionTension',
+    ]);
+
+    const questionText = ASSESSMENT_QUESTIONS
+      .flatMap((question) => [
+        question.question,
+        question.subtext ?? '',
+        ...question.options.flatMap((option) => [option.label, option.description ?? '']),
+      ])
+      .join(' ')
+      .toLowerCase();
+
+    expect(questionText).not.toContain('exact income');
+    expect(questionText).not.toContain('family income');
+    expect(questionText).not.toContain('caste');
+    expect(questionText).not.toContain('religion');
+  });
+});
 
 describe('generateCareerResultIntelligence', () => {
   it('generates different recommendation sets for different synthetic answer patterns', () => {
@@ -66,9 +170,12 @@ describe('generateCareerResultIntelligence', () => {
     expect(titles).toContain('Government Exam Path');
   });
 
-  it('includes recommendation explanation fields required by the staging result contract', () => {
+  it('includes recommendation explanation fields and a clarity confidence label', () => {
     const result = generateCareerResultIntelligence(peopleImpactPersona);
 
+    expect(['Initial Clarity', 'Strong Clarity', 'Needs More Exploration']).toContain(result.confidence.label);
+    expect(result.confidence.score).toBeGreaterThan(0);
+    expect(result.confidence.rationale.length).toBeGreaterThan(20);
     expect(result.summary.decisionPattern.length).toBeGreaterThan(20);
     expect(result.summary.strongestSignals.length).toBeGreaterThan(10);
     expect(result.summary.hiddenTension.length).toBeGreaterThan(20);
@@ -88,16 +195,78 @@ describe('generateCareerResultIntelligence', () => {
     }
   });
 
-  it('can generate a complete result from synthetic assessment answers', () => {
-    const result = generateCareerResultIntelligence({
-      psychology: {
-        motivations: ['creativity'],
-        strengths: ['analytical'],
-        personalityTraits: ['structured'],
-        values: ['worklife'],
-        lifestylePreferences: ['hybrid'],
-      },
+  it('changes salary guidance and tradeoffs when earning urgency is high', () => {
+    const immediate = generateCareerResultIntelligence(createPersona({
+      financialPressure: ['earning_now'],
+      riskTolerance: ['risk_stable'],
+      decisionTension: ['regret_low_income'],
+    }));
+    const longerRunway = generateCareerResultIntelligence(createPersona({
+      financialPressure: ['explore_longer'],
+      riskTolerance: ['risk_high_growth'],
+      decisionTension: ['regret_missed_potential'],
+    }));
+
+    expect(JSON.stringify(immediate)).toContain('earning urgency');
+    expect(immediate.nextSevenDayAction).toContain('paid entry routes');
+    expect(JSON.stringify(immediate.recommendations)).toContain('paid entry roles');
+    expect(JSON.stringify(longerRunway.recommendations)).toContain('longer skill-building runway');
+  });
+
+  it('changes warnings and next steps when family pressure is high', () => {
+    const highFamilyPressure = generateCareerResultIntelligence(createPersona({
+      familyExpectations: ['family_very_strong'],
+      decisionTension: ['regret_disappoint_family'],
+    }));
+    const selfDirected = generateCareerResultIntelligence(createPersona({
+      familyExpectations: ['self_directed'],
+      decisionTension: ['regret_missed_potential'],
+    }));
+
+    expect(highFamilyPressure.nextSevenDayAction).toContain('family-facing explanation');
+    expect(JSON.stringify(highFamilyPressure.recommendations)).toContain('Family expectations');
+    expect(highFamilyPressure.summary.hiddenTension).toContain('Family expectations');
+    expect(selfDirected.nextSevenDayAction).not.toContain('family-facing explanation');
+  });
+
+  it('changes path recommendations when risk tolerance changes', () => {
+    const stableRisk = generateCareerResultIntelligence(createPersona({
+      motivations: ['security'],
+      values: ['stability'],
+      riskTolerance: ['risk_stable'],
+      ambiguityTolerance: ['ambiguity_avoid'],
+    }));
+    const founderRisk = generateCareerResultIntelligence(createPersona({
+      motivations: ['creativity', 'independence'],
+      values: ['financial', 'growth'],
+      riskTolerance: ['risk_founder'],
+      ambiguityTolerance: ['ambiguity_curious'],
+      skillReadiness: ['proof_shipped'],
+    }));
+
+    expect(stableRisk.paths.naturalFit.title).not.toBe(founderRisk.paths.naturalFit.title);
+    expect(stableRisk.recommendations.map((career) => career.title)).toContain('Government Exam Path');
+    expect(founderRisk.recommendations.map((career) => career.title)).toContain('Founder / Freelancer Path');
+  });
+
+  it('lowers confidence when the signal pattern is incomplete', () => {
+    const incomplete = generateCareerResultIntelligence({
+      psychology: createEmptyAssessmentPsychologyData(),
     });
+    const complete = generateCareerResultIntelligence(builderPersona);
+
+    expect(incomplete.confidence.label).toBe('Needs More Exploration');
+    expect(complete.confidence.score).toBeGreaterThan(incomplete.confidence.score);
+  });
+
+  it('can generate a complete result from synthetic 15-question assessment answers', () => {
+    const result = generateCareerResultIntelligence(createPersona({
+      motivations: ['creativity'],
+      strengths: ['analytical'],
+      personalityTraits: ['structured'],
+      values: ['worklife'],
+      lifestylePreferences: ['hybrid'],
+    }));
 
     expect(result.archetype.name).toBeTruthy();
     expect(result.recommendations).toHaveLength(3);

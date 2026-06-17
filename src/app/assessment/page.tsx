@@ -7,33 +7,27 @@ import { AssessmentWelcome } from '@/components/assessment/AssessmentWelcome';
 import { PsychologyQuestions } from '@/components/assessment/PsychologyQuestions';
 import { AnalysisScreen } from '@/components/assessment/AnalysisScreen';
 import { ResultsDashboard } from '@/components/assessment/ResultsDashboard';
+import {
+  createEmptyAssessmentPsychologyData,
+  type AssessmentPsychologyData,
+} from '@/components/assessment/assessmentQuestions';
 import { ease, duration } from '@/lib/motion';
 
 export type AssessmentScreen = 'welcome' | 'psychology' | 'analysis' | 'results';
 
 export interface AssessmentData {
-  psychology: {
-    motivations: string[];
-    strengths: string[];
-    personalityTraits: string[];
-    values: string[];
-    lifestylePreferences: string[];
+  psychology: AssessmentPsychologyData;
+}
+
+function createInitialAssessmentData(): AssessmentData {
+  return {
+    psychology: createEmptyAssessmentPsychologyData(),
   };
 }
 
-const initialAssessmentData: AssessmentData = {
-  psychology: {
-    motivations: [],
-    strengths: [],
-    personalityTraits: [],
-    values: [],
-    lifestylePreferences: [],
-  },
-};
-
 export default function AssessmentPage() {
   const [currentScreen, setCurrentScreen] = useState<AssessmentScreen>('welcome');
-  const [assessmentData, setAssessmentData] = useState<AssessmentData>(initialAssessmentData);
+  const [assessmentData, setAssessmentData] = useState<AssessmentData>(() => createInitialAssessmentData());
   const [direction, setDirection] = useState(1);
 
   const navigateTo = useCallback((screen: AssessmentScreen, dir: number = 1) => {
@@ -61,7 +55,7 @@ export default function AssessmentPage() {
   };
 
   const handleRestart = () => {
-    setAssessmentData(initialAssessmentData);
+    setAssessmentData(createInitialAssessmentData());
     navigateTo('welcome', -1);
   };
 

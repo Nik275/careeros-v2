@@ -172,8 +172,8 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
           }}
         >
           {[
-            { number: '3', label: 'minutes', desc: 'Quick but meaningful' },
-            { number: '12', label: 'questions', desc: 'Thoughtfully designed' },
+            { number: '5', label: 'minutes', desc: 'Deeper but still focused' },
+            { number: '15', label: 'questions', desc: 'Psychology, pressure, and fit' },
             { number: '1', label: 'result', desc: 'Your personalized direction' },
           ].map((item, index) => (
             <motion.div

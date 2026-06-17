@@ -1,10 +1,4 @@
-export interface AssessmentPsychologyData {
-  motivations: string[];
-  strengths: string[];
-  personalityTraits: string[];
-  values: string[];
-  lifestylePreferences: string[];
-}
+import type { AssessmentPsychologyData } from './assessmentQuestions';
 
 export interface ResultAssessmentData {
   psychology: AssessmentPsychologyData;
@@ -24,11 +18,18 @@ export interface CareerRecommendation {
   matchedSignals: string[];
 }
 
+export type ResultConfidenceLabel = 'Initial Clarity' | 'Strong Clarity' | 'Needs More Exploration';
+
 export interface CareerResultIntelligence {
   archetype: {
     name: string;
     description: string;
     match: number;
+  };
+  confidence: {
+    label: ResultConfidenceLabel;
+    score: number;
+    rationale: string;
   };
   summary: {
     decisionPattern: string;
@@ -88,6 +89,47 @@ const SIGNAL_LABELS: Record<string, string> = {
   remote: 'remote flexibility',
   field: 'field activity',
   hybrid: 'hybrid variety',
+  earning_now: 'immediate earning urgency',
+  earning_6_months: 'near-term earning need',
+  earning_1_2_years: '1-2 year earning runway',
+  explore_longer: 'longer exploration runway',
+  family_very_strong: 'strong family expectation',
+  family_somewhat: 'family expectation to negotiate',
+  family_little: 'low family pressure',
+  self_directed: 'independent decision ownership',
+  risk_stable: 'low-risk preference',
+  risk_balanced: 'managed risk tolerance',
+  risk_high_growth: 'high-growth risk tolerance',
+  risk_founder: 'founder-style risk tolerance',
+  academic_strong: 'strong academics',
+  academic_steady: 'steady academics',
+  academic_inconsistent: 'inconsistent academics',
+  academic_practical: 'practical learning bias',
+  learning_daily: 'daily learning discipline',
+  learning_weekly: 'weekly deep-work discipline',
+  learning_deadline: 'deadline-driven learning',
+  learning_needs_structure: 'needs learning structure',
+  social_high_collab: 'high collaboration energy',
+  social_small_team: 'small-team energy',
+  social_one_on_one: 'one-on-one influence',
+  social_solo: 'solo focus energy',
+  ambiguity_curious: 'curiosity under ambiguity',
+  ambiguity_milestones: 'milestone-based ambiguity tolerance',
+  ambiguity_anxious: 'ambiguity anxiety',
+  ambiguity_avoid: 'low ambiguity tolerance',
+  location_relocate: 'relocation flexibility',
+  location_hybrid_nearby: 'nearby hybrid constraint',
+  location_remote: 'remote-first preference',
+  location_family_close: 'family-proximity constraint',
+  proof_shipped: 'shipped proof',
+  proof_internship: 'work exposure proof',
+  proof_coursework: 'coursework proof',
+  proof_starting: 'early proof stage',
+  regret_low_income: 'income regret fear',
+  regret_wasting_years: 'wasted-years regret fear',
+  regret_wrong_fit: 'wrong-fit regret fear',
+  regret_disappoint_family: 'family-disappointment regret fear',
+  regret_missed_potential: 'missed-potential regret fear',
 };
 
 const CAREER_CANDIDATES: CareerCandidate[] = [
@@ -345,6 +387,293 @@ const CAREER_CANDIDATES: CareerCandidate[] = [
   },
 ];
 
+const CONTEXT_SIGNAL_WEIGHTS: Record<string, Partial<Record<string, number>>> = {
+  earning_now: {
+    'sales-business-development': 16,
+    'digital-marketer': 12,
+    'business-analyst': 10,
+    'data-analyst': 8,
+    'finance-accounting': 8,
+    'ai-automation-builder': 6,
+    'founder-freelancer': -16,
+    'government-exam-path': -12,
+    'product-manager': -8,
+  },
+  earning_6_months: {
+    'sales-business-development': 12,
+    'digital-marketer': 10,
+    'business-analyst': 9,
+    'data-analyst': 8,
+    'software-engineer': 5,
+    'founder-freelancer': -8,
+    'government-exam-path': -8,
+  },
+  earning_1_2_years: {
+    'software-engineer': 9,
+    'cloud-devops-engineer': 8,
+    'cybersecurity-analyst': 7,
+    'product-designer': 6,
+    'data-analyst': 6,
+    'government-exam-path': 3,
+  },
+  explore_longer: {
+    'product-manager': 8,
+    'software-engineer': 7,
+    'government-exam-path': 7,
+    'cybersecurity-analyst': 6,
+    'founder-freelancer': 5,
+  },
+  family_very_strong: {
+    'government-exam-path': 18,
+    'finance-accounting': 13,
+    'cybersecurity-analyst': 12,
+    'software-engineer': 8,
+    'business-analyst': 8,
+    'founder-freelancer': -14,
+    'design-content': -8,
+  },
+  family_somewhat: {
+    'software-engineer': 6,
+    'business-analyst': 6,
+    'finance-accounting': 5,
+    'product-manager': 4,
+  },
+  family_little: {
+    'ai-automation-builder': 5,
+    'product-designer': 5,
+    'digital-marketer': 5,
+    'design-content': 4,
+  },
+  self_directed: {
+    'founder-freelancer': 10,
+    'ai-automation-builder': 8,
+    'product-designer': 6,
+    'software-engineer': 5,
+  },
+  risk_stable: {
+    'government-exam-path': 18,
+    'finance-accounting': 14,
+    'cybersecurity-analyst': 12,
+    'data-analyst': 10,
+    'business-analyst': 10,
+    'founder-freelancer': -18,
+    'design-content': -8,
+  },
+  risk_balanced: {
+    'software-engineer': 8,
+    'product-manager': 7,
+    'business-analyst': 7,
+    'product-designer': 6,
+    'healthcare-tech-ops': 5,
+  },
+  risk_high_growth: {
+    'software-engineer': 9,
+    'product-manager': 9,
+    'ai-automation-builder': 9,
+    'cloud-devops-engineer': 8,
+    'sales-business-development': 7,
+    'government-exam-path': -10,
+  },
+  risk_founder: {
+    'founder-freelancer': 20,
+    'ai-automation-builder': 14,
+    'design-content': 10,
+    'digital-marketer': 8,
+    'sales-business-development': 7,
+    'government-exam-path': -16,
+  },
+  academic_strong: {
+    'software-engineer': 8,
+    'finance-accounting': 8,
+    'government-exam-path': 8,
+    'cybersecurity-analyst': 7,
+    'product-manager': 5,
+  },
+  academic_steady: {
+    'business-analyst': 6,
+    'data-analyst': 6,
+    'software-engineer': 5,
+    'healthcare-tech-ops': 5,
+  },
+  academic_inconsistent: {
+    'government-exam-path': -10,
+    'finance-accounting': -6,
+    'digital-marketer': 7,
+    'design-content': 7,
+    'sales-business-development': 6,
+    'ai-automation-builder': 6,
+  },
+  academic_practical: {
+    'ai-automation-builder': 10,
+    'cloud-devops-engineer': 9,
+    'sales-business-development': 8,
+    'product-designer': 8,
+    'software-engineer': 6,
+  },
+  learning_daily: {
+    'software-engineer': 8,
+    'cybersecurity-analyst': 8,
+    'cloud-devops-engineer': 8,
+    'finance-accounting': 6,
+    'government-exam-path': 6,
+  },
+  learning_weekly: {
+    'product-designer': 6,
+    'data-analyst': 6,
+    'business-analyst': 6,
+    'teaching-mentoring': 5,
+  },
+  learning_deadline: {
+    'digital-marketer': 7,
+    'sales-business-development': 7,
+    'product-manager': 6,
+    'business-analyst': 5,
+  },
+  learning_needs_structure: {
+    'government-exam-path': 8,
+    'finance-accounting': 7,
+    'cybersecurity-analyst': 6,
+    'data-analyst': 5,
+  },
+  social_high_collab: {
+    'product-manager': 9,
+    'sales-business-development': 9,
+    'teaching-mentoring': 8,
+    'business-analyst': 7,
+    'ux-researcher': 7,
+  },
+  social_small_team: {
+    'software-engineer': 6,
+    'product-designer': 6,
+    'business-analyst': 5,
+    'healthcare-tech-ops': 5,
+  },
+  social_one_on_one: {
+    'sales-business-development': 10,
+    'teaching-mentoring': 9,
+    'ux-researcher': 8,
+    'digital-marketer': 5,
+  },
+  social_solo: {
+    'software-engineer': 8,
+    'cybersecurity-analyst': 7,
+    'data-analyst': 6,
+    'finance-accounting': 5,
+  },
+  ambiguity_curious: {
+    'product-manager': 8,
+    'ai-automation-builder': 8,
+    'founder-freelancer': 7,
+    'ux-researcher': 6,
+  },
+  ambiguity_milestones: {
+    'software-engineer': 6,
+    'product-designer': 6,
+    'business-analyst': 6,
+    'data-analyst': 5,
+  },
+  ambiguity_anxious: {
+    'government-exam-path': 10,
+    'finance-accounting': 8,
+    'cybersecurity-analyst': 7,
+    'founder-freelancer': -12,
+    'ai-automation-builder': -6,
+  },
+  ambiguity_avoid: {
+    'government-exam-path': 13,
+    'finance-accounting': 10,
+    'data-analyst': 8,
+    'business-analyst': 8,
+    'founder-freelancer': -14,
+  },
+  location_relocate: {
+    'software-engineer': 7,
+    'product-manager': 7,
+    'cloud-devops-engineer': 6,
+    'finance-accounting': 5,
+  },
+  location_hybrid_nearby: {
+    'business-analyst': 6,
+    'data-analyst': 6,
+    'finance-accounting': 5,
+    'healthcare-tech-ops': 5,
+  },
+  location_remote: {
+    'software-engineer': 8,
+    'ai-automation-builder': 8,
+    'product-designer': 7,
+    'design-content': 7,
+    'digital-marketer': 5,
+  },
+  location_family_close: {
+    'government-exam-path': 9,
+    'finance-accounting': 8,
+    'teaching-mentoring': 7,
+    'business-analyst': 6,
+    'software-engineer': -4,
+  },
+  proof_shipped: {
+    'software-engineer': 9,
+    'product-designer': 9,
+    'ai-automation-builder': 9,
+    'design-content': 8,
+  },
+  proof_internship: {
+    'product-manager': 8,
+    'business-analyst': 8,
+    'finance-accounting': 7,
+    'healthcare-tech-ops': 6,
+  },
+  proof_coursework: {
+    'data-analyst': 6,
+    'cybersecurity-analyst': 6,
+    'finance-accounting': 5,
+    'software-engineer': 4,
+  },
+  proof_starting: {
+    'digital-marketer': 6,
+    'teaching-mentoring': 5,
+    'business-analyst': 4,
+    'product-manager': -7,
+    'cloud-devops-engineer': -5,
+  },
+  regret_low_income: {
+    'software-engineer': 9,
+    'cloud-devops-engineer': 9,
+    'product-manager': 8,
+    'sales-business-development': 8,
+    'finance-accounting': 6,
+    'teaching-mentoring': -4,
+  },
+  regret_wasting_years: {
+    'business-analyst': 8,
+    'data-analyst': 7,
+    'digital-marketer': 7,
+    'sales-business-development': 7,
+    'government-exam-path': -12,
+  },
+  regret_wrong_fit: {
+    'ux-researcher': 7,
+    'product-designer': 6,
+    'teaching-mentoring': 6,
+    'business-analyst': 5,
+  },
+  regret_disappoint_family: {
+    'government-exam-path': 10,
+    'finance-accounting': 8,
+    'software-engineer': 7,
+    'cybersecurity-analyst': 7,
+    'founder-freelancer': -8,
+  },
+  regret_missed_potential: {
+    'software-engineer': 8,
+    'product-manager': 8,
+    'ai-automation-builder': 8,
+    'founder-freelancer': 7,
+    'cloud-devops-engineer': 7,
+  },
+};
+
 function selectedSignals(data: ResultAssessmentData): string[] {
   return [
     ...data.psychology.motivations,
@@ -352,6 +681,16 @@ function selectedSignals(data: ResultAssessmentData): string[] {
     ...data.psychology.personalityTraits,
     ...data.psychology.values,
     ...data.psychology.lifestylePreferences,
+    ...data.psychology.financialPressure,
+    ...data.psychology.familyExpectations,
+    ...data.psychology.riskTolerance,
+    ...data.psychology.academicConfidence,
+    ...data.psychology.learningDiscipline,
+    ...data.psychology.socialEnergy,
+    ...data.psychology.ambiguityTolerance,
+    ...data.psychology.locationFlexibility,
+    ...data.psychology.skillReadiness,
+    ...data.psychology.decisionTension,
   ];
 }
 
@@ -362,28 +701,121 @@ function formatSignals(signals: string[]): string {
 }
 
 function scoreCandidate(candidate: CareerCandidate, signals: Set<string>): { rawScore: number; matchedSignals: string[] } {
-  const matchedSignals = Object.keys(candidate.weights).filter((signal) => signals.has(signal));
-  const rawScore = matchedSignals.reduce((score, signal) => score + candidate.weights[signal], 0);
+  let rawScore = 0;
+  const matchedSignals: string[] = [];
+
+  for (const signal of signals) {
+    const directScore = candidate.weights[signal] ?? 0;
+    const contextScore = CONTEXT_SIGNAL_WEIGHTS[signal]?.[candidate.id] ?? 0;
+    const signalScore = directScore + contextScore;
+
+    if (signalScore !== 0) {
+      rawScore += signalScore;
+      matchedSignals.push(signal);
+    }
+  }
+
   return { rawScore, matchedSignals };
+}
+
+function contextualSalaryRange(baseSalaryRange: string, signals: Set<string>): string {
+  if (signals.has('earning_now')) {
+    return `${baseSalaryRange}; prioritize paid entry roles, internships, or client work before unpaid exploration`;
+  }
+
+  if (signals.has('earning_6_months')) {
+    return `${baseSalaryRange}; validate a paid route within one semester`;
+  }
+
+  if (signals.has('explore_longer')) {
+    return `${baseSalaryRange}; longer skill-building runway is acceptable if proof keeps improving`;
+  }
+
+  return baseSalaryRange;
+}
+
+function contextualTradeoff(baseTradeoff: string, signals: Set<string>): string {
+  const notes: string[] = [];
+
+  if (signals.has('earning_now')) {
+    notes.push('Because earning urgency is high, avoid paths that require long unpaid preparation before first income.');
+  }
+
+  if (signals.has('family_very_strong') || signals.has('regret_disappoint_family')) {
+    notes.push('Family expectations are a real constraint, so the path needs a clear explanation, visible milestones, and credible stability proof.');
+  }
+
+  if (signals.has('risk_stable') || signals.has('ambiguity_anxious') || signals.has('ambiguity_avoid')) {
+    notes.push('Your risk pattern favors staged choices with fallback options, not open-ended leaps.');
+  }
+
+  if (signals.has('academic_inconsistent')) {
+    notes.push('Inconsistent academics mean portfolio, project, or work proof must compensate for marks-based filtering.');
+  }
+
+  return notes.length > 0 ? `${baseTradeoff} ${notes.join(' ')}` : baseTradeoff;
+}
+
+function contextualNextStep(baseNextStep: string, signals: Set<string>): string {
+  if (signals.has('earning_now')) {
+    return `${baseNextStep} Also identify one paid internship, freelance, or junior-role route you could apply to this week.`;
+  }
+
+  if (signals.has('family_very_strong') || signals.has('regret_disappoint_family')) {
+    return `${baseNextStep} Prepare a family-facing explanation with expected timeline, costs, earning path, and backup option.`;
+  }
+
+  if (signals.has('risk_founder') || signals.has('risk_high_growth')) {
+    return `${baseNextStep} Define a small reversible experiment so ambition is tested without overcommitting too early.`;
+  }
+
+  if (signals.has('proof_starting')) {
+    return `${baseNextStep} Keep the first proof small enough to finish in 7 days, because completion matters more than complexity.`;
+  }
+
+  return baseNextStep;
+}
+
+function contextualAvoidIf(baseAvoidIf: string, signals: Set<string>): string {
+  const warnings: string[] = [];
+
+  if (signals.has('earning_now')) {
+    warnings.push('avoid long zero-income ramps unless there is a concrete support plan');
+  }
+
+  if (signals.has('risk_stable')) {
+    warnings.push('avoid this as a primary bet if the first year is highly uncertain');
+  }
+
+  if (signals.has('location_family_close')) {
+    warnings.push('avoid paths that require relocation before family constraints are resolved');
+  }
+
+  if (signals.has('learning_needs_structure')) {
+    warnings.push('avoid self-learning paths without coaching, peers, or weekly accountability');
+  }
+
+  return warnings.length > 0 ? `${baseAvoidIf} Also ${warnings.join('; ')}.` : baseAvoidIf;
 }
 
 function buildRecommendation(
   candidate: CareerCandidate,
   fitScore: number,
   matchedSignals: string[],
+  signals: Set<string>,
 ): CareerRecommendation {
   const labels = matchedSignals.map((signal) => SIGNAL_LABELS[signal] ?? signal);
 
   return {
     id: candidate.id,
     title: candidate.title,
-    salaryRange: candidate.salaryRange,
+    salaryRange: contextualSalaryRange(candidate.salaryRange, signals),
     fitScore,
     whyFits: candidate.whyFits,
     answerPattern: `Triggered by ${labels.length > 0 ? labels.join(' + ') : 'your current assessment pattern'} in the assessment.`,
-    tradeoff: candidate.tradeoff,
-    nextStep: candidate.nextStep,
-    avoidIf: candidate.avoidIf,
+    tradeoff: contextualTradeoff(candidate.tradeoff, signals),
+    nextStep: contextualNextStep(candidate.nextStep, signals),
+    avoidIf: contextualAvoidIf(candidate.avoidIf, signals),
     indiaContext: candidate.indiaContext,
     matchedSignals: labels,
   };
@@ -438,6 +870,12 @@ function buildSummary(data: ResultAssessmentData, top: CareerRecommendation): Ca
     decisionPattern = 'Your decision pattern is an impact pattern: you care about helping people, but the path still needs market value and skill depth.';
   }
 
+  if (signals.has('earning_now') || signals.has('earning_6_months')) {
+    decisionPattern = `${decisionPattern} Your earning timeline is near-term, so the recommendation weights paid proof and faster employability more heavily.`;
+  } else if (signals.has('explore_longer')) {
+    decisionPattern = `${decisionPattern} You also have room to explore longer, so the recommendation can include higher-upside skill compounding.`;
+  }
+
   let hiddenTension = 'Your hidden tension is optionality versus commitment: you need to test before locking into a path.';
   if (signals.has('independence') && (signals.has('security') || signals.has('stability'))) {
     hiddenTension = 'Your hidden tension is autonomy versus stability. Pure freedom paths may excite you, but income volatility could create stress.';
@@ -447,11 +885,71 @@ function buildSummary(data: ResultAssessmentData, top: CareerRecommendation): Ca
     hiddenTension = 'Your hidden tension is income upside versus work-life boundaries. High-ceiling paths may ask for intensity before they give freedom.';
   }
 
+  if (signals.has('family_very_strong') || signals.has('regret_disappoint_family')) {
+    hiddenTension = `${hiddenTension} Family expectations add another layer: your path must be explainable, not just personally exciting.`;
+  } else if (signals.has('risk_founder') && (signals.has('earning_now') || signals.has('ambiguity_anxious'))) {
+    hiddenTension = `${hiddenTension} Founder-style ambition is present, but your pressure signals say it should be tested as a side experiment first.`;
+  }
+
   return {
     decisionPattern,
     strongestSignals,
     hiddenTension,
-    whatNotIgnore: `Do not ignore proof. For ${top.title}, the Indian market will reward visible projects, internships, credentials, or outcomes more than interest alone.`,
+    whatNotIgnore: `Do not ignore proof. For ${top.title}, the Indian market will reward visible projects, internships, credentials, or outcomes more than interest alone. Your financial, family, risk, academic, and location signals should shape the first test, not just the career title.`,
+  };
+}
+
+function calculateSignalCoverage(data: ResultAssessmentData): number {
+  const signalGroups = Object.values(data.psychology);
+  const answeredGroups = signalGroups.filter((values) => values.length > 0).length;
+  return answeredGroups / signalGroups.length;
+}
+
+function calculateContradictionCount(signals: Set<string>): number {
+  const contradictions = [
+    signals.has('earning_now') && (signals.has('risk_founder') || signals.has('explore_longer')),
+    signals.has('risk_high_growth') && (signals.has('ambiguity_anxious') || signals.has('ambiguity_avoid')),
+    signals.has('independence') && (signals.has('family_very_strong') || signals.has('regret_disappoint_family')),
+    signals.has('security') && (signals.has('risk_founder') || signals.has('risk_high_growth')),
+    signals.has('location_remote') && signals.has('location_family_close'),
+    signals.has('academic_inconsistent') && signals.has('academic_strong'),
+  ];
+
+  return contradictions.filter(Boolean).length;
+}
+
+function buildConfidence(
+  data: ResultAssessmentData,
+  scoredCandidates: Array<{ rawScore: number }>,
+): CareerResultIntelligence['confidence'] {
+  const signals = new Set(selectedSignals(data));
+  const coverage = calculateSignalCoverage(data);
+  const topScore = scoredCandidates[0]?.rawScore ?? 0;
+  const secondScore = scoredCandidates[1]?.rawScore ?? 0;
+  const separation = topScore > 0 ? Math.min(1, Math.max(0, (topScore - secondScore) / topScore)) : 0;
+  const contradictionPenalty = calculateContradictionCount(signals) * 9;
+  const score = Math.max(30, Math.min(95, Math.round(coverage * 48 + separation * 38 + Math.min(14, signals.size) - contradictionPenalty)));
+
+  if (coverage < 0.86 || score < 58) {
+    return {
+      label: 'Needs More Exploration',
+      score,
+      rationale: 'Your answers give useful direction, but the signal pattern still has gaps or competing pressures. Treat this as a test plan, not a final verdict.',
+    };
+  }
+
+  if (score >= 74) {
+    return {
+      label: 'Strong Clarity',
+      score,
+      rationale: 'Your signals are broad enough and consistent enough to support a confident first path recommendation.',
+    };
+  }
+
+  return {
+    label: 'Initial Clarity',
+    score,
+    rationale: 'Your answers show a usable direction, but the next 7-day test should confirm whether the path feels real in practice.',
   };
 }
 
@@ -490,6 +988,38 @@ function chooseBalancedPath(
   return sorted[0]?.recommendation ?? recommendations[0];
 }
 
+function buildNextSevenDayAction(balanced: CareerRecommendation, signals: Set<string>): string {
+  if (signals.has('earning_now') || signals.has('earning_6_months')) {
+    return `Spend 7 days testing ${balanced.title}: complete the next step, then apply to or identify three paid entry routes so earning pressure is handled honestly.`;
+  }
+
+  if (signals.has('family_very_strong') || signals.has('regret_disappoint_family')) {
+    return `Spend 7 days testing ${balanced.title}: complete the next step, then write a family-facing explanation with timeline, cost, income path, and backup option.`;
+  }
+
+  if (signals.has('risk_founder') || signals.has('risk_high_growth')) {
+    return `Spend 7 days testing ${balanced.title}: complete the next step as a reversible experiment and measure whether the work creates energy, proof, or demand.`;
+  }
+
+  if (signals.has('academic_inconsistent') || signals.has('academic_practical')) {
+    return `Spend 7 days testing ${balanced.title}: create one visible proof artifact, because practical evidence will matter more than interest alone.`;
+  }
+
+  return `Spend 7 days testing ${balanced.title}: complete the next step, save evidence, and notice whether the work gives energy or only sounds impressive.`;
+}
+
+function buildTestBeforeChoosing(balanced: CareerRecommendation, signals: Set<string>): string {
+  if (signals.has('ambiguity_anxious') || signals.has('ambiguity_avoid') || signals.has('risk_stable')) {
+    return `Before choosing ${balanced.title}, test the riskiest assumption with a clear fallback: ${balanced.tradeoff}`;
+  }
+
+  if (signals.has('location_family_close')) {
+    return `Before choosing ${balanced.title}, verify whether the path works near home, hybrid, or remote before assuming relocation is possible.`;
+  }
+
+  return `Before choosing ${balanced.title}, test the hardest part: ${balanced.tradeoff}`;
+}
+
 export function generateCareerResultIntelligence(data: ResultAssessmentData): CareerResultIntelligence {
   const selected = selectedSignals(data);
   const signalSet = new Set(selected);
@@ -511,7 +1041,7 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
   const scoredRecommendations = effectivePool.map((item, index) => {
     const normalizedScore = 58 + (item.rawScore / bestRawScore) * 34 - index;
     const fitScore = Math.max(62, Math.min(97, Math.round(normalizedScore)));
-    const recommendation = buildRecommendation(item.candidate, fitScore, item.matchedSignals);
+    const recommendation = buildRecommendation(item.candidate, fitScore, item.matchedSignals, signalSet);
     return { candidate: item.candidate, recommendation };
   });
 
@@ -520,10 +1050,12 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
   const longTermOutcome = chooseLongTermPath(recommendations, scoredRecommendations);
   const balanced = chooseBalancedPath(recommendations, scoredRecommendations, signalSet);
   const archetype = buildArchetype(signalSet, naturalFit);
+  const confidence = buildConfidence(data, scoredCandidates);
   const summary = buildSummary(data, naturalFit);
 
   return {
     archetype,
+    confidence,
     summary,
     paths: {
       naturalFit,
@@ -531,8 +1063,8 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
       balanced,
     },
     recommendations,
-    nextSevenDayAction: `Spend 7 days testing ${balanced.title}: complete the next step, save evidence, and notice whether the work gives energy or only sounds impressive.`,
-    testBeforeChoosing: `Before choosing ${balanced.title}, test the hardest part: ${balanced.tradeoff}`,
+    nextSevenDayAction: buildNextSevenDayAction(balanced, signalSet),
+    testBeforeChoosing: buildTestBeforeChoosing(balanced, signalSet),
     comebackPrompt: 'Come back after the 7-day test and update your answers with what felt energizing, boring, stressful, or surprisingly natural.',
   };
 }

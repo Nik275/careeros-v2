@@ -58,7 +58,7 @@ export function QuestionCard({
         maxWidth: '720px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '8px',
         paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
       }}
     >
@@ -113,12 +113,12 @@ export function QuestionCard({
           transition={{ duration: duration.slow, delay: 0.15, ease: ease.luxury }}
           style={{
             fontFamily: 'Inter, "SF Pro Display", system-ui, sans-serif',
-            fontSize: 'clamp(22px, 5vw, 28px)',
+            fontSize: 'clamp(20px, 5vw, 26px)',
             fontWeight: 640,
             lineHeight: '1.3',
             letterSpacing: '-0.02em',
             color: '#ffffff',
-            margin: '0 0 12px 0',
+            margin: '0 0 6px 0',
           }}
         >
           {question.question}
@@ -130,9 +130,9 @@ export function QuestionCard({
             transition={{ duration: duration.normal, delay: 0.25 }}
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: 'clamp(14px, 3.5vw, 16px)',
+              fontSize: 'clamp(13px, 3.4vw, 15px)',
               fontWeight: 400,
-              lineHeight: '1.6',
+              lineHeight: '1.35',
               color: 'rgba(255, 255, 255, 0.55)',
               margin: 0,
             }}
@@ -147,7 +147,7 @@ export function QuestionCard({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '4px',
           width: '100%',
         }}
       >
@@ -179,8 +179,8 @@ export function QuestionCard({
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '4px',
-                padding: '10px 14px',
-                borderRadius: '16px',
+                padding: '8px 12px',
+                borderRadius: '14px',
                 background: isSelected
                   ? 'linear-gradient(135deg, rgba(128, 82, 255, 0.2) 0%, rgba(100, 50, 200, 0.15) 100%)'
                   : 'linear-gradient(135deg, rgba(20, 20, 25, 0.9) 0%, rgba(10, 10, 15, 0.85) 100%)',
@@ -208,8 +208,8 @@ export function QuestionCard({
                 {/* Selection Indicator */}
                 <div
                   style={{
-                    width: '22px',
-                    height: '22px',
+                    height: '20px',
+                    width: '20px',
                     borderRadius: question.allowMultiple ? '6px' : '50%',
                     background: isSelected
                       ? 'rgba(128, 82, 255, 0.15)'
@@ -252,7 +252,7 @@ export function QuestionCard({
                 <span
                   style={{
                     fontFamily: 'Inter, system-ui, sans-serif',
-                    fontSize: '16px',
+                    fontSize: '15px',
                     fontWeight: isSelected ? 550 : 450,
                     color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
                     transition: 'all 0.25s ease',
@@ -272,12 +272,12 @@ export function QuestionCard({
                   }}
                   style={{
                     fontFamily: 'Inter, system-ui, sans-serif',
-                    fontSize: '12px',
+                    fontSize: '11px',
                     fontWeight: 400,
-                    lineHeight: '1.4',
+                    lineHeight: '1.3',
                     color: isSelected ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.55)',
-                    margin: '0 0 0 34px',
-                    paddingTop: '4px',
+                    margin: '0 0 0 32px',
+                    paddingTop: '2px',
                     transition: 'all 0.25s ease',
                   }}
                 >
