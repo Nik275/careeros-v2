@@ -880,6 +880,9 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             Your CareerOS model gets sharper when you test a path and come back with what felt energizing, boring, stressful, or natural.
           </p>
           <motion.button
+            type="button"
+            onClick={onRestart}
+            aria-label="Retake assessment"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             whileHover={{
@@ -910,7 +913,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             }}
           >
             <RefreshCw size={17} />
-            <span>Retake After the 7-Day Test</span>
+            <span>Retake Assessment</span>
             <ArrowRight size={18} />
           </motion.button>
         </motion.div>
