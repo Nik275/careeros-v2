@@ -10,17 +10,20 @@ import { ResultsDashboard } from '@/components/assessment/ResultsDashboard';
 import {
   createEmptyAssessmentPsychologyData,
   type AssessmentPsychologyData,
+  type StudentStage,
 } from '@/components/assessment/assessmentQuestions';
 import { ease, duration } from '@/lib/motion';
 
 export type AssessmentScreen = 'welcome' | 'psychology' | 'analysis' | 'results';
 
 export interface AssessmentData {
+  studentStage: StudentStage;
   psychology: AssessmentPsychologyData;
 }
 
 function createInitialAssessmentData(): AssessmentData {
   return {
+    studentStage: 'class_9_10',
     psychology: createEmptyAssessmentPsychologyData(),
   };
 }
@@ -39,6 +42,13 @@ export default function AssessmentPage() {
     setAssessmentData(prev => ({
       ...prev,
       psychology: { ...prev.psychology, ...updates },
+    }));
+  }, []);
+
+  const updateStudentStage = useCallback((studentStage: StudentStage) => {
+    setAssessmentData(prev => ({
+      ...prev,
+      studentStage,
     }));
   }, []);
 
@@ -132,7 +142,11 @@ export default function AssessmentPage() {
                 flexDirection: 'column',
               }}
             >
-              <AssessmentWelcome onStart={handleStartAssessment} />
+              <AssessmentWelcome
+                selectedStage={assessmentData.studentStage}
+                onStageChange={updateStudentStage}
+                onStart={handleStartAssessment}
+              />
             </motion.div>
           )}
 

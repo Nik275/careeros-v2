@@ -1,6 +1,7 @@
-import type { AssessmentPsychologyData } from './assessmentQuestions';
+import type { AssessmentPsychologyData, StudentStage } from './assessmentQuestions';
 
 export interface ResultAssessmentData {
+  studentStage?: StudentStage;
   psychology: AssessmentPsychologyData;
 }
 
@@ -21,6 +22,17 @@ export interface CareerRecommendation {
 export type ResultConfidenceLabel = 'Initial Clarity' | 'Strong Clarity' | 'Needs More Exploration';
 
 export interface CareerResultIntelligence {
+  studentStage: StudentStage;
+  stageCopy: {
+    label: string;
+    heroSubtitle: string;
+    primaryPathLabel: string;
+    recommendationFrameLabel: string;
+    topRecommendationsLabel: string;
+    recommendationItemLabel: string;
+    salaryFootnote: string;
+    schoolDecisionReminder?: string;
+  };
   archetype: {
     name: string;
     description: string;
@@ -62,6 +74,104 @@ interface CareerCandidate {
   nextStep: string;
   avoidIf: string;
 }
+
+const DEFAULT_STUDENT_STAGE: StudentStage = 'college_undergrad';
+
+const TECH_HEAVY_CANDIDATE_IDS = new Set([
+  'software-engineer',
+  'cloud-devops-engineer',
+  'ai-automation-builder',
+  'cybersecurity-analyst',
+]);
+
+const ADVANCED_ROLE_IDS = new Set([
+  'product-manager',
+  'ai-automation-builder',
+  'cloud-devops-engineer',
+  'cybersecurity-analyst',
+]);
+
+const STAGE_LABELS: Record<StudentStage, string> = {
+  class_9_10: 'Class 9-10',
+  class_11_12: 'Class 11-12',
+  college_undergrad: 'College / undergraduate',
+  graduate_early: 'Graduate / early career',
+};
+
+const CANDIDATE_STAGE_DIRECTIONS: Record<string, { school: string; seniorSchool: string }> = {
+  'software-engineer': {
+    school: 'Tech + Problem-Solving Direction',
+    seniorSchool: 'Engineering + Software Career Family',
+  },
+  'data-analyst': {
+    school: 'Commerce + Data Thinking Direction',
+    seniorSchool: 'Data, Commerce, and Analytics Career Family',
+  },
+  'product-designer': {
+    school: 'Design + User Understanding Direction',
+    seniorSchool: 'Design and Product Experience Career Family',
+  },
+  'ux-researcher': {
+    school: 'People Research + Communication Direction',
+    seniorSchool: 'User Research and Psychology-Adjacent Career Family',
+  },
+  'product-manager': {
+    school: 'Problem-Solving + Leadership Direction',
+    seniorSchool: 'Product, Business, and Operations Career Family',
+  },
+  'cybersecurity-analyst': {
+    school: 'Digital Safety + Systems Direction',
+    seniorSchool: 'Cybersecurity and Digital Trust Career Family',
+  },
+  'cloud-devops-engineer': {
+    school: 'Systems + Infrastructure Direction',
+    seniorSchool: 'Cloud, Infrastructure, and Technical Operations Career Family',
+  },
+  'ai-automation-builder': {
+    school: 'Automation + Practical Building Direction',
+    seniorSchool: 'Automation, No-Code, and Applied AI Career Family',
+  },
+  'digital-marketer': {
+    school: 'Media + Communication Direction',
+    seniorSchool: 'Marketing, Media, and Growth Career Family',
+  },
+  'business-analyst': {
+    school: 'Business + Operations Direction',
+    seniorSchool: 'Business Analysis and Operations Career Family',
+  },
+  'founder-freelancer': {
+    school: 'Entrepreneurship + Family Business Direction',
+    seniorSchool: 'Entrepreneurship, Freelancing, and Small Business Career Family',
+  },
+  'government-exam-path': {
+    school: 'Public Service + Stable Career Direction',
+    seniorSchool: 'Government, Public Sector, and Exam Path Family',
+  },
+  'teaching-mentoring': {
+    school: 'Teaching + Mentoring Direction',
+    seniorSchool: 'Teaching, Training, and Mentoring Career Family',
+  },
+  'design-content': {
+    school: 'Creative Content + Communication Direction',
+    seniorSchool: 'Design, Content, and Creative Communication Career Family',
+  },
+  'sales-business-development': {
+    school: 'People + Business Communication Direction',
+    seniorSchool: 'Sales, Business Development, and Client Growth Career Family',
+  },
+  'finance-accounting': {
+    school: 'Finance + Accounting Direction',
+    seniorSchool: 'Commerce, Finance, Accounting, and Compliance Career Family',
+  },
+  'healthcare-tech-ops': {
+    school: 'Healthcare Support + Operations Direction',
+    seniorSchool: 'Healthcare-Adjacent Operations and Allied Health Career Family',
+  },
+  'legal-tech-business-ops': {
+    school: 'Law, Policy + Business Operations Direction',
+    seniorSchool: 'Law, Policy, Compliance, and Business Operations Career Family',
+  },
+};
 
 const SIGNAL_LABELS: Record<string, string> = {
   creativity: 'creation',
@@ -700,7 +810,76 @@ function formatSignals(signals: string[]): string {
   return labels.slice(0, 6).join(' + ');
 }
 
-function scoreCandidate(candidate: CareerCandidate, signals: Set<string>): { rawScore: number; matchedSignals: string[] } {
+function getStudentStage(data: ResultAssessmentData): StudentStage {
+  return data.studentStage ?? DEFAULT_STUDENT_STAGE;
+}
+
+function isSchoolStage(stage: StudentStage): boolean {
+  return stage === 'class_9_10' || stage === 'class_11_12';
+}
+
+function getStageCopy(stage: StudentStage): CareerResultIntelligence['stageCopy'] {
+  if (stage === 'class_9_10') {
+    return {
+      label: STAGE_LABELS[stage],
+      heroSubtitle: 'A school-friendly direction map based on your answers. This is not a final career decision.',
+      primaryPathLabel: 'Your direction',
+      recommendationFrameLabel: 'CareerOS direction frame',
+      topRecommendationsLabel: 'Top 3 directions to explore',
+      recommendationItemLabel: 'Direction',
+      salaryFootnote: 'For Class 9-10, salary is not the main decision point yet. First test subjects, skills, and real interest before locking into a career label.',
+      schoolDecisionReminder: 'This is not a final career decision. Treat it as your next test, not a lifelong commitment.',
+    };
+  }
+
+  if (stage === 'class_11_12') {
+    return {
+      label: STAGE_LABELS[stage],
+      heroSubtitle: 'A stream, course, skill, and career-family map for your next exploration cycle.',
+      primaryPathLabel: 'Recommended direction',
+      recommendationFrameLabel: 'CareerOS direction frame',
+      topRecommendationsLabel: 'Top 3 career families',
+      recommendationItemLabel: 'Family',
+      salaryFootnote: 'Salary ranges are future India-market context. Actual outcomes depend on course choice, city, skill proof, internships, and experience.',
+      schoolDecisionReminder: 'This is not a final career decision. Use it to choose smarter experiments, subjects, courses, and conversations.',
+    };
+  }
+
+  if (stage === 'graduate_early') {
+    return {
+      label: STAGE_LABELS[stage],
+      heroSubtitle: 'India-aware role recommendations based on fit, switching cost, proof, salary pressure, and employability.',
+      primaryPathLabel: 'Recommended path',
+      recommendationFrameLabel: 'CareerOS recommendation frame',
+      topRecommendationsLabel: 'Top 3 recommended paths',
+      recommendationItemLabel: 'Path',
+      salaryFootnote: 'Salary ranges are approximate India-market ranges and may vary by city, company, skill proof, experience, and switching cost.',
+    };
+  }
+
+  return {
+    label: STAGE_LABELS[stage],
+    heroSubtitle: 'India-aware recommendations based on your motivations, strengths, work style, lifestyle, and risk signals.',
+    primaryPathLabel: 'Recommended path',
+    recommendationFrameLabel: 'CareerOS recommendation frame',
+    topRecommendationsLabel: 'Top 3 recommended paths',
+    recommendationItemLabel: 'Path',
+    salaryFootnote: 'Salary ranges are approximate India-market ranges and may vary by city, company, skill proof, and experience.',
+  };
+}
+
+function hasStrongTechSignal(signals: Set<string>): boolean {
+  const builderOrLogic = hasAny(signals, ['analytical', 'practical', 'mastery']);
+  const deepWorkOrProof = hasAny(signals, ['independent', 'social_solo', 'learning_daily', 'proof_shipped', 'academic_strong']);
+  const ambiguityOrRunway = hasAny(signals, ['ambiguity_curious', 'explore_longer', 'risk_high_growth', 'risk_founder']);
+  return builderOrLogic && deepWorkOrProof && ambiguityOrRunway;
+}
+
+function scoreCandidate(
+  candidate: CareerCandidate,
+  signals: Set<string>,
+  stage: StudentStage,
+): { rawScore: number; matchedSignals: string[] } {
   let rawScore = 0;
   const matchedSignals: string[] = [];
 
@@ -715,10 +894,54 @@ function scoreCandidate(candidate: CareerCandidate, signals: Set<string>): { raw
     }
   }
 
+  if (TECH_HEAVY_CANDIDATE_IDS.has(candidate.id) && !hasStrongTechSignal(signals)) {
+    rawScore -= stage === 'class_9_10' ? 26 : 18;
+  }
+
+  if (ADVANCED_ROLE_IDS.has(candidate.id) && stage === 'class_9_10') {
+    rawScore -= 10;
+  }
+
+  if (
+    hasAny(signals, ['security', 'stability', 'family_very_strong', 'risk_stable']) &&
+    ['government-exam-path', 'finance-accounting', 'teaching-mentoring', 'business-analyst'].includes(candidate.id)
+  ) {
+    rawScore += 8;
+  }
+
+  if (
+    hasAny(signals, ['social', 'impact', 'purpose', 'social_one_on_one', 'social_high_collab']) &&
+    ['teaching-mentoring', 'sales-business-development', 'ux-researcher', 'healthcare-tech-ops'].includes(candidate.id)
+  ) {
+    rawScore += 8;
+  }
+
   return { rawScore, matchedSignals };
 }
 
-function contextualSalaryRange(baseSalaryRange: string, signals: Set<string>): string {
+function stageAdjustedTitle(candidate: CareerCandidate, stage: StudentStage): string {
+  const direction = CANDIDATE_STAGE_DIRECTIONS[candidate.id];
+
+  if (stage === 'class_9_10') {
+    return direction?.school ?? `${candidate.title} Direction`;
+  }
+
+  if (stage === 'class_11_12') {
+    return direction?.seniorSchool ?? `${candidate.title} Career Family`;
+  }
+
+  return candidate.title;
+}
+
+function contextualSalaryRange(baseSalaryRange: string, signals: Set<string>, stage: StudentStage): string {
+  if (stage === 'class_9_10') {
+    return 'Salary is not the focus yet; first test subjects, basic skills, and small projects before choosing a stream or career label.';
+  }
+
+  if (stage === 'class_11_12') {
+    return `Future India salary context: ${baseSalaryRange}`;
+  }
+
   if (signals.has('earning_now')) {
     return `${baseSalaryRange}; prioritize paid entry roles, internships, or client work before unpaid exploration`;
   }
@@ -803,19 +1026,54 @@ function buildRecommendation(
   fitScore: number,
   matchedSignals: string[],
   signals: Set<string>,
+  stage: StudentStage,
 ): CareerRecommendation {
   const labels = matchedSignals.map((signal) => SIGNAL_LABELS[signal] ?? signal);
+  const title = stageAdjustedTitle(candidate, stage);
+  const baseAnswerPattern =
+    labels.length > 0
+      ? `Your answers highlighted ${labels.slice(0, 5).join(', ')}${labels.length > 5 ? ', and related signals' : ''}.`
+      : 'Your answers show an early pattern that needs one practical test before you commit.';
+
+  if (stage === 'class_9_10') {
+    return {
+      id: candidate.id,
+      title,
+      salaryRange: contextualSalaryRange(candidate.salaryRange, signals, stage),
+      fitScore,
+      whyFits: `This direction matches your current signals without asking you to choose a job title too early. ${candidate.whyFits}`,
+      answerPattern: `${baseAnswerPattern} At Class 9-10, use this as a subject-and-skill clue, not a final decision.`,
+      tradeoff: `Do not overcommit yet. ${contextualTradeoff(candidate.tradeoff, signals)}`,
+      nextStep: `Try a beginner version this week: ${candidate.nextStep} Keep it small enough to finish alongside school.`,
+      avoidIf: `Avoid making this your only plan right now. ${contextualAvoidIf(candidate.avoidIf, signals)}`,
+      indiaContext: `${candidate.indiaContext} For school students, the useful question is which subjects, clubs, projects, and conversations make this direction feel real.`,
+      matchedSignals: labels,
+    };
+  }
+
+  if (stage === 'class_11_12') {
+    return {
+      id: candidate.id,
+      title,
+      salaryRange: contextualSalaryRange(candidate.salaryRange, signals, stage),
+      fitScore,
+      whyFits: `${candidate.whyFits} Treat this as a career family to compare with stream, course, entrance, and skill-building choices.`,
+      answerPattern: baseAnswerPattern,
+      tradeoff: contextualTradeoff(candidate.tradeoff, signals),
+      nextStep: `For the next 90 days, test this family through one course, one project, and one conversation with someone already in the field. ${candidate.nextStep}`,
+      avoidIf: contextualAvoidIf(candidate.avoidIf, signals),
+      indiaContext: candidate.indiaContext,
+      matchedSignals: labels,
+    };
+  }
 
   return {
     id: candidate.id,
-    title: candidate.title,
-    salaryRange: contextualSalaryRange(candidate.salaryRange, signals),
+    title,
+    salaryRange: contextualSalaryRange(candidate.salaryRange, signals, stage),
     fitScore,
     whyFits: candidate.whyFits,
-    answerPattern:
-      labels.length > 0
-        ? `Your answers highlighted ${labels.slice(0, 5).join(', ')}${labels.length > 5 ? ', and related signals' : ''}.`
-        : 'Your answers show an early pattern that needs one practical test before you commit.',
+    answerPattern: baseAnswerPattern,
     tradeoff: contextualTradeoff(candidate.tradeoff, signals),
     nextStep: contextualNextStep(candidate.nextStep, signals),
     avoidIf: contextualAvoidIf(candidate.avoidIf, signals),
@@ -828,11 +1086,15 @@ function hasAny(signals: Set<string>, values: string[]): boolean {
   return values.some((value) => signals.has(value));
 }
 
-function buildArchetype(signals: Set<string>, top: CareerRecommendation): CareerResultIntelligence['archetype'] {
+function buildArchetype(signals: Set<string>, top: CareerRecommendation, stage: StudentStage): CareerResultIntelligence['archetype'] {
+  const schoolSuffix = isSchoolStage(stage)
+    ? ' For your stage, this should become small experiments, subject choices, and conversations before any final career decision.'
+    : '';
+
   if (hasAny(signals, ['independence', 'creativity', 'practical', 'remote'])) {
     return {
       name: 'The Independent Builder',
-      description: 'You are pulled toward creation and ownership, but your best path still needs a monetizable skill stack and market proof.',
+      description: `You are pulled toward creation and ownership, but your best path still needs visible proof that the work fits you.${schoolSuffix}`,
       match: Math.min(96, Math.max(86, top.fitScore)),
     };
   }
@@ -840,7 +1102,7 @@ function buildArchetype(signals: Set<string>, top: CareerRecommendation): Career
   if (hasAny(signals, ['security', 'stability', 'structured'])) {
     return {
       name: 'The Structured Stabilizer',
-      description: 'You make better decisions when the path has clear rules, credible upside, and lower downside risk.',
+      description: `You make better decisions when the path has clear rules, credible upside, and lower downside risk.${schoolSuffix}`,
       match: Math.min(95, Math.max(84, top.fitScore)),
     };
   }
@@ -848,19 +1110,19 @@ function buildArchetype(signals: Set<string>, top: CareerRecommendation): Career
   if (hasAny(signals, ['impact', 'social', 'purpose', 'collaborative'])) {
     return {
       name: 'The People-Impact Strategist',
-      description: 'You are motivated by usefulness to people, but you need a path where that care converts into a durable skill and income model.',
+      description: `You are motivated by usefulness to people, but you need a path where that care becomes a real skill, not only a good intention.${schoolSuffix}`,
       match: Math.min(94, Math.max(84, top.fitScore)),
     };
   }
 
   return {
     name: 'The Adaptive Career Strategist',
-    description: 'Your answers show a broad pattern. CareerOS is prioritizing paths with enough skill proof, market demand, and reversibility.',
+    description: `Your answers show a broad pattern. CareerOS is prioritizing paths with enough proof, demand, and room to change direction.${schoolSuffix}`,
     match: Math.min(92, Math.max(80, top.fitScore)),
   };
 }
 
-function buildSummary(data: ResultAssessmentData, top: CareerRecommendation): CareerResultIntelligence['summary'] {
+function buildSummary(data: ResultAssessmentData, top: CareerRecommendation, stage: StudentStage): CareerResultIntelligence['summary'] {
   const signals = new Set(selectedSignals(data));
   const strongestSignals = formatSignals(selectedSignals(data));
 
@@ -894,11 +1156,17 @@ function buildSummary(data: ResultAssessmentData, top: CareerRecommendation): Ca
     hiddenTension = `${hiddenTension} Founder-style ambition is present, but your pressure signals say it should be tested as a side experiment first.`;
   }
 
+  const schoolWhatNotIgnore = stage === 'class_9_10'
+    ? `Do not ignore early exploration. For ${top.title}, the useful next step is to test subjects, beginner skills, and small projects before choosing a stream or career label. Also discuss the direction with family in simple terms: what you will try, how long it will take, and what you will learn from it.`
+    : stage === 'class_11_12'
+      ? `Do not ignore stream and course fit. For ${top.title}, compare subject requirements, entrance/exam pressure, beginner projects, and family expectations before you lock into one route.`
+      : `Do not ignore proof. For ${top.title}, the Indian market will reward visible projects, internships, credentials, or outcomes more than interest alone. Your financial, family, risk, academic, and location signals should shape the first test, not just the career title.`;
+
   return {
     decisionPattern,
     strongestSignals,
     hiddenTension,
-    whatNotIgnore: `Do not ignore proof. For ${top.title}, the Indian market will reward visible projects, internships, credentials, or outcomes more than interest alone. Your financial, family, risk, academic, and location signals should shape the first test, not just the career title.`,
+    whatNotIgnore: schoolWhatNotIgnore,
   };
 }
 
@@ -991,7 +1259,15 @@ function chooseBalancedPath(
   return sorted[0]?.recommendation ?? recommendations[0];
 }
 
-function buildNextSevenDayAction(balanced: CareerRecommendation, signals: Set<string>): string {
+function buildNextSevenDayAction(balanced: CareerRecommendation, signals: Set<string>, stage: StudentStage): string {
+  if (stage === 'class_9_10') {
+    return `For the next 7 days, test ${balanced.title} without making a career commitment: try one beginner activity, note what felt easy or boring, and ask one parent, teacher, or senior what subjects support this direction.`;
+  }
+
+  if (stage === 'class_11_12') {
+    return `For the next 7 days, test ${balanced.title}: compare one course route, one entrance or eligibility requirement, and one beginner project so your stream choice stays grounded.`;
+  }
+
   if (signals.has('earning_now') || signals.has('earning_6_months')) {
     return `Spend 7 days testing ${balanced.title}: complete the next step, then apply to or identify three paid entry routes so earning pressure is handled honestly.`;
   }
@@ -1011,7 +1287,15 @@ function buildNextSevenDayAction(balanced: CareerRecommendation, signals: Set<st
   return `Spend 7 days testing ${balanced.title}: complete the next step, save evidence, and notice whether the work gives energy or only sounds impressive.`;
 }
 
-function buildTestBeforeChoosing(balanced: CareerRecommendation, signals: Set<string>): string {
+function buildTestBeforeChoosing(balanced: CareerRecommendation, signals: Set<string>, stage: StudentStage): string {
+  if (stage === 'class_9_10') {
+    return `Before choosing a stream or career label, test whether ${balanced.title} feels interesting in real activities, not just in your imagination.`;
+  }
+
+  if (stage === 'class_11_12') {
+    return `Before choosing ${balanced.title}, check subject fit, entrance pressure, costs, and one backup route with your family or mentor.`;
+  }
+
   if (signals.has('ambiguity_anxious') || signals.has('ambiguity_avoid') || signals.has('risk_stable')) {
     return `Before choosing ${balanced.title}, test the riskiest assumption with a clear fallback: ${balanced.tradeoff}`;
   }
@@ -1024,11 +1308,13 @@ function buildTestBeforeChoosing(balanced: CareerRecommendation, signals: Set<st
 }
 
 export function generateCareerResultIntelligence(data: ResultAssessmentData): CareerResultIntelligence {
+  const studentStage = getStudentStage(data);
+  const stageCopy = getStageCopy(studentStage);
   const selected = selectedSignals(data);
   const signalSet = new Set(selected);
 
   const scoredCandidates = CAREER_CANDIDATES.map((candidate) => {
-    const score = scoreCandidate(candidate, signalSet);
+    const score = scoreCandidate(candidate, signalSet, studentStage);
     return { candidate, ...score };
   }).sort((a, b) => {
     if (b.rawScore !== a.rawScore) return b.rawScore - a.rawScore;
@@ -1044,7 +1330,7 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
   const scoredRecommendations = effectivePool.map((item, index) => {
     const normalizedScore = 58 + (item.rawScore / bestRawScore) * 34 - index;
     const fitScore = Math.max(62, Math.min(97, Math.round(normalizedScore)));
-    const recommendation = buildRecommendation(item.candidate, fitScore, item.matchedSignals, signalSet);
+    const recommendation = buildRecommendation(item.candidate, fitScore, item.matchedSignals, signalSet, studentStage);
     return { candidate: item.candidate, recommendation };
   });
 
@@ -1052,11 +1338,13 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
   const naturalFit = recommendations[0];
   const longTermOutcome = chooseLongTermPath(recommendations, scoredRecommendations);
   const balanced = chooseBalancedPath(recommendations, scoredRecommendations, signalSet);
-  const archetype = buildArchetype(signalSet, naturalFit);
+  const archetype = buildArchetype(signalSet, naturalFit, studentStage);
   const confidence = buildConfidence(data, scoredCandidates);
-  const summary = buildSummary(data, naturalFit);
+  const summary = buildSummary(data, naturalFit, studentStage);
 
   return {
+    studentStage,
+    stageCopy,
     archetype,
     confidence,
     summary,
@@ -1066,8 +1354,10 @@ export function generateCareerResultIntelligence(data: ResultAssessmentData): Ca
       balanced,
     },
     recommendations,
-    nextSevenDayAction: buildNextSevenDayAction(balanced, signalSet),
-    testBeforeChoosing: buildTestBeforeChoosing(balanced, signalSet),
-    comebackPrompt: 'Come back after the 7-day test and update your answers with what felt energizing, boring, stressful, or surprisingly natural.',
+    nextSevenDayAction: buildNextSevenDayAction(balanced, signalSet, studentStage),
+    testBeforeChoosing: buildTestBeforeChoosing(balanced, signalSet, studentStage),
+    comebackPrompt: isSchoolStage(studentStage)
+      ? 'Come back after your next test and update your answers with what felt interesting, boring, stressful, or surprisingly natural.'
+      : 'Come back after the 7-day test and update your answers with what felt energizing, boring, stressful, or surprisingly natural.',
   };
 }

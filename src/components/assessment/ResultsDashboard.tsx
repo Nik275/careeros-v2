@@ -110,6 +110,14 @@ function buildTopVerdict(results: CareerResultIntelligence): string {
   const pathTitle = results.paths.balanced.title;
   const archetype = results.archetype.name.toLowerCase();
 
+  if (results.studentStage === 'class_9_10') {
+    return `Your strongest direction is ${pathTitle}. Treat it as a small test for subjects, skills, and interests, not a final career choice.`;
+  }
+
+  if (results.studentStage === 'class_11_12') {
+    return `Your strongest career family is ${pathTitle}. Compare it with stream fit, course routes, entrance pressure, and beginner proof.`;
+  }
+
   if (archetype.includes('builder')) {
     return `Your strongest direction is practical tech-building, with paid proof-building before a big commitment.`;
   }
@@ -128,6 +136,14 @@ function buildTopVerdict(results: CareerResultIntelligence): string {
 function buildConfidenceExplanation(results: CareerResultIntelligence): string {
   const fitLevel = results.archetype.match >= 90 ? 'High' : results.archetype.match >= 82 ? 'Good' : 'Moderate';
 
+  if (results.studentStage === 'class_9_10') {
+    return `${fitLevel} identity fit means your answers point toward this direction. ${results.confidence.label} means you should test it with one simple activity before treating it as a serious choice.`;
+  }
+
+  if (results.studentStage === 'class_11_12') {
+    return `${fitLevel} identity fit means your answers match this career family. ${results.confidence.label} means the next step is to test stream, course, skill, and family-fit assumptions.`;
+  }
+
   return `${fitLevel} identity fit means your personality and signals match this direction. ${results.confidence.label} means CareerOS still wants the recommendation tested because confidence is based on signal consistency, not just fit percentage.`;
 }
 
@@ -141,7 +157,19 @@ function buildConsensusInsight(results: CareerResultIntelligence): string {
 
   if (repeatedTitle) {
     const count = titles.filter((title) => title === repeatedTitle).length;
+    if (results.studentStage === 'class_9_10') {
+      return `${repeatedTitle} appears in ${count} places because it fits more than one part of your answer pattern. Use it as your next experiment, not a final decision.`;
+    }
+
     return `${repeatedTitle} appears in ${count} recommendation roles because it wins across more than one lens: fit, long-term outcome, and risk-adjusted balance.`;
+  }
+
+  if (results.studentStage === 'class_9_10') {
+    return 'These three directions separate what may feel natural, what could grow later, and what is safest to test next.';
+  }
+
+  if (results.studentStage === 'class_11_12') {
+    return 'These three career families separate fit, future upside, and the most practical next route for stream and course planning.';
   }
 
   return 'These three paths separate day-to-day fit, long-term upside, and the balanced choice so the recommendation is easier to compare.';
@@ -155,12 +183,17 @@ function buildPathRoleCopy(label: string, path: CareerRecommendation, results: C
   ].filter((title) => title === path.title).length > 1;
 
   if (isRepeated) {
-    return 'Consensus signal: this path wins in more than one recommendation lens.';
+    return results.studentStage === 'class_9_10'
+      ? 'Repeated signal: this direction fits more than one part of your answers.'
+      : 'Consensus signal: this path wins in more than one recommendation lens.';
   }
 
-  if (label === 'Natural Fit Path') return 'Best day-to-day match for your current psychology and work style.';
-  if (label === 'Best Long-Term Outcome') return 'Highest upside after adjusting for your current fit signals.';
-  return 'Most practical first bet after balancing fit, risk, income, and constraints.';
+  if (label.includes('Natural')) return 'Best day-to-day match for your current psychology and work style.';
+  if (label.includes('Long-Term')) return 'Highest upside after adjusting for your current fit signals.';
+  if (label.includes('Longer-Term')) return 'A later option to keep open while you test the basics now.';
+  return results.studentStage === 'class_9_10'
+    ? 'Most practical next test after balancing fit, family context, pressure, and uncertainty.'
+    : 'Most practical first bet after balancing fit, risk, income, and constraints.';
 }
 
 function PathMiniCard({
@@ -280,7 +313,15 @@ function DetailRow({
   );
 }
 
-function RecommendationCard({ career, index }: { career: CareerRecommendation; index: number }) {
+function RecommendationCard({
+  career,
+  index,
+  itemLabel,
+}: {
+  career: CareerRecommendation;
+  index: number;
+  itemLabel: string;
+}) {
   const accent =
     index === 0
       ? 'rgba(128, 82, 255, 0.9)'
@@ -333,7 +374,7 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
               marginBottom: '10px',
             }}
           >
-            Path {index + 1}
+            {itemLabel} {index + 1}
           </div>
           <h4
             style={{
@@ -364,7 +405,9 @@ function RecommendationCard({ career, index }: { career: CareerRecommendation; i
                 color: 'rgba(255,255,255,0.72)',
               }}
             >
-              <BadgeIndianRupee size={15} strokeWidth={1.7} style={{ color: accent }} />
+              {career.salaryRange.includes('₹') && (
+                <BadgeIndianRupee size={15} strokeWidth={1.7} style={{ color: accent }} />
+              )}
               {career.salaryRange}
             </span>
           </div>
@@ -603,7 +646,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               margin: 0,
             }}
           >
-            India-aware recommendations based on your motivations, strengths, work style, lifestyle, and risk signals.
+            {results.stageCopy.heroSubtitle}
           </p>
         </motion.div>
 
@@ -649,7 +692,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               gap: '12px',
             }}
           >
-            <IntelligenceCard title="Best first bet" accent="rgba(128, 82, 255, 0.72)">
+            <IntelligenceCard title={results.stageCopy.primaryPathLabel} accent="rgba(128, 82, 255, 0.72)">
               <SmallText>{results.paths.balanced.title}</SmallText>
             </IntelligenceCard>
             <IntelligenceCard title="Proof to collect" accent="rgba(69, 214, 160, 0.62)">
@@ -659,6 +702,19 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               <SmallText>{results.testBeforeChoosing}</SmallText>
             </IntelligenceCard>
           </div>
+          {results.stageCopy.schoolDecisionReminder && (
+            <p
+              style={{
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: 'rgba(255,255,255,0.66)',
+                margin: '16px 0 0 0',
+              }}
+            >
+              {results.stageCopy.schoolDecisionReminder}
+            </p>
+          )}
         </motion.div>
 
         <motion.div
@@ -770,7 +826,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <SectionLabel>CareerOS recommendation frame</SectionLabel>
+          <SectionLabel>{results.stageCopy.recommendationFrameLabel}</SectionLabel>
           <p
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
@@ -790,19 +846,19 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             }}
           >
             <PathMiniCard
-              label="Natural Fit Path"
+              label={results.studentStage === 'class_9_10' ? 'Natural Direction' : 'Natural Fit Path'}
               path={results.paths.naturalFit}
               icon={<Compass size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Natural Fit Path', results.paths.naturalFit, results)}
             />
             <PathMiniCard
-              label="Best Long-Term Outcome"
+              label={results.studentStage === 'class_9_10' ? 'Longer-Term Option' : 'Best Long-Term Outcome'}
               path={results.paths.longTermOutcome}
               icon={<TrendingUp size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Best Long-Term Outcome', results.paths.longTermOutcome, results)}
             />
             <PathMiniCard
-              label="Balanced Recommendation"
+              label={results.studentStage === 'class_9_10' ? 'Balanced Next Test' : 'Balanced Recommendation'}
               path={results.paths.balanced}
               icon={<ShieldAlert size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Balanced Recommendation', results.paths.balanced, results)}
@@ -811,10 +867,15 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <SectionLabel>Top 3 recommended paths</SectionLabel>
+          <SectionLabel>{results.stageCopy.topRecommendationsLabel}</SectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {results.recommendations.map((career, index) => (
-              <RecommendationCard key={career.id} career={career} index={index} />
+              <RecommendationCard
+                key={career.id}
+                career={career}
+                index={index}
+                itemLabel={results.stageCopy.recommendationItemLabel}
+              />
             ))}
           </div>
         </motion.div>
@@ -929,7 +990,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
             lineHeight: 1.5,
           }}
         >
-          Salary ranges are approximate India-market ranges and may vary by city, company, skill proof, and experience.
+          {results.stageCopy.salaryFootnote}
         </motion.p>
       </motion.div>
     </div>

@@ -1,5 +1,36 @@
 import type { Question } from './QuestionCard';
 
+export type StudentStage = 'class_9_10' | 'class_11_12' | 'college_undergrad' | 'graduate_early';
+
+export interface StudentStageOption {
+  id: StudentStage;
+  label: string;
+  description: string;
+}
+
+export const STUDENT_STAGE_OPTIONS: StudentStageOption[] = [
+  {
+    id: 'class_9_10',
+    label: 'Class 9-10',
+    description: 'Direction, subjects, and simple experiments before choosing too early',
+  },
+  {
+    id: 'class_11_12',
+    label: 'Class 11-12',
+    description: 'Stream, course, exam, and skill-building alignment',
+  },
+  {
+    id: 'college_undergrad',
+    label: 'College / undergraduate',
+    description: 'Roles, internships, projects, portfolio, and India salary context',
+  },
+  {
+    id: 'graduate_early',
+    label: 'Graduate / early career',
+    description: 'Role fit, switching, upskilling, proof, and employability tradeoffs',
+  },
+];
+
 export interface AssessmentPsychologyData {
   motivations: string[];
   strengths: string[];

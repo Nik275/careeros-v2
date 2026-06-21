@@ -3,14 +3,19 @@ import {
   ASSESSMENT_QUESTIONS,
   createEmptyAssessmentPsychologyData,
   type AssessmentPsychologyData,
+  type StudentStage,
 } from '../assessmentQuestions';
 import {
   generateCareerResultIntelligence,
   type ResultAssessmentData,
 } from '../resultIntelligence';
 
-function createPersona(overrides: Partial<AssessmentPsychologyData>): ResultAssessmentData {
+function createPersona(
+  overrides: Partial<AssessmentPsychologyData>,
+  studentStage: StudentStage = 'college_undergrad',
+): ResultAssessmentData {
   return {
+    studentStage,
     psychology: {
       ...createEmptyAssessmentPsychologyData(),
       motivations: ['mastery'],
@@ -151,6 +156,72 @@ describe('generateCareerResultIntelligence', () => {
     expect(builderTitles).not.toEqual(stabilityTitles);
     expect(stabilityTitles).not.toEqual(peopleImpactTitles);
     expect(new Set([builderTitles[0], stabilityTitles[0], peopleImpactTitles[0]]).size).toBeGreaterThan(1);
+  });
+
+  it('keeps Class 10 output direction-led instead of hard job-title led', () => {
+    const result = generateCareerResultIntelligence(createPersona({
+      motivations: ['mastery', 'security'],
+      strengths: ['analytical', 'organizing'],
+      personalityTraits: ['structured'],
+      values: ['stability'],
+      financialPressure: ['explore_longer'],
+      familyExpectations: ['family_very_strong'],
+      riskTolerance: ['risk_stable'],
+      academicConfidence: ['academic_steady'],
+      skillReadiness: ['proof_starting'],
+    }, 'class_9_10'));
+
+    const titles = result.recommendations.map((career) => career.title);
+
+    expect(result.stageCopy.primaryPathLabel).toBe('Your direction');
+    expect(titles.every((title) => title.includes('Direction'))).toBe(true);
+    expect(titles).not.toContain('Software Engineer');
+    expect(titles).not.toContain('AI Automation Builder');
+    expect(result.nextSevenDayAction).toContain('beginner activity');
+    expect(result.summary.whatNotIgnore).toContain('subjects');
+    expect(result.stageCopy.schoolDecisionReminder).toContain('not a final career decision');
+  });
+
+  it('allows a college builder to receive tech recommendations when the signals justify it', () => {
+    const result = generateCareerResultIntelligence(builderPersona);
+    const titles = result.recommendations.map((career) => career.title);
+
+    expect(titles.some((title) => ['Software Engineer', 'AI Automation Builder', 'Cloud/DevOps Engineer'].includes(title))).toBe(true);
+    expect(result.stageCopy.primaryPathLabel).toBe('Recommended path');
+  });
+
+  it('does not force a stability and family-pressure persona into IT recommendations', () => {
+    const result = generateCareerResultIntelligence(stabilityPersona);
+    const titles = result.recommendations.map((career) => career.title);
+
+    expect(titles).toContain('Government Exam Path');
+    expect(titles).toContain('Finance / Accounting Path');
+    expect(titles).not.toContain('AI Automation Builder');
+    expect(titles).not.toContain('Cloud/DevOps Engineer');
+  });
+
+  it('elevates people-impact non-IT recommendations for people-facing signals', () => {
+    const result = generateCareerResultIntelligence(peopleImpactPersona);
+    const titles = result.recommendations.map((career) => career.title);
+
+    expect(titles.some((title) => [
+      'Teaching / Mentoring Path',
+      'Sales / Business Development',
+      'UX Researcher',
+      'Healthcare-Adjacent Tech / Operations',
+    ].includes(title))).toBe(true);
+    expect(titles).not.toEqual(['Software Engineer', 'AI Automation Builder', 'Product Manager']);
+  });
+
+  it('changes the same answer pattern across student stages', () => {
+    const classTen = generateCareerResultIntelligence(createPersona(builderPersona.psychology, 'class_9_10'));
+    const college = generateCareerResultIntelligence(createPersona(builderPersona.psychology, 'college_undergrad'));
+
+    expect(classTen.recommendations[0].title).not.toBe(college.recommendations[0].title);
+    expect(classTen.recommendations[0].title).toContain('Direction');
+    expect(college.recommendations.map((career) => career.title)).toContain('AI Automation Builder');
+    expect(classTen.recommendations[0].salaryRange).not.toContain('LPA');
+    expect(college.recommendations[0].salaryRange).toContain('LPA');
   });
 
   it('uses India salary language and never emits USD symbols', () => {

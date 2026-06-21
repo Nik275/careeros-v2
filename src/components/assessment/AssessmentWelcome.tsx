@@ -4,12 +4,15 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { ease, duration, stagger } from '@/lib/motion';
+import { STUDENT_STAGE_OPTIONS, type StudentStage } from './assessmentQuestions';
 
 interface AssessmentWelcomeProps {
+  selectedStage: StudentStage;
+  onStageChange: (stage: StudentStage) => void;
   onStart: () => void;
 }
 
-export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
+export function AssessmentWelcome({ selectedStage, onStageChange, onStart }: AssessmentWelcomeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
 
@@ -244,6 +247,90 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          style={{
+            width: '100%',
+            maxWidth: '560px',
+            marginBottom: '36px',
+            textAlign: 'left',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: '12px',
+              fontWeight: 650,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.48)',
+              marginBottom: '10px',
+              textAlign: 'center',
+            }}
+          >
+            Where are you right now?
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '8px',
+            }}
+          >
+            {STUDENT_STAGE_OPTIONS.map((stage) => {
+              const isSelected = stage.id === selectedStage;
+
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  onClick={() => onStageChange(stage.id)}
+                  aria-pressed={isSelected}
+                  style={{
+                    padding: '13px 14px',
+                    borderRadius: '14px',
+                    background: isSelected
+                      ? 'linear-gradient(135deg, rgba(128, 82, 255, 0.22) 0%, rgba(72, 48, 160, 0.18) 100%)'
+                      : 'linear-gradient(135deg, rgba(20,20,25,0.88) 0%, rgba(10,10,15,0.82) 100%)',
+                    border: isSelected
+                      ? '1.5px solid rgba(128, 82, 255, 0.58)'
+                      : '1px solid rgba(255,255,255,0.075)',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    boxShadow: isSelected
+                      ? '0 10px 28px rgba(128, 82, 255, 0.18)'
+                      : '0 2px 12px rgba(0,0,0,0.18)',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 660,
+                      marginBottom: '5px',
+                    }}
+                  >
+                    {stage.label}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      fontSize: '12px',
+                      lineHeight: 1.35,
+                      color: 'rgba(255,255,255,0.58)',
+                    }}
+                  >
+                    {stage.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* CTA Button */}
