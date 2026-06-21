@@ -137,11 +137,11 @@ function buildConfidenceExplanation(results: CareerResultIntelligence): string {
   const fitLevel = results.archetype.match >= 90 ? 'High' : results.archetype.match >= 82 ? 'Good' : 'Moderate';
 
   if (results.studentStage === 'class_9_10') {
-    return `${fitLevel} identity fit means your answers point toward this direction. ${results.confidence.label} means you should test it with one simple activity before treating it as a serious choice.`;
+    return `${fitLevel} match means your answers point toward this direction. ${results.confidence.label} means you should test it with one simple activity before treating it as a serious choice.`;
   }
 
   if (results.studentStage === 'class_11_12') {
-    return `${fitLevel} identity fit means your answers match this career family. ${results.confidence.label} means the next step is to test stream, course, skill, and family-fit assumptions.`;
+    return `${fitLevel} match means your answers fit this career family. ${results.confidence.label} means the next step is to test stream, course, skill, and family-fit assumptions.`;
   }
 
   return `${fitLevel} identity fit means your personality and signals match this direction. ${results.confidence.label} means CareerOS still wants the recommendation tested because confidence is based on signal consistency, not just fit percentage.`;
@@ -159,6 +159,10 @@ function buildConsensusInsight(results: CareerResultIntelligence): string {
     const count = titles.filter((title) => title === repeatedTitle).length;
     if (results.studentStage === 'class_9_10') {
       return `${repeatedTitle} appears in ${count} places because it fits more than one part of your answer pattern. Use it as your next experiment, not a final decision.`;
+    }
+
+    if (results.studentStage === 'class_11_12') {
+      return `${repeatedTitle} appears in ${count} places because it fits more than one part of your answer pattern: fit, future options, and a practical next route.`;
     }
 
     return `${repeatedTitle} appears in ${count} recommendation roles because it wins across more than one lens: fit, long-term outcome, and risk-adjusted balance.`;
@@ -201,11 +205,13 @@ function PathMiniCard({
   path,
   icon,
   reason,
+  showSalary = true,
 }: {
   label: string;
   path: CareerRecommendation;
   icon: ReactNode;
   reason: string;
+  showSalary?: boolean;
 }) {
   return (
     <div
@@ -260,7 +266,7 @@ function PathMiniCard({
         >
           {path.title}
         </div>
-        <SmallText>{path.salaryRange}</SmallText>
+        {showSalary && <SmallText>{path.salaryRange}</SmallText>}
         <p
           style={{
             fontFamily: 'Inter, system-ui, sans-serif',
@@ -317,10 +323,12 @@ function RecommendationCard({
   career,
   index,
   itemLabel,
+  studentStage,
 }: {
   career: CareerRecommendation;
   index: number;
   itemLabel: string;
+  studentStage: CareerResultIntelligence['studentStage'];
 }) {
   const accent =
     index === 0
@@ -387,30 +395,32 @@ function RecommendationCard({
           >
             {career.title}
           </h4>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '8px',
-              alignItems: 'center',
-            }}
-          >
-            <span
+          {studentStage !== 'class_9_10' && (
+            <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
                 alignItems: 'center',
-                gap: '6px',
-                fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: '13px',
-                color: 'rgba(255,255,255,0.72)',
               }}
             >
-              {career.salaryRange.includes('₹') && (
-                <BadgeIndianRupee size={15} strokeWidth={1.7} style={{ color: accent }} />
-              )}
-              {career.salaryRange}
-            </span>
-          </div>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontSize: '13px',
+                  color: 'rgba(255,255,255,0.72)',
+                }}
+              >
+                {career.salaryRange.includes('₹') && (
+                  <BadgeIndianRupee size={15} strokeWidth={1.7} style={{ color: accent }} />
+                )}
+                {career.salaryRange}
+              </span>
+            </div>
+          )}
         </div>
 
         <div
@@ -429,55 +439,89 @@ function RecommendationCard({
           <span
             style={{
               fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '20px',
+              fontSize: studentStage === 'class_9_10' ? '13px' : '20px',
               fontWeight: 760,
               color: accent,
-              lineHeight: 1,
+              lineHeight: 1.15,
+              textAlign: 'center',
             }}
           >
-            {career.fitScore}%
+            {studentStage === 'class_9_10' ? 'Try' : `${career.fitScore}%`}
           </span>
-          <span
-            style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '10px',
-              color: 'rgba(255,255,255,0.42)',
-              marginTop: '4px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-            }}
-          >
-            Fit
-          </span>
+          {studentStage !== 'class_9_10' && (
+            <span
+              style={{
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: '10px',
+                color: 'rgba(255,255,255,0.42)',
+                marginTop: '4px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
+              Fit
+            </span>
+          )}
         </div>
       </div>
 
       <div style={{ display: 'grid', gap: '12px' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '12px',
-          }}
-        >
-          <IntelligenceCard title="Why-fit" accent={accent}>
-            <SmallText>{career.whyFits}</SmallText>
-          </IntelligenceCard>
-          <IntelligenceCard title="What your answers showed" accent={accent}>
-            <SmallText>{career.answerPattern}</SmallText>
-          </IntelligenceCard>
-        </div>
+        {studentStage === 'class_9_10' ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            <IntelligenceCard title="What this means" accent={accent}>
+              <SmallText>{career.whyFits}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Subjects to test" accent={accent}>
+              <SmallText>{career.subjectsToExplore}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Skills to try" accent={accent}>
+              <SmallText>{career.skillsToTry}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="Try this first" accent={accent}>
+              <SmallText>{career.beginnerActivity}</SmallText>
+            </IntelligenceCard>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            <IntelligenceCard title="Why-fit" accent={accent}>
+              <SmallText>{career.whyFits}</SmallText>
+            </IntelligenceCard>
+            <IntelligenceCard title="What your answers showed" accent={accent}>
+              <SmallText>{career.answerPattern}</SmallText>
+            </IntelligenceCard>
+          </div>
+        )}
 
         <div>
-          <DetailRow title="Tradeoff" accent="rgba(255, 190, 110, 0.86)">
-            {career.tradeoff}
-          </DetailRow>
-          <DetailRow title="Next-step" accent="rgba(88, 222, 170, 0.86)">
-            {career.nextStep}
-          </DetailRow>
-          <DetailRow title="Avoid-if" accent="rgba(255, 120, 140, 0.86)">
-            {career.avoidIf}
-          </DetailRow>
+          {studentStage === 'class_9_10' ? (
+            <DetailRow title="Be careful if" accent="rgba(255, 120, 140, 0.86)">
+              {career.avoidOvercommitting}
+            </DetailRow>
+          ) : (
+            <>
+              <DetailRow title="Tradeoff" accent="rgba(255, 190, 110, 0.86)">
+                {career.tradeoff}
+              </DetailRow>
+              <DetailRow title="Next-step" accent="rgba(88, 222, 170, 0.86)">
+                {career.nextStep}
+              </DetailRow>
+              <DetailRow title="Avoid-if" accent="rgba(255, 120, 140, 0.86)">
+                {career.avoidIf}
+              </DetailRow>
+            </>
+          )}
         </div>
       </div>
     </motion.div>
@@ -783,7 +827,9 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
                     color: 'rgba(128, 82, 255, 1)',
                   }}
                 >
-                  {results.archetype.match}% identity fit
+                  {results.studentStage === 'class_9_10'
+                    ? `${results.archetype.match}% direction match`
+                    : `${results.archetype.match}% identity fit`}
                 </span>
                 <span
                   style={{
@@ -850,18 +896,21 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
               path={results.paths.naturalFit}
               icon={<Compass size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Natural Fit Path', results.paths.naturalFit, results)}
+              showSalary={results.studentStage !== 'class_9_10'}
             />
             <PathMiniCard
-              label={results.studentStage === 'class_9_10' ? 'Longer-Term Option' : 'Best Long-Term Outcome'}
+              label={results.studentStage === 'class_9_10' ? 'Strong Future Option' : 'Best Long-Term Outcome'}
               path={results.paths.longTermOutcome}
               icon={<TrendingUp size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Best Long-Term Outcome', results.paths.longTermOutcome, results)}
+              showSalary={results.studentStage !== 'class_9_10'}
             />
             <PathMiniCard
-              label={results.studentStage === 'class_9_10' ? 'Balanced Next Test' : 'Balanced Recommendation'}
+              label={results.studentStage === 'class_9_10' ? 'Best First Test' : 'Balanced Recommendation'}
               path={results.paths.balanced}
               icon={<ShieldAlert size={19} strokeWidth={1.6} style={{ color: 'rgba(128,82,255,0.9)' }} />}
               reason={buildPathRoleCopy('Balanced Recommendation', results.paths.balanced, results)}
+              showSalary={results.studentStage !== 'class_9_10'}
             />
           </div>
         </motion.div>
@@ -875,6 +924,7 @@ export function ResultsDashboard({ data, onRestart }: ResultsDashboardProps) {
                 career={career}
                 index={index}
                 itemLabel={results.stageCopy.recommendationItemLabel}
+                studentStage={results.studentStage}
               />
             ))}
           </div>

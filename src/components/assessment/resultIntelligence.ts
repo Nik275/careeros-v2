@@ -9,6 +9,10 @@ export interface CareerRecommendation {
   id: string;
   title: string;
   salaryRange: string;
+  subjectsToExplore?: string;
+  skillsToTry?: string;
+  beginnerActivity?: string;
+  avoidOvercommitting?: string;
   fitScore: number;
   whyFits: string;
   answerPattern: string;
@@ -75,6 +79,13 @@ interface CareerCandidate {
   avoidIf: string;
 }
 
+interface SchoolExplorationGuidance {
+  subjects: string;
+  skills: string;
+  beginnerActivity: string;
+  avoid: string;
+}
+
 const DEFAULT_STUDENT_STAGE: StudentStage = 'college_undergrad';
 
 const TECH_HEAVY_CANDIDATE_IDS = new Set([
@@ -100,7 +111,7 @@ const STAGE_LABELS: Record<StudentStage, string> = {
 
 const CANDIDATE_STAGE_DIRECTIONS: Record<string, { school: string; seniorSchool: string }> = {
   'software-engineer': {
-    school: 'Tech + Problem-Solving Direction',
+    school: 'Technology + Problem Solving Direction',
     seniorSchool: 'Engineering + Software Career Family',
   },
   'data-analyst': {
@@ -108,31 +119,31 @@ const CANDIDATE_STAGE_DIRECTIONS: Record<string, { school: string; seniorSchool:
     seniorSchool: 'Data, Commerce, and Analytics Career Family',
   },
   'product-designer': {
-    school: 'Design + User Understanding Direction',
+    school: 'Design + Problem Solving Direction',
     seniorSchool: 'Design and Product Experience Career Family',
   },
   'ux-researcher': {
-    school: 'People Research + Communication Direction',
+    school: 'People + Understanding Direction',
     seniorSchool: 'User Research and Psychology-Adjacent Career Family',
   },
   'product-manager': {
-    school: 'Problem-Solving + Leadership Direction',
+    school: 'Problem Solving + Leadership Direction',
     seniorSchool: 'Product, Business, and Operations Career Family',
   },
   'cybersecurity-analyst': {
-    school: 'Digital Safety + Systems Direction',
+    school: 'Technology + Safety Direction',
     seniorSchool: 'Cybersecurity and Digital Trust Career Family',
   },
   'cloud-devops-engineer': {
-    school: 'Systems + Infrastructure Direction',
+    school: 'Technology + Systems Direction',
     seniorSchool: 'Cloud, Infrastructure, and Technical Operations Career Family',
   },
   'ai-automation-builder': {
-    school: 'Automation + Practical Building Direction',
+    school: 'Technology + Problem Solving Direction',
     seniorSchool: 'Automation, No-Code, and Applied AI Career Family',
   },
   'digital-marketer': {
-    school: 'Media + Communication Direction',
+    school: 'Media + Content Direction',
     seniorSchool: 'Marketing, Media, and Growth Career Family',
   },
   'business-analyst': {
@@ -144,32 +155,143 @@ const CANDIDATE_STAGE_DIRECTIONS: Record<string, { school: string; seniorSchool:
     seniorSchool: 'Entrepreneurship, Freelancing, and Small Business Career Family',
   },
   'government-exam-path': {
-    school: 'Public Service + Stable Career Direction',
+    school: 'Stable Public-Service Direction',
     seniorSchool: 'Government, Public Sector, and Exam Path Family',
   },
   'teaching-mentoring': {
-    school: 'Teaching + Mentoring Direction',
+    school: 'Teaching + Helping Direction',
     seniorSchool: 'Teaching, Training, and Mentoring Career Family',
   },
   'design-content': {
-    school: 'Creative Content + Communication Direction',
+    school: 'Design + Creativity Direction',
     seniorSchool: 'Design, Content, and Creative Communication Career Family',
   },
   'sales-business-development': {
-    school: 'People + Business Communication Direction',
+    school: 'Business + Communication Direction',
     seniorSchool: 'Sales, Business Development, and Client Growth Career Family',
   },
   'finance-accounting': {
-    school: 'Finance + Accounting Direction',
+    school: 'Commerce + Money Management Direction',
     seniorSchool: 'Commerce, Finance, Accounting, and Compliance Career Family',
   },
   'healthcare-tech-ops': {
-    school: 'Healthcare Support + Operations Direction',
+    school: 'Health + Helping Direction',
     seniorSchool: 'Healthcare-Adjacent Operations and Allied Health Career Family',
   },
   'legal-tech-business-ops': {
-    school: 'Law, Policy + Business Operations Direction',
+    school: 'Law + Society Direction',
     seniorSchool: 'Law, Policy, Compliance, and Business Operations Career Family',
+  },
+};
+
+const SCHOOL_EXPLORATION_GUIDANCE: Record<string, SchoolExplorationGuidance> = {
+  'software-engineer': {
+    subjects: 'Maths, Computer Science, Physics basics',
+    skills: 'coding basics, logical puzzles, simple websites',
+    beginnerActivity: 'Build one small calculator, quiz, or webpage.',
+    avoid: 'Do not choose Science only because everyone says tech has money.',
+  },
+  'data-analyst': {
+    subjects: 'Maths, Statistics basics, Economics, Computer Science',
+    skills: 'spreadsheets, charts, data reading, asking clear questions',
+    beginnerActivity: 'Make a simple chart from sports, marks, or public data and explain what it shows.',
+    avoid: 'Do not assume data work is only coding; first test whether patterns and numbers interest you.',
+  },
+  'product-designer': {
+    subjects: 'Art/design exposure, Computer Science basics, Psychology basics',
+    skills: 'sketching, observation, app critique, simple design tools',
+    beginnerActivity: 'Redesign one confusing app screen on paper and explain your choices.',
+    avoid: 'Do not pick design only because it looks creative; test whether solving user problems interests you.',
+  },
+  'ux-researcher': {
+    subjects: 'Psychology basics, English, Sociology, Computer Science exposure',
+    skills: 'listening, interviewing, note-taking, pattern spotting',
+    beginnerActivity: 'Ask three classmates why they use one app and write what you learned.',
+    avoid: 'Do not overcommit before testing whether patient listening feels natural.',
+  },
+  'product-manager': {
+    subjects: 'Maths basics, Economics, English, Computer Science exposure',
+    skills: 'problem framing, communication, planning, decision-making',
+    beginnerActivity: 'Pick one school problem and write a simple improvement plan.',
+    avoid: 'Do not treat leadership as a job title; first test whether solving messy problems energizes you.',
+  },
+  'cybersecurity-analyst': {
+    subjects: 'Computer Science, Maths, digital safety basics',
+    skills: 'password safety, logical thinking, careful observation',
+    beginnerActivity: 'Create a simple cyber-safety checklist for your family or class.',
+    avoid: 'Do not choose this only because it sounds powerful; test whether careful digital detective work interests you.',
+  },
+  'cloud-devops-engineer': {
+    subjects: 'Computer Science, Maths, Physics basics',
+    skills: 'systems thinking, troubleshooting, simple web hosting',
+    beginnerActivity: 'Publish one basic webpage and note every step needed to make it work.',
+    avoid: 'Do not rush into advanced tools before basics feel comfortable.',
+  },
+  'ai-automation-builder': {
+    subjects: 'Maths, Computer Science, Physics basics',
+    skills: 'coding basics, automation tools, logical puzzles',
+    beginnerActivity: 'Build one tiny calculator, chatbot, or task checklist using beginner tools.',
+    avoid: 'Do not choose Science only because everyone says AI has money.',
+  },
+  'digital-marketer': {
+    subjects: 'English, Business Studies, Media, Psychology basics',
+    skills: 'writing, simple design, audience observation, storytelling',
+    beginnerActivity: 'Create three posts for a school club and compare which one is clearest.',
+    avoid: 'Do not chase popularity; test whether communication and consistency feel good.',
+  },
+  'business-analyst': {
+    subjects: 'Business Studies, Maths basics, Economics, English',
+    skills: 'planning, process mapping, clear writing, asking why',
+    beginnerActivity: 'Map how one school event is organized from idea to execution.',
+    avoid: 'Do not assume business means only money; test whether organizing problems interests you.',
+  },
+  'founder-freelancer': {
+    subjects: 'Business Studies, English, Economics, Computer Science or design exposure',
+    skills: 'selling, basic budgeting, communication, small experiments',
+    beginnerActivity: 'Interview five people about one everyday problem before building a solution.',
+    avoid: 'Do not overcommit to business before testing demand and family comfort.',
+  },
+  'government-exam-path': {
+    subjects: 'Social Science, English, Maths basics, current affairs',
+    skills: 'reading discipline, note-making, patience, structured study',
+    beginnerActivity: 'Read one current-affairs article and explain it simply to a parent or friend.',
+    avoid: 'Do not decide years of exam preparation in Class 10; first test whether the study style suits you.',
+  },
+  'teaching-mentoring': {
+    subjects: 'Any subject you enjoy explaining, English, Psychology basics',
+    skills: 'explaining, patience, listening, making examples',
+    beginnerActivity: 'Teach one topic to a friend and ask what became clearer.',
+    avoid: 'Do not choose helping roles only because you are kind; test whether teaching gives you energy.',
+  },
+  'design-content': {
+    subjects: 'English, Art/design, Media, language subjects',
+    skills: 'writing, visual thinking, storytelling, consistency',
+    beginnerActivity: 'Make one poster, short article, or explainer video on a topic you like.',
+    avoid: 'Do not confuse liking content with enjoying the work of making it regularly.',
+  },
+  'sales-business-development': {
+    subjects: 'English, Business Studies, Economics, Psychology basics',
+    skills: 'speaking, listening, persuasion, confidence with rejection',
+    beginnerActivity: 'Explain a school event or idea to five people and note their questions.',
+    avoid: 'Do not choose this only for money; test whether people-facing work energizes you.',
+  },
+  'finance-accounting': {
+    subjects: 'Maths, Commerce, Economics, Accountancy basics',
+    skills: 'budgeting, careful calculation, record keeping, patience',
+    beginnerActivity: 'Track a small weekly budget and explain where the money went.',
+    avoid: 'Do not choose Commerce only because it feels safe; test whether money details interest you.',
+  },
+  'healthcare-tech-ops': {
+    subjects: 'Biology, Psychology basics, English, basic data skills',
+    skills: 'careful observation, empathy, organizing, explaining clearly',
+    beginnerActivity: 'Map how a clinic visit works from entry to follow-up using only public observation.',
+    avoid: 'Do not choose health-related paths only due to family pressure; test whether helping in structured settings suits you.',
+  },
+  'legal-tech-business-ops': {
+    subjects: 'Social Science, Political Science basics, English, Economics',
+    skills: 'reading carefully, argument, writing, fairness thinking',
+    beginnerActivity: 'Read one simple news issue and write both sides of the argument.',
+    avoid: 'Do not choose law or policy only because it sounds respected; test whether reading and reasoning feel natural.',
   },
 };
 
@@ -824,7 +946,7 @@ function getStageCopy(stage: StudentStage): CareerResultIntelligence['stageCopy'
       label: STAGE_LABELS[stage],
       heroSubtitle: 'A school-friendly direction map based on your answers. This is not a final career decision.',
       primaryPathLabel: 'Your direction',
-      recommendationFrameLabel: 'CareerOS direction frame',
+      recommendationFrameLabel: 'Your Direction Map',
       topRecommendationsLabel: 'Top 3 directions to explore',
       recommendationItemLabel: 'Direction',
       salaryFootnote: 'For Class 9-10, salary is not the main decision point yet. First test subjects, skills, and real interest before locking into a career label.',
@@ -835,9 +957,9 @@ function getStageCopy(stage: StudentStage): CareerResultIntelligence['stageCopy'
   if (stage === 'class_11_12') {
     return {
       label: STAGE_LABELS[stage],
-      heroSubtitle: 'A stream, course, skill, and career-family map for your next exploration cycle.',
+      heroSubtitle: 'A stream, course, skill, and future-path map for your next exploration cycle.',
       primaryPathLabel: 'Recommended direction',
-      recommendationFrameLabel: 'CareerOS direction frame',
+      recommendationFrameLabel: 'Your Direction Map',
       topRecommendationsLabel: 'Top 3 career families',
       recommendationItemLabel: 'Family',
       salaryFootnote: 'Salary ranges are future India-market context. Actual outcomes depend on course choice, city, skill proof, internships, and experience.',
@@ -895,11 +1017,11 @@ function scoreCandidate(
   }
 
   if (TECH_HEAVY_CANDIDATE_IDS.has(candidate.id) && !hasStrongTechSignal(signals)) {
-    rawScore -= stage === 'class_9_10' ? 26 : 18;
+    rawScore -= stage === 'class_9_10' ? 36 : 18;
   }
 
   if (ADVANCED_ROLE_IDS.has(candidate.id) && stage === 'class_9_10') {
-    rawScore -= 10;
+    rawScore -= 14;
   }
 
   if (
@@ -914,6 +1036,29 @@ function scoreCandidate(
     ['teaching-mentoring', 'sales-business-development', 'ux-researcher', 'healthcare-tech-ops'].includes(candidate.id)
   ) {
     rawScore += 8;
+  }
+
+  if (stage === 'class_9_10') {
+    if (
+      hasAny(signals, ['security', 'stability', 'family_very_strong', 'risk_stable', 'ambiguity_avoid']) &&
+      ['government-exam-path', 'finance-accounting', 'business-analyst', 'teaching-mentoring'].includes(candidate.id)
+    ) {
+      rawScore += 10;
+    }
+
+    if (
+      hasAny(signals, ['social', 'impact', 'purpose', 'collaborative', 'social_one_on_one', 'social_high_collab']) &&
+      ['teaching-mentoring', 'sales-business-development', 'ux-researcher', 'healthcare-tech-ops'].includes(candidate.id)
+    ) {
+      rawScore += 10;
+    }
+
+    if (
+      hasAny(signals, ['creative', 'creativity', 'flexible']) &&
+      ['design-content', 'product-designer', 'digital-marketer'].includes(candidate.id)
+    ) {
+      rawScore += 8;
+    }
   }
 
   return { rawScore, matchedSignals };
@@ -935,7 +1080,7 @@ function stageAdjustedTitle(candidate: CareerCandidate, stage: StudentStage): st
 
 function contextualSalaryRange(baseSalaryRange: string, signals: Set<string>, stage: StudentStage): string {
   if (stage === 'class_9_10') {
-    return 'Salary is not the focus yet; first test subjects, basic skills, and small projects before choosing a stream or career label.';
+    return 'Money can be strong later, but your first task is to test interest and subject fit.';
   }
 
   if (stage === 'class_11_12') {
@@ -1036,17 +1181,23 @@ function buildRecommendation(
       : 'Your answers show an early pattern that needs one practical test before you commit.';
 
   if (stage === 'class_9_10') {
+    const guidance = SCHOOL_EXPLORATION_GUIDANCE[candidate.id];
+
     return {
       id: candidate.id,
       title,
       salaryRange: contextualSalaryRange(candidate.salaryRange, signals, stage),
+      subjectsToExplore: guidance?.subjects,
+      skillsToTry: guidance?.skills,
+      beginnerActivity: guidance?.beginnerActivity,
+      avoidOvercommitting: guidance?.avoid,
       fitScore,
-      whyFits: `This direction matches your current signals without asking you to choose a job title too early. ${candidate.whyFits}`,
-      answerPattern: `${baseAnswerPattern} At Class 9-10, use this as a subject-and-skill clue, not a final decision.`,
-      tradeoff: `Do not overcommit yet. ${contextualTradeoff(candidate.tradeoff, signals)}`,
-      nextStep: `Try a beginner version this week: ${candidate.nextStep} Keep it small enough to finish alongside school.`,
-      avoidIf: `Avoid making this your only plan right now. ${contextualAvoidIf(candidate.avoidIf, signals)}`,
-      indiaContext: `${candidate.indiaContext} For school students, the useful question is which subjects, clubs, projects, and conversations make this direction feel real.`,
+      whyFits: `This direction matches your answers without asking you to choose a final career now.`,
+      answerPattern: `${baseAnswerPattern} At Class 9-10, use this as a clue for subjects, skills, and small experiments.`,
+      tradeoff: guidance?.avoid ?? `Do not overcommit yet. ${contextualTradeoff(candidate.tradeoff, signals)}`,
+      nextStep: guidance?.beginnerActivity ?? `Try one beginner version this week and keep it small enough to finish alongside school.`,
+      avoidIf: guidance?.avoid ?? `Avoid making this your only plan right now.`,
+      indiaContext: `For school students, the useful question is which subjects, clubs, projects, and conversations make this direction feel real.`,
       matchedSignals: labels,
     };
   }
@@ -1090,6 +1241,38 @@ function buildArchetype(signals: Set<string>, top: CareerRecommendation, stage: 
   const schoolSuffix = isSchoolStage(stage)
     ? ' For your stage, this should become small experiments, subject choices, and conversations before any final career decision.'
     : '';
+
+  if (stage === 'class_9_10') {
+    if (hasAny(signals, ['independence', 'creativity', 'practical', 'remote'])) {
+      return {
+        name: 'The Curious Builder',
+        description: `You seem to learn by making, trying, and improving things. Start with small projects before choosing a stream.`,
+        match: Math.min(96, Math.max(86, top.fitScore)),
+      };
+    }
+
+    if (hasAny(signals, ['security', 'stability', 'structured'])) {
+      return {
+        name: 'The Careful Planner',
+        description: `You seem to like clear steps, stable options, and choices you can explain to family. Test subjects and routines before deciding.`,
+        match: Math.min(95, Math.max(84, top.fitScore)),
+      };
+    }
+
+    if (hasAny(signals, ['impact', 'social', 'purpose', 'collaborative'])) {
+      return {
+        name: 'The People Helper',
+        description: `You seem interested in understanding or helping people. Test this with simple teaching, communication, or service activities.`,
+        match: Math.min(94, Math.max(84, top.fitScore)),
+      };
+    }
+
+    return {
+      name: 'The Exploring Student',
+      description: `Your answers show a few possible directions. Use the next week to test what feels interesting, boring, or natural.`,
+      match: Math.min(92, Math.max(80, top.fitScore)),
+    };
+  }
 
   if (hasAny(signals, ['independence', 'creativity', 'practical', 'remote'])) {
     return {

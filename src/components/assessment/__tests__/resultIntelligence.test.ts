@@ -182,6 +182,78 @@ describe('generateCareerResultIntelligence', () => {
     expect(result.stageCopy.schoolDecisionReminder).toContain('not a final career decision');
   });
 
+  it('keeps Class 9-10 primary recommendations salary-light and exploration focused', () => {
+    const result = generateCareerResultIntelligence(createPersona({
+      motivations: ['security'],
+      strengths: ['organizing', 'analytical'],
+      personalityTraits: ['structured'],
+      values: ['stability'],
+      financialPressure: ['explore_longer'],
+      familyExpectations: ['family_very_strong'],
+      riskTolerance: ['risk_stable'],
+      academicConfidence: ['academic_steady'],
+      skillReadiness: ['proof_starting'],
+    }, 'class_9_10'));
+    const serializedRecommendations = JSON.stringify(result.recommendations);
+
+    expect(result.stageCopy.recommendationFrameLabel).toBe('Your Direction Map');
+    expect(result.stageCopy.topRecommendationsLabel).toBe('Top 3 directions to explore');
+    expect(serializedRecommendations).not.toContain('₹');
+    expect(serializedRecommendations).not.toContain('LPA');
+    expect(serializedRecommendations).not.toContain('Automation, No-Code');
+    expect(serializedRecommendations).not.toContain('Government Exam Path');
+    expect(serializedRecommendations).not.toContain('Finance / Accounting Path');
+
+    for (const recommendation of result.recommendations) {
+      expect(recommendation.subjectsToExplore).toBeTruthy();
+      expect(recommendation.skillsToTry).toBeTruthy();
+      expect(recommendation.beginnerActivity).toBeTruthy();
+      expect(recommendation.avoidOvercommitting).toBeTruthy();
+      expect(recommendation.salaryRange).toBe('Money can be strong later, but your first task is to test interest and subject fit.');
+    }
+  });
+
+  it('shows Class 11-12 stream and course framing without turning into final job advice', () => {
+    const result = generateCareerResultIntelligence(createPersona({
+      motivations: ['impact'],
+      strengths: ['social', 'organizing'],
+      personalityTraits: ['collaborative'],
+      values: ['purpose'],
+      socialEnergy: ['social_one_on_one'],
+      skillReadiness: ['proof_coursework'],
+    }, 'class_11_12'));
+
+    expect(result.stageCopy.heroSubtitle).toContain('stream');
+    expect(result.stageCopy.heroSubtitle).toContain('course');
+    expect(result.recommendations[0].nextStep).toContain('90 days');
+    expect(result.recommendations[0].salaryRange).toContain('Future India salary context');
+    expect(result.summary.whatNotIgnore).toContain('stream and course fit');
+  });
+
+  it('produces different non-tech school directions for different school personas', () => {
+    const stableSchool = generateCareerResultIntelligence(createPersona({
+      motivations: ['security'],
+      strengths: ['organizing'],
+      values: ['stability'],
+      familyExpectations: ['family_very_strong'],
+      riskTolerance: ['risk_stable'],
+      socialEnergy: ['social_solo'],
+    }, 'class_9_10'));
+    const peopleSchool = generateCareerResultIntelligence(createPersona({
+      motivations: ['impact'],
+      strengths: ['social'],
+      personalityTraits: ['collaborative'],
+      values: ['purpose'],
+      familyExpectations: ['family_somewhat'],
+      socialEnergy: ['social_one_on_one'],
+    }, 'class_9_10'));
+
+    expect(stableSchool.recommendations[0].title).not.toBe(peopleSchool.recommendations[0].title);
+    expect(stableSchool.recommendations.map((career) => career.title)).toContain('Stable Public-Service Direction');
+    expect(peopleSchool.recommendations.map((career) => career.title)).toContain('Teaching + Helping Direction');
+    expect(peopleSchool.recommendations.map((career) => career.title)).not.toContain('Technology + Problem Solving Direction');
+  });
+
   it('allows a college builder to receive tech recommendations when the signals justify it', () => {
     const result = generateCareerResultIntelligence(builderPersona);
     const titles = result.recommendations.map((career) => career.title);
